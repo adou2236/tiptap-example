@@ -1,13 +1,13 @@
 <template>
   <div>
-    占位数据:<input v-model="viewText"/><br/>
-    标签类型:
-    <select v-model="type">
+<!--    占位数据:<input v-model="viewText"/><br/>-->
+
+    标签类型：<select v-model="type">
       <option value ="string">常量标签</option>
       <option value ="formula">公式标签</option>
       <option value="request">函数标签</option>
     </select><br/>
-    内部数据:<input v-model="index"/>
+    内部数据：<input v-model="index"/>
   </div>
 </template>
 

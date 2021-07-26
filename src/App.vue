@@ -1,86 +1,19 @@
 <template>
   <div>
-    <div v-if="editor">
-      <button @click="editor.chain().focus().setFontColor('#958DF1').run()" :class="{ 'is-active': editor.isActive('textStyle', { fontColor: '#958DF1' })}">
-        设置颜色
-      </button>
-      <button @click="editor.chain().focus().setFontFamily('serif').run()" :class="{ 'is-active': editor.isActive('textStyle', { fontFamily: 'serif' }) }">
-        字体
-      </button>
-      <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }">
-        加粗
-      </button>
-      <button @click="editor.chain().focus().toggleItalic().run()" :class="{ 'is-active': editor.isActive('italic') }">
-        斜体
-      </button>
-      <button @click="editor.chain().focus().toggleStrike().run()" :class="{ 'is-active': editor.isActive('strike') }">
-        横线
-      </button>
-      <button @click="editor.chain().focus().toggleUnderline().run()" :class="{ 'is-active': editor.isActive('underline') }">
-        下划线
-      </button>
-      <button @click="editor.chain().focus().toggleCode().run()" :class="{ 'is-active': editor.isActive('code') }">
-        代码
-      </button>
-      <button @click="editor.chain().focus().unsetAllMarks().run()">
-        清除样式
-      </button>
-      <button @click="editor.chain().focus().clearNodes().run()">
-        clear nodes
-      </button>
-      <button @click="editor.chain().focus().setParagraph().run()" :class="{ 'is-active': editor.isActive('paragraph') }">
-        paragraph
-      </button>
-      <button @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }">
-        h1
-      </button>
-      <button @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }">
-        h2
-      </button>
-      <button @click="editor.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }">
-        h3
-      </button>
-      <button @click="editor.chain().focus().toggleHeading({ level: 4 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 4 }) }">
-        h4
-      </button>
-      <button @click="editor.chain().focus().toggleHeading({ level: 5 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 5 }) }">
-        h5
-      </button>
-      <button @click="editor.chain().focus().toggleHeading({ level: 6 }).run()" :class="{ 'is-active': editor.isActive('heading', { level: 6 }) }">
-        h6
-      </button>
-      <button @click="editor.chain().focus().toggleBulletList().run()" :class="{ 'is-active': editor.isActive('bulletList') }">
-        列表
-      </button>
-      <button @click="editor.chain().focus().toggleOrderedList().run()" :class="{ 'is-active': editor.isActive('orderedList') }">
-        数字列表
-      </button>
-      <button @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ 'is-active': editor.isActive('codeBlock') }">
-        代码块
-      </button>
-      <button @click="editor.chain().focus().toggleBlockquote().run()" :class="{ 'is-active': editor.isActive('blockquote') }">
-        引用块
-      </button>
-      <button @click="editor.chain().focus().setHorizontalRule().run()">
-        水平分割线
-      </button>
-      <button @click="editor.chain().focus().setHardBreak().run()">
-        强制换行
-      </button>
-      <button @click="editor.chain().focus().undo().run()">
-        撤销
-      </button>
-      <button @click="editor.chain().focus().redo().run()">
-        反撤销
-      </button>
-    </div>
-    <div style="display: flex">
-      <div style="width: 20%">插入对象工具栏</div>
-      <editor-content class="editor-content" :editor="editor"/>
+    <menu-bar v-if="editor" class="menu-bar" :editor="editor" />
+    <div style="display: flex;margin-top: 20px">
+      <object-selector style="width: 20%"
+                       :editor="editor"
+                       :objects="tools"
+                       @lineInsert="handleAddLine"
+                       @tagInsert="handleAppendTag"
+      ></object-selector>
+      <div class="editor-content">
+        <editor-content :editor="editor"/>
+        <div class="new-line" @click="handleAddLine(true)">+</div>
+      </div>
       <object-editor style="width: 20%" :current-object="selectNode"></object-editor>
     </div>
-    <div @click="handleAppendLine">添加新的一行</div>
-    <div @click="handleAppendTag">添加占位符</div>
     <div style="font-family: serif" @click="handleClick">JSON输出</div>
     <div style="font-family: serif" @click="handleClick2">html输出</div>
   </div>
@@ -97,23 +30,28 @@ import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 import FontFamily from '@tiptap/extension-font-family'
 import FontColor from './tools/font-color/font-color'
-import CustomerTag from './tools/font-color/customerTag/Extension'
-import ContentBox from "./tools/font-color/contentBox/Extension";
+import FontSize from './tools/font-size/font-size'
+import CustomerTag from './tools/customerTag/Extension'
+import ContentBox from "./tools/contentBox/Extension";
 import Focus from '@tiptap/extension-focus'
+import MenuBar from './components/MenuBar/MenuBar'
 import ObjectEditor from "./components/objectEditor";
+import ObjectSelector from "./components/objectSelector";
 
 export default {
   components: {
+    ObjectSelector,
     ObjectEditor,
+    MenuBar,
     EditorContent,
   },
 
   data() {
     return {
       editor:null,
-      editors: [],
       selectNode:null,
-      json: {
+      selectParagraph:null,
+      json:{
         "type":"doc",
         "content":[
           {
@@ -133,6 +71,15 @@ export default {
                 "content":[
                   {
                     "type":"text",
+                    "marks":[
+                      {
+                        "type":"textStyle",
+                        "attrs":{
+                          "fontFamily":null,
+                          "fontColor":"red"
+                        }
+                      }
+                    ],
                     "text":"第二段"
                   }
                 ]
@@ -194,7 +141,11 @@ export default {
             ]
           }
         ]
-      }
+      },
+      tools:[
+        {id:'line',name:'插入段落'},
+        {id:'tag',name:'插入文本'},
+      ]
     }
   },
 
@@ -211,6 +162,7 @@ export default {
         FontFamily,
         Underline,
         FontColor,
+        FontSize,
         CustomerTag,
         ContentBox,
         Focus.configure({
@@ -223,8 +175,11 @@ export default {
       onFocus({ editor, event }) {
         that.handleFocus(editor,event)
       },
-      getObject(v){
+      getTag(v){
         that.selectNode = v
+      },
+      getParagraph(v){
+        that.selectParagraph = v
       }
     })
 
@@ -234,18 +189,23 @@ export default {
     this.editor.destroy()
   },
   methods:{
-    handleAppendLine(){
-      // const {size} = this.editor.view.state.doc.content
-      // const transaction = this.editor.state.tr.insertText('content-box', size )
-      // this.editor.view.dispatch(transaction)
-      this.editor.commands.focus('end')
-      this.editor.commands.insertContent({
+    handleSelect(){
+
+    },
+    handleAddLine(append=false){
+      let position = this.editor.getCharacterCount()+2
+      if(this.selectParagraph&&!append){
+        position = this.selectParagraph.getPos() + this.selectParagraph.node.nodeSize
+      }
+      console.log(position)
+      this.editor.commands.insertContentAt(position,{
         "type":"contentBox",
         "content":[{
           "type":"paragraph",
           "content":[]
         }]
       })
+
     },
     handleAppendTag(){
       let type = prompt("输入标签类型",)
@@ -280,18 +240,33 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.menu-bar{
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  padding: 0.25rem;
+  border-bottom: 3px solid #0D0D0D;
+}
 .editor-content{
   width: 60%;
   margin: auto;
   margin-bottom: 10px;
   /deep/.ProseMirror{
-    padding: 15px;
     &:focus-visible{
       outline: none;
     }
   }
+  .new-line{
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px dashed black;
+    box-sizing: border-box;
+  }
 }
-.ProseMirror {
+/deep/.ProseMirror {
   > * + * {
     margin-top: 0.75em;
   }
@@ -363,4 +338,6 @@ pre {
   }
 }
 
+</style>
+<style>
 </style>

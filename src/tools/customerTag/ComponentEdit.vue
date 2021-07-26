@@ -1,6 +1,6 @@
 <template>
   <node-view-wrapper class="vue-component">
-    <span @click="tagClick"><node-view-content class="content" :class="[node.attrs.type]"/></span>
+    <span @click="handleClick"><node-view-content class="content" :class="[node.attrs.type]"/></span>
   </node-view-wrapper>
 </template>
 
@@ -18,8 +18,8 @@ export default Vue.extend({
   },
 
   methods: {
-    tagClick(){
-      this.editor.options.getObject(this)
+    handleClick(){
+      this.editor.options.getTag(this)
     }
 
   },

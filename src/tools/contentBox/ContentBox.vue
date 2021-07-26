@@ -1,6 +1,6 @@
 <template>
   <node-view-wrapper class="outter-content">
-    <node-view-content class="content"/>
+    <div @click="handleClick"><node-view-content  class="content"/></div>
     <div @click="handleDelete" class="delete-icon">删除</div>
   </node-view-wrapper>
 </template>
@@ -30,8 +30,12 @@ export default Vue.extend({
     },
   },
   mounted() {
+    console.log(this)
   },
   methods: {
+    handleClick(){
+      this.editor.options.getParagraph(this)
+    },
     handleDelete(){
       this.deleteNode()
     }
@@ -42,14 +46,16 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .outter-content{
   position: relative;
+  &.focus{
+    .content{
+      border: 1px solid blueviolet;
+    }
+  }
   .content {
     padding: 10px;
     margin-bottom: 10px;
     border: 1px dashed black;
 
-  }
-  &.focus>.content{
-    border: 1px solid blueviolet;
   }
   &:hover{
     .delete-icon{

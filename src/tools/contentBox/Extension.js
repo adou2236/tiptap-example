@@ -14,23 +14,11 @@ export default Node.create({
     //添加里字段
     addAttributes() {
         return {
-            // isFocused:{
-            //     default: false
-            // }
-            // index: {
-            //     default: 'none',
-            //     require: true
-            // }
-
         }
     },
 
     parseHTML() {
-        return [
-            {
-                tag: 'div',
-            },
-        ]
+        return [{tag: 'div'}]
     },
 
     renderHTML({ HTMLAttributes }) {

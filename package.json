@@ -20,8 +20,10 @@
     "@tiptap/vue-2": "^2.0.0-beta.39",
     "core-js": "^3.6.5",
     "node-sass": "^4.14.1",
+    "remixicon": "^2.5.0",
     "scss": "^0.2.4",
     "scss-loader": "^0.0.1",
+    "vcolorpicker": "^1.1.0",
     "vue": "^2.6.11"
   },
   "devDependencies": {
