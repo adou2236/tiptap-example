@@ -14,8 +14,10 @@
       </div>
       <object-editor style="width: 20%" :current-object="selectNode"></object-editor>
     </div>
-    <div style="font-family: serif" @click="handleClick">JSON输出</div>
-    <div style="font-family: serif" @click="handleClick2">html输出</div>
+    <div @click="handleClick">JSON输出</div>
+    <div @click="handleClick2">html输出</div>
+<!--    <div @click="onlyShow">预览模式</div>-->
+    <my-dialog v-model="dialogVisible" :content="dialogContent" :type="dialogType"></my-dialog>
   </div>
 </template>
 
@@ -28,7 +30,12 @@ import Text from '@tiptap/extension-text'
 import CodeBlock from '@tiptap/extension-code-block'
 import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
+import TextAlign from '@tiptap/extension-text-align'
 import FontFamily from '@tiptap/extension-font-family'
+import Table from '@tiptap/extension-table'
+import TableRow from '@tiptap/extension-table-row'
+import TableHeader from '@tiptap/extension-table-header'
+import TableCell from './tools/table-cell'
 import FontColor from './tools/font-color/font-color'
 import FontSize from './tools/font-size/font-size'
 import CustomerTag from './tools/customerTag/Extension'
@@ -37,6 +44,8 @@ import Focus from '@tiptap/extension-focus'
 import MenuBar from './components/MenuBar/MenuBar'
 import ObjectEditor from "./components/objectEditor";
 import ObjectSelector from "./components/objectSelector";
+import myDialog from "./components/Dialog"
+
 
 export default {
   components: {
@@ -44,10 +53,12 @@ export default {
     ObjectEditor,
     MenuBar,
     EditorContent,
+    myDialog
   },
 
   data() {
     return {
+      value:'',
       editor:null,
       selectNode:null,
       selectParagraph:null,
@@ -59,6 +70,9 @@ export default {
             "content":[
               {
                 "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
+                },
                 "content":[
                   {
                     "type":"text",
@@ -68,6 +82,9 @@ export default {
               },
               {
                 "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
+                },
                 "content":[
                   {
                     "type":"text",
@@ -76,7 +93,8 @@ export default {
                         "type":"textStyle",
                         "attrs":{
                           "fontFamily":null,
-                          "fontColor":"red"
+                          "fontColor":"red",
+                          "fontSize":null
                         }
                       }
                     ],
@@ -86,6 +104,9 @@ export default {
               },
               {
                 "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
+                },
                 "content":[
                   {
                     "type":"text",
@@ -100,6 +121,9 @@ export default {
             "content":[
               {
                 "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
+                },
                 "content":[
                   {
                     "type":"text",
@@ -109,6 +133,9 @@ export default {
               },
               {
                 "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
+                },
                 "content":[
                   {
                     "type":"text",
@@ -118,6 +145,9 @@ export default {
               },
               {
                 "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
+                },
                 "content":[
                   {
                     "type":"text",
@@ -145,14 +175,8 @@ export default {
       tools:[
         {id:'line',name:'插入段落'},
         {id:'tag',name:'插入文本'},
-      ]
-    }
-  },
-
-  mounted() {
-    let that = this
-    this.editor = new Editor({
-      extensions: [
+      ],
+      defaultProps:[
         StarterKit,
         Document,
         Paragraph,
@@ -165,13 +189,38 @@ export default {
         FontSize,
         CustomerTag,
         ContentBox,
+        TextAlign.configure({
+          types: ['heading', 'paragraph'],
+        }),
         Focus.configure({
           className: 'focus',
           mode: 'shallowest',
         }),
+        Table.configure({
+          resizable: true,
+        }),
+        TableRow,
+        TableHeader,
+        TableCell
       ],
+      dialogVisible:false,
+      dialogContent:'',
+      dialogType:'string',
+    }
+  },
+
+  mounted() {
+    let that = this
+    this.editor = new Editor({
+      extensions: this.defaultProps,
       content: this.json,
       editable: true,
+      onCreate(){
+        console.log("初始化")
+      },
+      onUpdate(){
+        console.log("数据更新")
+      },
       onFocus({ editor, event }) {
         that.handleFocus(editor,event)
       },
@@ -180,7 +229,7 @@ export default {
       },
       getParagraph(v){
         that.selectParagraph = v
-      }
+      },
     })
 
   },
@@ -208,33 +257,38 @@ export default {
 
     },
     handleAppendTag(){
-      let type = prompt("输入标签类型",)
       let text = prompt("输入占位字符",)
-      if(type){
-        this.editor.commands.insertContent({
-          "type":"customerTag",
-          "attrs":{
-            "type":type,
-            "index":"economic"
-          },
-          "content":[
-            {
-              "type":"text",
-              "text":text
-            }
-          ]
-        })
-      }
+      this.editor.commands.insertContent({
+        "type":"customerTag",
+        "attrs":{
+          "type":"string",
+          "index":"economic"
+        },
+        "content":[
+          {
+            "type":"text",
+            "text":text
+          }
+        ]
+      })
 
     },
     handleFocus(v){
       this.editor = v
     },
     handleClick(){
-      console.log(JSON.stringify(this.editor.getJSON()))
+      this.dialogType = 'string'
+      this.dialogContent = this.editor.getJSON()
+      this.dialogVisible = true
     },
     handleClick2(){
-      console.log(JSON.stringify(this.editor.getHTML()))
+      this.dialogType = 'dom'
+      this.dialogContent = this.editor.getHTML()
+      this.dialogVisible = true
+    },
+    onlyShow(){
+      this.dialogContent = this.editor.getHTML()
+      this.dialogVisible = true
     }
   }
 }
@@ -275,6 +329,9 @@ export default {
   ul,
   ol {
     padding: 0 1rem;
+  }
+  p {
+    margin: 0;
   }
 
   h1,
@@ -336,6 +393,63 @@ pre {
     background: none;
     font-size: 0.8rem;
   }
+}
+/deep/.ProseMirror {
+  table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+
+    td,
+    th {
+      min-width: 1em;
+      border: 2px solid #ced4da;
+      padding: 3px 5px;
+      vertical-align: top;
+      box-sizing: border-box;
+      position: relative;
+
+      > * {
+        margin-bottom: 0;
+      }
+    }
+
+    th {
+      font-weight: bold;
+      text-align: left;
+      background-color: #f1f3f5;
+    }
+
+    .selectedCell:after {
+      z-index: 2;
+      position: absolute;
+      content: "";
+      left: 0; right: 0; top: 0; bottom: 0;
+      background: rgba(200, 200, 255, 0.4);
+      pointer-events: none;
+    }
+
+    .column-resize-handle {
+      position: absolute;
+      right: -2px;
+      top: 0;
+      bottom: -2px;
+      width: 4px;
+      background-color: #adf;
+      pointer-events: none;
+    }
+  }
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
 }
 
 </style>

@@ -18,11 +18,11 @@ export default Node.create({
     },
 
     parseHTML() {
-        return [{tag: 'div'}]
+        return [{tag: 'content-box'}]
     },
 
-    renderHTML({ HTMLAttributes }) {
-        return ['div', mergeAttributes(HTMLAttributes)]
+    renderHTML({HTMLAttributes}) {
+        return ['div', mergeAttributes(HTMLAttributes),0]
     },
 
     addNodeView() {

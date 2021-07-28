@@ -12,6 +12,7 @@ import MenuItem from './MenuItem.vue'
 import ColorPicker from "./ColorPicker";
 import FontSizePicker from "./FontSizePicker"
 import FontFamilyPicker from "./FontFamilyPicker";
+import TableSelector from './TableSelector'
 
 export default {
   components: {
@@ -81,7 +82,7 @@ export default {
           title: '颜色',
           selector: true,
           components: ColorPicker,
-          options:['red','blue'],
+          options:['red','blue','black','pink'],
           action: (param) => this.editor.chain().focus().setFontColor(param).run(),
           isActive: () => this.editor.getAttributes("textStyle").fontColor,
         },
@@ -93,6 +94,33 @@ export default {
           options:['12px','13px','14px','15px','16px','17px','18px','19px','20px'],
           action: (param) => this.editor.chain().focus().setFontSize(param).run(),
           isActive: () => this.editor.getAttributes("textStyle").fontSize,
+        },
+        {
+          type: 'divider',
+        },
+        {
+          icon: 'align-left',
+          title: '左对齐',
+          action: () => this.editor.chain().focus().setTextAlign('left').run(),
+          isActive: () => this.editor.isActive({ textAlign: 'left' }),
+        },
+        {
+          icon: 'align-center',
+          title: '居中对齐',
+          action: () => this.editor.chain().focus().setTextAlign('center').run(),
+          isActive: () => this.editor.isActive({ textAlign: 'center' }),
+        },
+        {
+          icon: 'align-right',
+          title: '右对齐',
+          action: () => this.editor.chain().focus().setTextAlign('right').run(),
+          isActive: () => this.editor.isActive({ textAlign: 'right' }),
+        },
+        {
+          icon: 'align-justify',
+          title: '两端对齐',
+          action: () => this.editor.chain().focus().setTextAlign('justify').run(),
+          isActive: () => this.editor.isActive({ textAlign: 'justify' }),
         },
         {
           type: 'divider',
@@ -132,6 +160,18 @@ export default {
           title: '代码块',
           action: () => this.editor.chain().focus().toggleCodeBlock().run(),
           isActive: () => this.editor.isActive('codeBlock'),
+        },
+        {
+          type: 'divider',
+        },
+        {
+          icon: 'layout-grid-line',
+          title: '表格',
+          selector: true,
+          components: TableSelector,
+          action: ({row,col}) => {
+            this.editor.chain().focus().insertTable({rows:row,cols:col,withHeaderRow: false}).run()
+          },
         },
         {
           type: 'divider',

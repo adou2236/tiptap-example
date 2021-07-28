@@ -8,7 +8,7 @@ export default Node.create({
     inline: true,
     content: 'text*',
     selectable: true,
-    draggable: true,
+    draggable: false,
 
     //添加里字段
     addAttributes() {
@@ -33,7 +33,7 @@ export default Node.create({
     },
 
     renderHTML({ HTMLAttributes }) {
-        return ['customer-tag', mergeAttributes(HTMLAttributes)]
+        return ['span', mergeAttributes(HTMLAttributes),0]
     },
 
     addNodeView() {

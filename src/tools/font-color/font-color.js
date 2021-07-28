@@ -22,7 +22,6 @@ const FontColor = Extension.create({
                             };
                         },
                         parseHTML: element => {
-                            console.log('FOO', element.style)
                             return {
                                 fontColor: element.style.color.replace(/['"]+/g, ''),
                             }

@@ -21,16 +21,9 @@ export default Vue.extend({
     }
   },
   watch:{
-    selected(newValue) {
-      if (newValue) {
-        console.log("聚焦")
-      } else {
-        console.log("失去焦点")
-      }
-    },
   },
   mounted() {
-    console.log(this)
+    // console.log(this)
   },
   methods: {
     handleClick(){
@@ -68,7 +61,6 @@ export default Vue.extend({
     right: 0;
     top: 0;
   }
-
 }
 
 

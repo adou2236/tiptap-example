@@ -1,37 +1,30 @@
 <template>
   <div style="position: relative">
     <button class="color-block" @click.stop="showPicker">
-      <svg class="remix" :style="`fill:${isActive()}`">
-        <use :xlink:href="require('remixicon/fonts/remixicon.symbol.svg') + `#ri-font-size`" />
+      <svg class="remix">
+        <use :xlink:href="require('remixicon/fonts/remixicon.symbol.svg') + `#ri-layout-grid-line`" />
       </svg>
     </button>
-    <div class="select-pane" v-if="visible">
-      <div class="select-item" v-for="(item,index) in options"
-           :key="index"
-           :class="isActive()===item?'is-active':''"
-           @click="handleClick(item)">{{ item }}</div>
-
+    <div class="select-pane" v-if="visible" @click="setTable" @mouseleave="changeCell(0,0)">
+      <div class="row" v-for="row in maxRows" :key="row">
+        <span class="cell" v-for="col in maxCols" :id="`${row}-${col}`" :key="`${row}-${col}`" @mouseover="changeCell(row,col)"
+              :class="row<=selectedRow&&col<=selectedCol?'color-cell':''"
+        />
+      </div>
     </div>
   </div>
 
 </template>
 
 <script>
-
 export default {
-  name: "ColorPicker",
-  props:{
-    isActive:{
-      type: Function,
-      default: null,
-    },
-    options:{
-      type:Array,
-      default: ()=>['12px','13px','14px','15px','16px','17px','18px','19px','20px']
-    }
-  },
+  name: "TableSelector",
   data(){
     return{
+      maxCols:10,
+      maxRows:10,
+      selectedRow:0,
+      selectedCol:0,
       visible:false
     }
   },
@@ -42,6 +35,18 @@ export default {
     window.removeEventListener('click',this.hidePicker)
   },
   methods:{
+    setTable(){
+      if(this.selectedRow&&this.selectedCol){
+        let params = {
+          row:this.selectedRow,col:this.selectedCol
+        }
+        this.$emit('action',params)
+      }
+    },
+    changeCell(row,col){
+      this.selectedRow = row
+      this.selectedCol = col
+    },
     handleClick(item){
       this.$emit('action',item)
     },
@@ -99,18 +104,33 @@ export default {
   top: 1.75rem;
   border-radius: 0.5rem;
   left: 0;
-  width: 10rem;
-  flex-wrap: wrap;
+  padding: 0.25rem;
   z-index: 100;
-  .select-item{
-    cursor: pointer;
-    box-sizing: border-box;
-    &.is-active,
-    &:hover{
-      background: #0D0D0D;
-      color: #FFFFFF;
+  width: auto;
+  .row{
+    display: flex;
+    flex-wrap: nowrap;
+    //&:nth-child(10n+10){
+    //  .cell{
+    //    border-bottom: 1px solid black;
+    //  }
+    //}
+    .cell{
+      width: 1rem;
+      height: 1rem;
+      border: 1px solid black;
+      //border-bottom: none;
+      //border-right: none;
+      &.color-cell{
+        border-color: red;
+      }
+      //&:nth-child(10n+10){
+      //  border-right: 1px solid black;
+      //}
     }
   }
+
 }
 
 </style>
+
