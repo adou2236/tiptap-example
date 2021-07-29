@@ -1,19 +1,17 @@
 <template>
-  <div class="dialog" v-show="visible" >
-    <div v-if="type === 'string'" class="content">
-      <pre>
-        {{content}}
-      </pre>
-    </div>
-    <div v-else-if="type === 'dom'" class="content" v-html="content">
-    </div>
+  <div class="dialog content" v-show="visible" >
+    <slot class="content"></slot>
     <div class="close" @click="close">X</div>
   </div>
 </template>
 
 <script>
+import imageUpload from "./imageUpload";
 export default {
   name: "index",
+  components:{
+    imageUpload
+  },
   model:{
     prop:'visible',
     event:'change'
@@ -39,7 +37,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .dialog{
   position: absolute;
   width: 80vw;
@@ -61,6 +59,39 @@ export default {
 .content{
   height: 100%;
   overflow: scroll;
-}
 
+
+}
 </style>
+<style scoped>
+.content >>> p{
+  margin: 0;
+}
+.content >>> table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+.content >>> td, th {
+  min-width: 1em;
+  border: 2px solid #ced4da;
+  padding: 3px 5px;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+.content >>>  th {
+  min-width: 1em;
+  border: 2px solid #ced4da;
+  padding: 3px 5px;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+  font-weight: bold;
+  text-align: left;
+  background-color: #f1f3f5;
+}
+</style>
+

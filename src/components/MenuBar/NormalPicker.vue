@@ -2,15 +2,14 @@
   <div style="position: relative">
     <button class="color-block" @click.stop="showPicker">
       <svg class="remix" :style="`fill:${isActive()}`">
-        <use :xlink:href="require('remixicon/fonts/remixicon.symbol.svg') + `#ri-font-size`" />
+        <use :xlink:href="require('remixicon/fonts/remixicon.symbol.svg') + `#ri-${icon}`" />
       </svg>
     </button>
     <div class="select-pane" v-if="visible">
       <div class="select-item" v-for="(item,index) in options"
            :key="index"
-           :class="isActive()===item?'is-active':''"
-           @click="handleClick(item)">{{ item }}</div>
-
+           :class="isActive()===item.id?'is-active':''"
+           @click="handleClick(item.id)">{{ item.label }}</div>
     </div>
   </div>
 
@@ -19,15 +18,19 @@
 <script>
 
 export default {
-  name: "ColorPicker",
+  name: "NormalPicker",
   props:{
     isActive:{
       type: Function,
       default: null,
     },
+    icon:{
+      type:String
+    },
     options:{
       type:Array,
-      default: ()=>['12px','13px','14px','15px','16px','17px','18px','19px','20px']
+      default: ()=>[
+      ]
     }
   },
   data(){

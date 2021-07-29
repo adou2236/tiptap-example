@@ -26,6 +26,12 @@ export default {
         case 'tag':
           this.$emit("tagInsert");
           break
+        case 'image':
+          this.$emit("imageInsert");
+          break
+        case 'chart':
+          this.$emit('chartInsert');
+          break
         default:
           return
 

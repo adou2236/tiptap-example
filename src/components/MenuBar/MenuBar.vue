@@ -10,8 +10,7 @@
 <script>
 import MenuItem from './MenuItem.vue'
 import ColorPicker from "./ColorPicker";
-import FontSizePicker from "./FontSizePicker"
-import FontFamilyPicker from "./FontFamilyPicker";
+import NormalPicker from "./NormalPicker"
 import TableSelector from './TableSelector'
 
 export default {
@@ -54,10 +53,10 @@ export default {
           isActive: () => this.editor.isActive('underline'),
         },
         {
-          icon: 'font-family',
+          icon: 'emphasis-cn',
           title: '字体',
           selector: true,
-          components: FontFamilyPicker,
+          components: NormalPicker,
           options:[
             {label:"隶书", id:"LiSu"},
             {label:"幼圆", id:"YouYuan"},
@@ -90,8 +89,18 @@ export default {
           icon: 'font-size',
           title: '字号',
           selector: true,
-          components: FontSizePicker,
-          options:['12px','13px','14px','15px','16px','17px','18px','19px','20px'],
+          components: NormalPicker,
+          options:[
+            {id:'12px',label:'12'},
+            {id:'13px',label:'13'},
+            {id:'14px',label:'14'},
+            {id:'15px',label:'15'},
+            {id:'16px',label:'16'},
+            {id:'17px',label:'17'},
+            {id:'18px',label:'18'},
+            {id:'19px',label:'19'},
+            {id:'20px',label:'20'},
+          ],
           action: (param) => this.editor.chain().focus().setFontSize(param).run(),
           isActive: () => this.editor.getAttributes("textStyle").fontSize,
         },
@@ -138,6 +147,24 @@ export default {
           isActive: () => this.editor.isActive('heading', { level: 2 }),
         },
         {
+          icon: 'h-3',
+          title: '标题3',
+          action: () => this.editor.chain().focus().toggleHeading({ level: 3 }).run(),
+          isActive: () => this.editor.isActive('heading', { level: 3 }),
+        },
+        {
+          icon: 'h-4',
+          title: '标题4',
+          action: () => this.editor.chain().focus().toggleHeading({ level: 4 }).run(),
+          isActive: () => this.editor.isActive('heading', { level: 4 }),
+        },
+        {
+          icon: 'h-5',
+          title: '标题5',
+          action: () => this.editor.chain().focus().toggleHeading({ level: 5 }).run(),
+          isActive: () => this.editor.isActive('heading', { level: 5 }),
+        },
+        {
           icon: 'paragraph',
           title: '正文',
           action: () => this.editor.chain().focus().setParagraph().run(),
@@ -172,6 +199,25 @@ export default {
           action: ({row,col}) => {
             this.editor.chain().focus().insertTable({rows:row,cols:col,withHeaderRow: false}).run()
           },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          icon: 'line-height',
+          title: '行间距',
+          selector: true,
+          components: NormalPicker,
+          options:[
+            {id:'1em',label:'1'},
+            {id:'1.15em',label:'1.15'},
+            {id:'1.5em',label:'1.5'},
+            {id:'2em',label:'2'},
+            {id:'2.5em',label:'2.5'},
+            {id:'3em',label:'3'},
+          ],
+          action: (param) => this.editor.chain().focus().setLineHeight(param).run(),
+          isActive: () => this.editor.getAttributes("textStyle").lineHeight,
         },
         {
           type: 'divider',

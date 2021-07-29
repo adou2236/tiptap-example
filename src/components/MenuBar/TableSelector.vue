@@ -118,6 +118,7 @@ export default {
     .cell{
       width: 1rem;
       height: 1rem;
+      margin: 2px;
       border: 1px solid black;
       //border-bottom: none;
       //border-right: none;

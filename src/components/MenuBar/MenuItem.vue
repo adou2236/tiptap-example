@@ -1,6 +1,6 @@
 <template>
   <div v-if="selector">
-    <component :is="components" :options="options" :isActive="isActive" @action="action"/>
+    <component :is="components" :options="options" :icon="icon" :isActive="isActive" @action="action"/>
   </div>
   <div v-else>
     <button

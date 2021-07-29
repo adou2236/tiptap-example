@@ -1,12 +1,14 @@
 <template>
   <div>
     <menu-bar v-if="editor" class="menu-bar" :editor="editor" />
+    <table-menu :editor="editor"></table-menu>
     <div style="display: flex;margin-top: 20px">
       <object-selector style="width: 20%"
                        :editor="editor"
                        :objects="tools"
                        @lineInsert="handleAddLine"
                        @tagInsert="handleAppendTag"
+                       @imageInsert="handleInsertImage"
       ></object-selector>
       <div class="editor-content">
         <editor-content :editor="editor"/>
@@ -16,13 +18,20 @@
     </div>
     <div @click="handleClick">JSON输出</div>
     <div @click="handleClick2">html输出</div>
-<!--    <div @click="onlyShow">预览模式</div>-->
-    <my-dialog v-model="dialogVisible" :content="dialogContent" :type="dialogType"></my-dialog>
+    <my-dialog v-model="dialogVisible" >
+      <dl v-html="dialogContent">
+        {{dialogContent}}
+      </dl>
+    </my-dialog>
+    <my-dialog v-model="dialogVisible2">
+      <image-upload @handleCommit="imageCommit"></image-upload>
+    </my-dialog>
+
   </div>
 </template>
 
 <script>
-import { Editor, EditorContent } from '@tiptap/vue-2'
+import {Editor, EditorContent} from '@tiptap/vue-2'
 import StarterKit from '@tiptap/starter-kit'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -35,25 +44,33 @@ import FontFamily from '@tiptap/extension-font-family'
 import Table from '@tiptap/extension-table'
 import TableRow from '@tiptap/extension-table-row'
 import TableHeader from '@tiptap/extension-table-header'
+import Focus from '@tiptap/extension-focus'
+
 import TableCell from './tools/table-cell'
 import FontColor from './tools/font-color/font-color'
 import FontSize from './tools/font-size/font-size'
+import LineHeight from "./tools/line-height/line-height";
+
+
 import CustomerTag from './tools/customerTag/Extension'
 import ContentBox from "./tools/contentBox/Extension";
-import Focus from '@tiptap/extension-focus'
 import MenuBar from './components/MenuBar/MenuBar'
 import ObjectEditor from "./components/objectEditor";
 import ObjectSelector from "./components/objectSelector";
 import myDialog from "./components/Dialog"
+import imageUpload from "./components/Dialog/imageUpload";
+import TableMenu from "./components/MenuBar/TableMenu";
 
 
 export default {
   components: {
+    TableMenu,
     ObjectSelector,
     ObjectEditor,
     MenuBar,
     EditorContent,
-    myDialog
+    myDialog,
+    imageUpload
   },
 
   data() {
@@ -62,107 +79,429 @@ export default {
       editor:null,
       selectNode:null,
       selectParagraph:null,
-      json:{
-        "type":"doc",
-        "content":[
+      json: {
+        "type": "doc",
+        "content": [
           {
-            "type":"contentBox",
-            "content":[
+            "type": "contentBox",
+            "content": [
               {
-                "type":"paragraph",
-                "attrs":{
-                  "textAlign":"left"
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": "left"
                 },
-                "content":[
+                "content": [
                   {
-                    "type":"text",
-                    "text":"第一段"
+                    "type": "text",
+                    "text": "第一段"
                   }
                 ]
               },
               {
-                "type":"paragraph",
-                "attrs":{
-                  "textAlign":"left"
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": "left"
                 },
-                "content":[
+                "content": [
                   {
-                    "type":"text",
-                    "marks":[
+                    "type": "text",
+                    "marks": [
                       {
-                        "type":"textStyle",
-                        "attrs":{
-                          "fontFamily":null,
-                          "fontColor":"red",
-                          "fontSize":null
+                        "type": "textStyle",
+                        "attrs": {
+                          "fontFamily": null,
+                          "fontColor": "red",
+                          "fontSize": null
                         }
                       }
                     ],
-                    "text":"第二段"
+                    "text": "第二段"
                   }
                 ]
               },
               {
-                "type":"paragraph",
-                "attrs":{
-                  "textAlign":"left"
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": "left"
                 },
-                "content":[
+                "content": [
                   {
-                    "type":"text",
-                    "text":"第三段"
+                    "type": "text",
+                    "text": "第三段"
+                  }
+                ]
+              },
+              {
+                "type": "table",
+                "content": [
+                  {
+                    "type": "tableRow",
+                    "content": [
+                      {
+                        "type": "tableHeader",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "Name"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableHeader",
+                        "attrs": {
+                          "colspan": 3,
+                          "rowspan": 1,
+                          "colwidth": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "Description"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "tableRow",
+                    "content": [
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "Cyndi Lauper"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "singer"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "songwriter"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "actress"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "tableRow",
+                    "content": [
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "Philipp Kühn"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "designer"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "developer"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "maker"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "tableRow",
+                    "content": [
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "Hans Pagel"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 1,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "wrote this"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "tableCell",
+                        "attrs": {
+                          "colspan": 2,
+                          "rowspan": 1,
+                          "colwidth": null,
+                          "backgroundColor": null
+                        },
+                        "content": [
+                          {
+                            "type": "paragraph",
+                            "attrs": {
+                              "textAlign": "left"
+                            },
+                            "content": [
+                              {
+                                "type": "text",
+                                "text": "that’s it"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
             ]
           },
           {
-            "type":"contentBox",
-            "content":[
+            "type": "contentBox",
+            "content": [
               {
-                "type":"paragraph",
-                "attrs":{
-                  "textAlign":"left"
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": "left"
                 },
-                "content":[
+                "content": [
                   {
-                    "type":"text",
-                    "text":"第一段"
+                    "type": "text",
+                    "text": "第一段"
                   }
                 ]
               },
               {
-                "type":"paragraph",
-                "attrs":{
-                  "textAlign":"left"
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": "left"
                 },
-                "content":[
+                "content": [
                   {
-                    "type":"text",
-                    "text":"第二段"
+                    "type": "text",
+                    "text": "第二段"
                   }
                 ]
               },
               {
-                "type":"paragraph",
-                "attrs":{
-                  "textAlign":"left"
+                "type": "paragraph",
+                "attrs": {
+                  "textAlign": "left"
                 },
-                "content":[
+                "content": [
                   {
-                    "type":"text",
-                    "text":"第三段"
+                    "type": "text",
+                    "text": "第三段"
                   },
                   {
-                    "type":"customerTag",
-                    "attrs":{
-                      "type":"string",
-                      "index":"economic"
+                    "type": "customerTag",
+                    "attrs": {
+                      "type": "string",
+                      "index": "被翻译的文本"
                     },
-                    "content":[
+                    "content": [
                       {
-                        "type":"text",
-                        "text":"asd"
+                        "type": "text",
+                        "text": "这是一段常量文本"
                       }
                     ]
                   }
@@ -175,6 +514,8 @@ export default {
       tools:[
         {id:'line',name:'插入段落'},
         {id:'tag',name:'插入文本'},
+        {id:'image',name:'插入图片'},
+        {id:'chart',name:'插入表格'},
       ],
       defaultProps:[
         StarterKit,
@@ -187,6 +528,7 @@ export default {
         Underline,
         FontColor,
         FontSize,
+        LineHeight,
         CustomerTag,
         ContentBox,
         TextAlign.configure({
@@ -204,6 +546,7 @@ export default {
         TableCell
       ],
       dialogVisible:false,
+      dialogVisible2:false,
       dialogContent:'',
       dialogType:'string',
     }
@@ -238,6 +581,9 @@ export default {
     this.editor.destroy()
   },
   methods:{
+    imageCommit(value){
+      console.log(value)
+    },
     handleSelect(){
 
     },
@@ -246,7 +592,6 @@ export default {
       if(this.selectParagraph&&!append){
         position = this.selectParagraph.getPos() + this.selectParagraph.node.nodeSize
       }
-      console.log(position)
       this.editor.commands.insertContentAt(position,{
         "type":"contentBox",
         "content":[{
@@ -262,7 +607,7 @@ export default {
         "type":"customerTag",
         "attrs":{
           "type":"string",
-          "index":"economic"
+          "index":"被翻译的文本"
         },
         "content":[
           {
@@ -273,23 +618,20 @@ export default {
       })
 
     },
+    handleInsertImage(){
+      this.dialogVisible2 = true
+    },
     handleFocus(v){
       this.editor = v
     },
     handleClick(){
-      this.dialogType = 'string'
-      this.dialogContent = this.editor.getJSON()
+      this.dialogContent = `<pre>${this.editor.getJSON()}</pre>`
       this.dialogVisible = true
     },
     handleClick2(){
-      this.dialogType = 'dom'
-      this.dialogContent = this.editor.getHTML()
+      this.dialogContent = `<div>${this.editor.getHTML()}</div>`
       this.dialogVisible = true
     },
-    onlyShow(){
-      this.dialogContent = this.editor.getHTML()
-      this.dialogVisible = true
-    }
   }
 }
 </script>
@@ -447,11 +789,12 @@ pre {
   overflow-x: auto;
 }
 
+
+
+</style>
+<style>
 .resize-cursor {
   cursor: ew-resize;
   cursor: col-resize;
 }
-
-</style>
-<style>
 </style>

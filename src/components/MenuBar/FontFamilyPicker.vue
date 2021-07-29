@@ -10,7 +10,6 @@
            :key="index"
            :class="isActive()===item.id?'is-active':''"
            @click="handleClick(item.id)">{{ item.label }}</div>
-
     </div>
   </div>
 
@@ -19,7 +18,7 @@
 <script>
 
 export default {
-  name: "ColorPicker",
+  name: "FontFamilyPicker",
   props:{
     isActive:{
       type: Function,
