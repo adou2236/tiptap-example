@@ -31,17 +31,9 @@ export default Node.create({
             },
         ]
     },
-    translate(){
-        return this
-    },
 
     renderHTML({node,HTMLAttributes}) {
         return ['span', mergeAttributes(HTMLAttributes),`${node.attrs.index}`]
-    },
-
-    renderText({ node }) {
-        console.log("asd",node)
-        return `@${node.attrs.index}`
     },
 
     addNodeView() {

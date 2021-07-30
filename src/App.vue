@@ -24,7 +24,7 @@
       </dl>
     </my-dialog>
     <my-dialog v-model="dialogVisible2">
-      <image-upload @handleCommit="imageCommit"></image-upload>
+      <image-upload @imageCommit="imageCommit"></image-upload>
     </my-dialog>
 
   </div>
@@ -45,6 +45,8 @@ import Table from '@tiptap/extension-table'
 import TableRow from '@tiptap/extension-table-row'
 import TableHeader from '@tiptap/extension-table-header'
 import Focus from '@tiptap/extension-focus'
+import Image from '@tiptap/extension-image'
+
 
 import TableCell from './tools/table-cell'
 import FontColor from './tools/font-color/font-color'
@@ -60,6 +62,7 @@ import ObjectSelector from "./components/objectSelector";
 import myDialog from "./components/Dialog"
 import imageUpload from "./components/Dialog/imageUpload";
 import TableMenu from "./components/MenuBar/TableMenu";
+import CustomImage from "./tools/imageBox/Extension"
 
 
 export default {
@@ -70,7 +73,7 @@ export default {
     MenuBar,
     EditorContent,
     myDialog,
-    imageUpload
+    imageUpload,
   },
 
   data() {
@@ -80,102 +83,121 @@ export default {
       selectNode:null,
       selectParagraph:null,
       json: {
-        "type": "doc",
-        "content": [
+        "type":"doc",
+        "content":[
           {
-            "type": "contentBox",
-            "content": [
+            "type":"contentBox",
+            "content":[
               {
-                "type": "paragraph",
-                "attrs": {
-                  "textAlign": "left"
+                "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
                 },
-                "content": [
+                "content":[
                   {
-                    "type": "text",
-                    "text": "第一段"
+                    "type":"text",
+                    "text":"第一段"
                   }
                 ]
               },
               {
-                "type": "paragraph",
-                "attrs": {
-                  "textAlign": "left"
+                "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
                 },
-                "content": [
+                "content":[
                   {
-                    "type": "text",
-                    "marks": [
+                    "type":"text",
+                    "marks":[
                       {
-                        "type": "textStyle",
-                        "attrs": {
-                          "fontFamily": null,
-                          "fontColor": "red",
-                          "fontSize": null
+                        "type":"textStyle",
+                        "attrs":{
+                          "fontFamily":null,
+                          "fontColor":"red",
+                          "fontSize":null,
+                          "lineHeight":null
                         }
                       }
                     ],
-                    "text": "第二段"
+                    "text":"第二段"
                   }
                 ]
               },
               {
-                "type": "paragraph",
-                "attrs": {
-                  "textAlign": "left"
+                "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
                 },
-                "content": [
+                "content":[
                   {
-                    "type": "text",
-                    "text": "第三段"
+                    "type":"text",
+                    "text":"第三段"
                   }
                 ]
               },
               {
-                "type": "table",
-                "content": [
+                "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
+                },
+                "content":[
                   {
-                    "type": "tableRow",
-                    "content": [
+                    "type":"custom-image",
+                    "attrs":{
+                      "src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAACGklEQVRYR+2YP2gTURzHP7+XxvpvMulgERQsiIPgJgpC29ilKnRUB0dBUGjdtKY87VAXC0oddHFyyiBW3EwoBESQTA51cBNBjSdVKxjTu59IUUqb9F1yVwn0bn3f3+99+Lwf944TOvyRDucjAYx6Qg0N7uu3W7+bYBbIASbqJiHrX6Xr9ZMfylPVlfmGgJmcHUGDxyEbxxZTYfRL8eYdJ2B2IH9ORR7FtnPoRnrVK03eSgBDC1sTTAy27265MjGYGFw24HgPflJ0HORrq75EdRsieaCvcW0sMygzXunG5Vbh/uZ35fJXROX2BgJSFXQiQLw2IHcKjAP7NxKwDa6wJbEccdjN2sltMsAaYk4t1X5WXK66utN9qDwDetbPxmvwvZeZ30uh4LsA/6xnBideAEf/JyAKZUTmnYAa7BFk2JlL7mK3Ikci3hmMjLO2QQIYVWpiMDEY6oM1qqZ16jfxDAbAEzAz3Tt4WVv0D4FcRDgLbAmvPH6Di8BDE5i71Tn7djVI9vi13dqVviSiFxSybtC4AJV3CPf8wNxfmLMLro17T9vtv3745xUZBQ40z0cHrIjq9OdvHwtUHtRdYGvWrTXZMsOq/hjIYNtXXebE9YME5jWQAgLQWSNMV4uT5ZahmhT09NvDQUrHUD3zb07FDHlF+3xlSdN/1JmB/BFFjqXUPG00X3GBZodsry75I0jqjVeypdV9O/4n+m8P4GA4mIoMyQAAAABJRU5ErkJggg==",
+                      "alt":null,
+                      "title":null,
+                      "width":200,
+                      "height":200
+                    }
+                  }
+                ]
+              },
+              {
+                "type":"table",
+                "content":[
+                  {
+                    "type":"tableRow",
+                    "content":[
                       {
-                        "type": "tableHeader",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null
+                        "type":"tableHeader",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "Name"
+                                "type":"text",
+                                "text":"Name"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableHeader",
-                        "attrs": {
-                          "colspan": 3,
-                          "rowspan": 1,
-                          "colwidth": null
+                        "type":"tableHeader",
+                        "attrs":{
+                          "colspan":3,
+                          "rowspan":1,
+                          "colwidth":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "Description"
+                                "type":"text",
+                                "text":"Description"
                               }
                             ]
                           }
@@ -184,95 +206,95 @@ export default {
                     ]
                   },
                   {
-                    "type": "tableRow",
-                    "content": [
+                    "type":"tableRow",
+                    "content":[
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "Cyndi Lauper"
+                                "type":"text",
+                                "text":"Cyndi Lauper"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "singer"
+                                "type":"text",
+                                "text":"singer"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "songwriter"
+                                "type":"text",
+                                "text":"songwriter"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "actress"
+                                "type":"text",
+                                "text":"actress"
                               }
                             ]
                           }
@@ -281,95 +303,95 @@ export default {
                     ]
                   },
                   {
-                    "type": "tableRow",
-                    "content": [
+                    "type":"tableRow",
+                    "content":[
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "Philipp Kühn"
+                                "type":"text",
+                                "text":"Philipp Kühn"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "designer"
+                                "type":"text",
+                                "text":"designer"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "developer"
+                                "type":"text",
+                                "text":"developer"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "maker"
+                                "type":"text",
+                                "text":"maker"
                               }
                             ]
                           }
@@ -378,72 +400,72 @@ export default {
                     ]
                   },
                   {
-                    "type": "tableRow",
-                    "content": [
+                    "type":"tableRow",
+                    "content":[
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "Hans Pagel"
+                                "type":"text",
+                                "text":"Hans Pagel"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 1,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":1,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "wrote this"
+                                "type":"text",
+                                "text":"wrote this"
                               }
                             ]
                           }
                         ]
                       },
                       {
-                        "type": "tableCell",
-                        "attrs": {
-                          "colspan": 2,
-                          "rowspan": 1,
-                          "colwidth": null,
-                          "backgroundColor": null
+                        "type":"tableCell",
+                        "attrs":{
+                          "colspan":2,
+                          "rowspan":1,
+                          "colwidth":null,
+                          "backgroundColor":null
                         },
-                        "content": [
+                        "content":[
                           {
-                            "type": "paragraph",
-                            "attrs": {
-                              "textAlign": "left"
+                            "type":"paragraph",
+                            "attrs":{
+                              "textAlign":"left"
                             },
-                            "content": [
+                            "content":[
                               {
-                                "type": "text",
-                                "text": "that’s it"
+                                "type":"text",
+                                "text":"that’s it"
                               }
                             ]
                           }
@@ -456,52 +478,52 @@ export default {
             ]
           },
           {
-            "type": "contentBox",
-            "content": [
+            "type":"contentBox",
+            "content":[
               {
-                "type": "paragraph",
-                "attrs": {
-                  "textAlign": "left"
+                "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
                 },
-                "content": [
+                "content":[
                   {
-                    "type": "text",
-                    "text": "第一段"
+                    "type":"text",
+                    "text":"第一段"
                   }
                 ]
               },
               {
-                "type": "paragraph",
-                "attrs": {
-                  "textAlign": "left"
+                "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
                 },
-                "content": [
+                "content":[
                   {
-                    "type": "text",
-                    "text": "第二段"
+                    "type":"text",
+                    "text":"第二段"
                   }
                 ]
               },
               {
-                "type": "paragraph",
-                "attrs": {
-                  "textAlign": "left"
+                "type":"paragraph",
+                "attrs":{
+                  "textAlign":"left"
                 },
-                "content": [
+                "content":[
                   {
-                    "type": "text",
-                    "text": "第三段"
+                    "type":"text",
+                    "text":"第三段"
                   },
                   {
-                    "type": "customerTag",
-                    "attrs": {
-                      "type": "string",
-                      "index": "被翻译的文本"
+                    "type":"customerTag",
+                    "attrs":{
+                      "type":"string",
+                      "index":"被翻译的文本"
                     },
-                    "content": [
+                    "content":[
                       {
-                        "type": "text",
-                        "text": "这是一段常量文本"
+                        "type":"text",
+                        "text":"这是一段常量文本"
                       }
                     ]
                   }
@@ -531,6 +553,12 @@ export default {
         LineHeight,
         CustomerTag,
         ContentBox,
+        CustomImage.configure({
+          inline:true
+        }),
+        Image.configure({
+          inline:true
+        }),
         TextAlign.configure({
           types: ['heading', 'paragraph'],
         }),
@@ -581,8 +609,12 @@ export default {
     this.editor.destroy()
   },
   methods:{
-    imageCommit(value){
-      console.log(value)
+    changeSize(){
+      this.editor.chain().focus().setImageSize([100,100]).run()
+    },
+    imageCommit(url){
+      this.editor.chain().focus().setCustomerImage({ src: url }).run()
+      this.dialogVisible2 = false
     },
     handleSelect(){
 
@@ -625,8 +657,7 @@ export default {
       this.editor = v
     },
     handleClick(){
-      this.dialogContent = `<pre>${this.editor.getJSON()}</pre>`
-      this.dialogVisible = true
+      console.log(JSON.stringify(this.editor.getJSON()))
     },
     handleClick2(){
       this.dialogContent = `<div>${this.editor.getHTML()}</div>`
@@ -705,10 +736,10 @@ export default {
     }
   }
 
-  img {
-    max-width: 100%;
-    height: auto;
-  }
+  //img {
+  //  max-width: 100%;
+  //  height: auto;
+  //}
 
   blockquote {
     padding-left: 1rem;

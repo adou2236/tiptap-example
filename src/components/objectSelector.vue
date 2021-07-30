@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(item,index) in objects" :key="index" @click="handleSelect(item)">{{item.name}}</div>
+    <button v-for="(item,index) in objects" :key="index" @click="handleSelect(item)">{{item.name}}</button>
   </div>
 </template>
 

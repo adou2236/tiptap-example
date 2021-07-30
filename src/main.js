@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import App from './App.vue'
 import 'remixicon/fonts/remixicon.css'
+import VueDraggableResizable from 'vue-draggable-resizable'
+import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
+Vue.component('vue-draggable-resizable', VueDraggableResizable)
+
 Vue.config.productionTip = false
 
 

@@ -1,7 +1,7 @@
 <template>
   <div
       class="bubble-menu"
-      v-if="editor&&editor.can().deleteTable()"
+      v-if="editor&&editor.isActive('table')"
   >
     <button @click="editor.chain().focus().deleteColumn().run()" :disabled="!editor.can().deleteColumn()">
       删除当前列
