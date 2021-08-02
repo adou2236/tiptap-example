@@ -93,5 +93,8 @@ export default {
   text-align: left;
   background-color: #f1f3f5;
 }
+.content >>> .chart{
+  width: 100%;
+}
 </style>
 

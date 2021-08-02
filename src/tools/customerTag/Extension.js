@@ -3,7 +3,7 @@ import { VueNodeViewRenderer } from '@tiptap/vue-2'
 import Component from './ComponentEdit.vue'
 
 export default Node.create({
-    name: 'customerTag',
+    name: 'custom-tag',
     group: 'inline',
     inline: true,
     content: 'text*',
@@ -27,7 +27,7 @@ export default Node.create({
     parseHTML() {
         return [
             {
-                tag: 'customer-tag',
+                tag: 'custom-tag',
             },
         ]
     },

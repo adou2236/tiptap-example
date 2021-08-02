@@ -1,59 +1,109 @@
 <template>
   <div>
 <!--    占位数据:<input v-model="viewText"/><br/>-->
+    <div v-if="editor&&editor.isActive('custom-tag')">
+      标签类型：<select v-model="type">
+        <option value ="string">常量标签</option>
+        <option value ="formula">公式标签</option>
+        <option value="request">函数标签</option>
+      </select><br/>
+        内部数据：<input v-model="tagIndex"/>
+    </div>
+    <div v-else-if="editor&&editor.isActive('custom-image')">
+      图片属性<br/>
+      图片路径<input v-model="imageAttr.src" /><br/>
+      图片宽<input v-model="imageAttr.width" />px<br/>
+      图片高<input v-model="imageAttr.height" />px<br/>
+      <button @click="setImageAttr">确定</button>
+    </div>
+    <table-menu v-else-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
+    <div v-else-if="editor&&editor.isActive('custom-chart')">
+      当前绘图所用指标{{chartIndex}}<br/>
+      <button @click="changeChartIndex">切换指标</button>
+    </div>
 
-    标签类型：<select v-model="type">
-      <option value ="string">常量标签</option>
-      <option value ="formula">公式标签</option>
-      <option value="request">函数标签</option>
-    </select><br/>
-    内部数据：<input v-model="index"/>
+
   </div>
 </template>
 
 <script>
+import TableMenu from "./MenuBar/TableMenu";
 export default {
   name: "objectEditor",
+  components: {TableMenu},
   props:{
-    currentObject:{
-      type:Object,
+    editor:{
+      type:Object
+    },
+  },
+  data(){
+    return{
     }
+  },
+  mounted() {
+    console.log(this.editor.getAttributes('custom-image'))
   },
   computed:{
     //如何改变里内容
     type:{
       get(){
-        return this.currentObject?.node?.attrs?.type || ''
+        return this.editor.getAttributes('custom-tag').type || ''
       },
       set(v){
-        this.currentObject.updateAttributes({type:v})
+        this.editor.chain().focus().updateAttributes('custom-tag',{type:v}).run()
       }
 
     },
-    index:{
+    chartIndex:{
       get(){
-        return this.currentObject?.node?.attrs?.index || ''
+        return this.editor.getAttributes('custom-chart').index || ''
+      },
+      set(){
+      }
+    },
+    tagIndex:{
+      get(){
+        return this.editor.getAttributes('custom-tag').index || ''
       },
       set(v){
-        this.currentObject.updateAttributes({index:v})
+        this.editor.chain().updateAttributes('custom-tag',{index:v}).run()
       }
 
     },
-    viewText:{
+    imageAttr:{
       get(){
-        return  this.currentObject?.node?.textContent || ''
+        return{
+          src:this.editor.getAttributes('custom-image').src,
+          width:this.editor.getAttributes('custom-image').width,
+          height:this.editor.getAttributes('custom-image').height,
+        }
       },
-      //如何改变表内容
-      set(v){
-        this.currentObject.updateAttributes({textContent:v})
-      }
+      set(){
 
+      }
     }
+
 
   },
   watch:{
     currentObject(v){
       console.log(v)
+    }
+  },
+  methods:{
+    changeChartIndex(){
+      let data = {
+        index:this.chartIndex+1
+      }
+      this.editor.chain().focus().updateAttributes('custom-chart',data).run()
+    },
+    setImageAttr(){
+      let data = {
+        width:this.imageAttr.width,
+        height:this.imageAttr.height,
+        src:this.imageAttr.src,
+      }
+      this.editor.chain().focus().updateAttributes('custom-image',data).run()
     }
   }
 }

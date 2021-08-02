@@ -1,5 +1,5 @@
 <template>
-  <node-view-wrapper :style="{height:'200px'}" class="vue-component">
+  <node-view-wrapper class="vue-component">
     <vue-draggable-resizable :w="width" :h="height"
                              :draggable="false" @resizing="onResize"
                              :parent="true">

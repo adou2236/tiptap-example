@@ -11,10 +11,10 @@ export default Image.extend({
             draggable:false,
             ...Image.config.addAttributes(),
             width: {
-                default: 200,
+                default: null,
             },
             height:{
-                default: 200
+                default: null
             }
 
         }

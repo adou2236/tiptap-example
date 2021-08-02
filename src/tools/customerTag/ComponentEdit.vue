@@ -1,6 +1,6 @@
 <template>
-  <node-view-wrapper class="vue-component">
-    <span @click="handleClick"><node-view-content class="content" :class="[node.attrs.type]"/></span>
+  <node-view-wrapper  class="vue-component">
+    <node-view-content class="content" :class="[node.attrs.type]"/>
   </node-view-wrapper>
 </template>
 

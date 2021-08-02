@@ -1,7 +1,6 @@
 <template>
   <div>
     <menu-bar v-if="editor" class="menu-bar" :editor="editor" />
-    <table-menu :editor="editor"></table-menu>
     <div style="display: flex;margin-top: 20px">
       <object-selector style="width: 20%"
                        :editor="editor"
@@ -9,12 +8,13 @@
                        @lineInsert="handleAddLine"
                        @tagInsert="handleAppendTag"
                        @imageInsert="handleInsertImage"
+                       @chartInsert="handleInsertChart"
       ></object-selector>
       <div class="editor-content">
         <editor-content :editor="editor"/>
         <div class="new-line" @click="handleAddLine(true)">+</div>
       </div>
-      <object-editor style="width: 20%" :current-object="selectNode"></object-editor>
+      <object-editor style="width: 20%" v-if="editor" :editor="editor"></object-editor>
     </div>
     <div @click="handleClick">JSON输出</div>
     <div @click="handleClick2">html输出</div>
@@ -25,6 +25,11 @@
     </my-dialog>
     <my-dialog v-model="dialogVisible2">
       <image-upload @imageCommit="imageCommit"></image-upload>
+    </my-dialog>
+    <my-dialog v-model="dialogVisible3" >
+      <pre>
+          {{dialogContent}}
+      </pre>
     </my-dialog>
 
   </div>
@@ -47,13 +52,13 @@ import TableHeader from '@tiptap/extension-table-header'
 import Focus from '@tiptap/extension-focus'
 import Image from '@tiptap/extension-image'
 
-
+//自定义操作
 import TableCell from './tools/table-cell'
 import FontColor from './tools/font-color/font-color'
 import FontSize from './tools/font-size/font-size'
 import LineHeight from "./tools/line-height/line-height";
 
-
+//自定义组件
 import CustomerTag from './tools/customerTag/Extension'
 import ContentBox from "./tools/contentBox/Extension";
 import MenuBar from './components/MenuBar/MenuBar'
@@ -63,6 +68,7 @@ import myDialog from "./components/Dialog"
 import imageUpload from "./components/Dialog/imageUpload";
 import TableMenu from "./components/MenuBar/TableMenu";
 import CustomImage from "./tools/imageBox/Extension"
+import CustomChart from "./tools/chartBox/Extension"
 
 
 export default {
@@ -80,9 +86,8 @@ export default {
     return {
       value:'',
       editor:null,
-      selectNode:null,
       selectParagraph:null,
-      json: {
+      json:{
         "type":"doc",
         "content":[
           {
@@ -144,11 +149,12 @@ export default {
                   {
                     "type":"custom-image",
                     "attrs":{
+                      "draggable":null,
                       "src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAACGklEQVRYR+2YP2gTURzHP7+XxvpvMulgERQsiIPgJgpC29ilKnRUB0dBUGjdtKY87VAXC0oddHFyyiBW3EwoBESQTA51cBNBjSdVKxjTu59IUUqb9F1yVwn0bn3f3+99+Lwf944TOvyRDucjAYx6Qg0N7uu3W7+bYBbIASbqJiHrX6Xr9ZMfylPVlfmGgJmcHUGDxyEbxxZTYfRL8eYdJ2B2IH9ORR7FtnPoRnrVK03eSgBDC1sTTAy27265MjGYGFw24HgPflJ0HORrq75EdRsieaCvcW0sMygzXunG5Vbh/uZ35fJXROX2BgJSFXQiQLw2IHcKjAP7NxKwDa6wJbEccdjN2sltMsAaYk4t1X5WXK66utN9qDwDetbPxmvwvZeZ30uh4LsA/6xnBideAEf/JyAKZUTmnYAa7BFk2JlL7mK3Ikci3hmMjLO2QQIYVWpiMDEY6oM1qqZ16jfxDAbAEzAz3Tt4WVv0D4FcRDgLbAmvPH6Di8BDE5i71Tn7djVI9vi13dqVviSiFxSybtC4AJV3CPf8wNxfmLMLro17T9vtv3745xUZBQ40z0cHrIjq9OdvHwtUHtRdYGvWrTXZMsOq/hjIYNtXXebE9YME5jWQAgLQWSNMV4uT5ZahmhT09NvDQUrHUD3zb07FDHlF+3xlSdN/1JmB/BFFjqXUPG00X3GBZodsry75I0jqjVeypdV9O/4n+m8P4GA4mIoMyQAAAABJRU5ErkJggg==",
                       "alt":null,
                       "title":null,
-                      "width":200,
-                      "height":200
+                      "width":null,
+                      "height":null
                     }
                   }
                 ]
@@ -466,6 +472,19 @@ export default {
                               {
                                 "type":"text",
                                 "text":"that’s it"
+                              },
+                              {
+                                "type":"custom-tag",
+                                "attrs":{
+                                  "type":"formula",
+                                  "index":"这段公式被翻译出来了"
+                                },
+                                "content":[
+                                  {
+                                    "type":"text",
+                                    "text":"这是一段公式文本"
+                                  }
+                                ]
                               }
                             ]
                           }
@@ -515,7 +534,7 @@ export default {
                     "text":"第三段"
                   },
                   {
-                    "type":"customerTag",
+                    "type":"custom-tag",
                     "attrs":{
                       "type":"string",
                       "index":"被翻译的文本"
@@ -553,6 +572,7 @@ export default {
         LineHeight,
         CustomerTag,
         ContentBox,
+        CustomChart,
         CustomImage.configure({
           inline:true
         }),
@@ -575,28 +595,27 @@ export default {
       ],
       dialogVisible:false,
       dialogVisible2:false,
+      dialogVisible3:false,
       dialogContent:'',
       dialogType:'string',
     }
   },
+  watch:{
 
+  },
+  computed:{
+  },
   mounted() {
     let that = this
     this.editor = new Editor({
       extensions: this.defaultProps,
       content: this.json,
       editable: true,
-      onCreate(){
-        console.log("初始化")
+      onCreate({editor}){
+        // console.log(editor)
       },
       onUpdate(){
-        console.log("数据更新")
-      },
-      onFocus({ editor, event }) {
-        that.handleFocus(editor,event)
-      },
-      getTag(v){
-        that.selectNode = v
+        // console.log("数据更新")
       },
       getParagraph(v){
         that.selectParagraph = v
@@ -616,27 +635,24 @@ export default {
       this.editor.chain().focus().setCustomerImage({ src: url }).run()
       this.dialogVisible2 = false
     },
-    handleSelect(){
-
-    },
     handleAddLine(append=false){
       let position = this.editor.getCharacterCount()+2
       if(this.selectParagraph&&!append){
         position = this.selectParagraph.getPos() + this.selectParagraph.node.nodeSize
       }
-      this.editor.commands.insertContentAt(position,{
+      this.editor.chain().focus().insertContentAt(position,{
         "type":"contentBox",
         "content":[{
           "type":"paragraph",
           "content":[]
         }]
-      })
+      }).run()
 
     },
     handleAppendTag(){
       let text = prompt("输入占位字符",)
-      this.editor.commands.insertContent({
-        "type":"customerTag",
+      this.editor.chain().focus().insertContent({
+        "type":"custom-tag",
         "attrs":{
           "type":"string",
           "index":"被翻译的文本"
@@ -647,7 +663,17 @@ export default {
             "text":text
           }
         ]
-      })
+      }).run()
+
+    },
+    handleInsertChart(){
+      this.editor.chain().focus().insertContent({
+        type:'custom-chart',
+        attrs:{
+          index:1,
+          src:'#'
+        }
+      }).run()
 
     },
     handleInsertImage(){
@@ -657,7 +683,8 @@ export default {
       this.editor = v
     },
     handleClick(){
-      console.log(JSON.stringify(this.editor.getJSON()))
+      this.dialogContent = this.editor.getJSON()
+      this.dialogVisible3 = true
     },
     handleClick2(){
       this.dialogContent = `<div>${this.editor.getHTML()}</div>`
@@ -736,10 +763,16 @@ export default {
     }
   }
 
-  //img {
-  //  max-width: 100%;
-  //  height: auto;
-  //}
+  img {
+    max-width: 100%;
+    &.ProseMirror-selectednode {
+      outline: 3px solid #68cef8;
+    }
+  }
+  .chart{
+    width: 100%;
+    height: 400px;
+  }
 
   blockquote {
     padding-left: 1rem;
