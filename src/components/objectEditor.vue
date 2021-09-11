@@ -17,20 +17,21 @@
       <button @click="setImageAttr">确定</button>
     </div>
     <table-menu v-else-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
-    <div v-else-if="editor&&editor.isActive('custom-chart')">
-      当前绘图所用指标{{chartIndex}}<br/>
-      <button @click="changeChartIndex">切换指标</button>
-    </div>
-
-
+    <echarts-menu v-else-if="editor&&editor.isActive('custom-chart')"
+                  :editor="editor"
+                  :options="chartOptions"
+    ></echarts-menu>
+<!--                      @renderChart="renderChart"-->
   </div>
 </template>
 
 <script>
 import TableMenu from "./MenuBar/TableMenu";
+import EchartsMenu from "./MenuBar/EchartsMenu/index.vue"
+import {baseOptions} from "../unit/baseType";
 export default {
   name: "objectEditor",
-  components: {TableMenu},
+  components: {EchartsMenu, TableMenu},
   props:{
     editor:{
       type:Object
@@ -41,7 +42,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.editor.getAttributes('custom-image'))
   },
   computed:{
     //如何改变里内容
@@ -52,13 +52,20 @@ export default {
       set(v){
         this.editor.chain().focus().updateAttributes('custom-tag',{type:v}).run()
       }
-
+    },
+    chartOptions: {
+      get(){
+        return this.editor.getAttributes('custom-chart').options
+      },
+      set(){
+      }
     },
     chartIndex:{
       get(){
-        return this.editor.getAttributes('custom-chart').index || ''
+        return this.editor.getAttributes('custom-chart').index || []
       },
-      set(){
+      set(v){
+        // this.editor.chain().updateAttributes('custom-chart',{index:v}).run()
       }
     },
     tagIndex:{
@@ -91,12 +98,17 @@ export default {
     }
   },
   methods:{
-    changeChartIndex(){
-      let data = {
-        index:this.chartIndex+1
-      }
-      this.editor.chain().focus().updateAttributes('custom-chart',data).run()
+    renderChart(options){
+      let base = new baseOptions(options)
+      // this.editor.chain().updateAttributes('custom-chart', {options:base.options}).run()
+      this.editor.chain().upDateChartOptions(base.options).run()
     },
+    // renderChart(){
+    //   let data = {
+    //     index:this.chartIndex+1
+    //   }
+    //   this.editor.chain().focus().setChartOptions('custom-chart',data).run()
+    // },
     setImageAttr(){
       let data = {
         width:this.imageAttr.width,

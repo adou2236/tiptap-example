@@ -1,6 +1,6 @@
 <template>
   <node-view-wrapper  class="vue-component">
-    <node-view-content class="content" :class="[node.attrs.type]"/>
+    <node-view-content ref="text" class="content" :class="[node.attrs.type]"/>
   </node-view-wrapper>
 </template>
 
@@ -16,12 +16,7 @@ export default Vue.extend({
   props: nodeViewProps,
   mounted(){
   },
-
   methods: {
-    handleClick(){
-      this.editor.options.getTag(this)
-    }
-
   },
 })
 </script>

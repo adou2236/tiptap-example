@@ -31,8 +31,32 @@ export default Node.create({
             },
         ]
     },
+    // addCommands() {
+    //     const that = this
+    //     return {
+    //         editorOver: () => ({commands}) => {
+    //             commands.exitCode().run()
+    //         },
+    //     }
+    // },
+    // addProseMirrorPlugins () {
+    //     const that = this
+    //     return [
+    //         new Plugin({
+    //             key: new PluginKey('eventHandler'),
+    //             props: {
+    //                 handleKeyDown (view, pos) {
+    //                     if(pos.code === 'Space'||pos.code === 'Enter'){
+    //                         that.editor.chain().focus().editorOver().run()
+    //                     }
+    //                 }
+    //             }
+    //         })
+    //     ]
+    // },
 
     renderHTML({node,HTMLAttributes}) {
+        //此处增加翻译逻辑
         return ['span', mergeAttributes(HTMLAttributes),`${node.attrs.index}`]
     },
 

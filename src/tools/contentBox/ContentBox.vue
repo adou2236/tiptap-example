@@ -1,6 +1,6 @@
 <template>
-  <node-view-wrapper class="outter-content">
-    <div @click="handleClick"><node-view-content  class="content"/></div>
+  <node-view-wrapper class="outter-content" >
+    <node-view-content class="content"/>
     <div @click="handleDelete" class="delete-icon">删除</div>
   </node-view-wrapper>
 </template>
@@ -23,11 +23,10 @@ export default Vue.extend({
   watch:{
   },
   mounted() {
-    // console.log(this)
   },
   methods: {
-    handleClick(){
-      this.editor.options.getParagraph(this)
+    handleChange(v){
+      console.log(v)
     },
     handleDelete(){
       this.deleteNode()

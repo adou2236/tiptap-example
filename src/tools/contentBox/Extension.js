@@ -1,8 +1,10 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-2'
 import Component from './ContentBox.vue'
+import Paragraph from '@tiptap/extension-paragraph'
 
-export default Node.create({
+
+export default Paragraph.extend({
     name: 'contentBox',
     group: 'block',
     inline: false,
@@ -16,7 +18,6 @@ export default Node.create({
         return {
         }
     },
-
     parseHTML() {
         return [{tag: 'content-box'}]
     },

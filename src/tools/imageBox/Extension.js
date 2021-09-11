@@ -5,10 +5,10 @@ import Component from "./imageBox.vue";
 
 export default Image.extend({
     name: 'custom-image',
+    draggable:false,
 
     addAttributes() {
         return {
-            draggable:false,
             ...Image.config.addAttributes(),
             width: {
                 default: null,
@@ -34,6 +34,7 @@ export default Image.extend({
                 }
             },
             setImageSize: (options) => ({ tr, commands  }) => {
+                console.log("进入函数",tr,commands)
                 return commands.updateAttributes('custom-image', {width:options[0],height:options[1]})
             },
         }

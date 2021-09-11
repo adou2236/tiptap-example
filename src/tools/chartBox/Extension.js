@@ -6,15 +6,13 @@ export default Node.create({
     name: 'custom-chart',
     group: 'block',
     inline: false,
-    content: 'block*',
     selectable: true,
-    defining: true,
-    isolating: true,
     draggable: false,
-    atom:true,
+    atom: true,
     //查询表格所用到的指标
     //方案一：配置存本地，数据通过请求获得
     //方案二：配置与数据参数均通过请求获取，通过两个请求完成绘图✅
+
     addAttributes() {
         return {
             index:{
@@ -23,28 +21,23 @@ export default Node.create({
             //完成绘图后生成的base64
             src:{
                 default:"#"
+            },
+            options:{
+                default:{}
             }
         }
     },
 
-    // addCommands() {
-    //     return {
-    //         setCustomerImage: (options) => ({ tr, commands }) => {
-    //             if(tr.selection?.node?.type?.name === 'custom-image') {
-    //                 return commands.updateAttributes('custom-image', options)
-    //             }
-    //             else {
-    //                 return commands.insertContent({
-    //                     type: this.name,
-    //                     attrs: options
-    //                 })
-    //             }
-    //         },
-    //         setImageSize: (options) => ({ tr, commands  }) => {
-    //             return commands.updateAttributes('custom-image', {width:options[0],height:options[1]})
-    //         },
-    //     }
-    // },
+    addCommands() {
+        return {
+            upDateChartOptions: (options) => ({ tr, commands  }) => {
+                let isChange = JSON.stringify(options) !== JSON.stringify(tr.selection?.node?.attrs?.options)
+                if(tr.selection?.node?.type?.name === 'custom-chart'&&isChange) {
+                    return commands.updateAttributes('custom-chart', {options:options})
+                }
+            },
+        }
+    },
 
     parseHTML() {
         return [{tag: 'custom-chart'}]
@@ -52,12 +45,11 @@ export default Node.create({
 
     renderHTML({HTMLAttributes}) {
         let attr = {
-            ...HTMLAttributes,
+            src:HTMLAttributes.src,
             class:'chart'
         }
         return ['img', mergeAttributes(attr)]
     },
-
     addNodeView() {
         return VueNodeViewRenderer(Component)
     },

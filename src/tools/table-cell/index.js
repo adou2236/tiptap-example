@@ -10,12 +10,12 @@ const CustomTableCell = TableCell.extend({
                 default: null,
                 parseHTML: element => {
                     return {
-                        backgroundColor: element.getAttribute('data-background-color'),
+                        backgroundColor: element.getAttribute('background-color'),
                     }
                 },
                 renderHTML: attributes => {
                     return {
-                        'data-background-color': attributes.backgroundColor,
+                        'background-color': attributes.backgroundColor,
                         style: `background-color: ${attributes.backgroundColor}`,
                     }
                 },

@@ -1,8 +1,6 @@
 <template>
   <div
-      class="bubble-menu"
-      v-if="editor&&editor.isActive('table')"
-  >
+      class="bubble-menu">
     <button @click="editor.chain().focus().deleteColumn().run()" :disabled="!editor.can().deleteColumn()">
       删除当前列
     </button>
@@ -30,6 +28,18 @@
     <button @click="editor.chain().focus().toggleHeaderCell().run()" :disabled="!editor.can().toggleHeaderCell()">
       单元格切换
     </button>
+    <button @click="editor.chain().focus().mergeCells().run()" :disabled="!editor.can().mergeCells()">
+      合并单元格
+    </button>
+    <button @click="editor.chain().focus().splitCell().run()" :disabled="!editor.can().splitCell()">
+      分割单元格
+    </button>
+    <button @click="editor.chain().focus().setCellAttribute('backgroundColor', '#FAF594').run()" >
+      背景色黄
+    </button>
+    <button @click="editor.chain().focus().setCellAttribute('backgroundColor', '#FFFFFF').run()">
+      背景色白
+    </button>
   </div>
 </template>
 
@@ -44,7 +54,9 @@ export default {
   mounted(){
   },
   methods:{
-
+    handleChange(v){
+      console.log(v)
+    },
     stopBubble(e) {
       if (e && e.preventDefault && e.stopPropagation) {
         e.stopPropagation();
@@ -59,6 +71,10 @@ export default {
 </script>
 
 <style scoped>
+.bubble-menu>button{
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
 
 
 </style>
