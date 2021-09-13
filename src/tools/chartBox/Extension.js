@@ -5,7 +5,7 @@ import Component from "./chartBox.vue";
 export default Node.create({
     name: 'custom-chart',
     group: 'block',
-    inline: false,
+    // inline: false,
     selectable: true,
     draggable: false,
     atom: true,

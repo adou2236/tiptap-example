@@ -1,5 +1,5 @@
 <template>
-  <node-view-wrapper :id="`chart-${random}`" class="chart" v-loading="loading">
+  <node-view-wrapper :id="`chart-${random}`" class="chart" v-loading="loading" element-loading-text="模拟异步加载">
   </node-view-wrapper>
 </template>
 
@@ -7,7 +7,8 @@
 import {NodeViewWrapper, nodeViewProps, NodeViewContent} from '@tiptap/vue-2'
 import * as echarts from 'echarts'
 import {baseOptions, deepCopy} from "../../unit/baseType";
-
+import {randomTweenData} from "../../assets/maps";
+import '../../assets/china.js'
 export default {
   name: "chartBox",
   components: {
@@ -76,7 +77,8 @@ export default {
           }
           item.data = arr
         })
-      }else if(options.series[0].type === 'pie'){
+      }
+      else if(options.series[0].type === 'pie'){
         //饼状图数据附加
         let data = []
         options.series[0].dataIndex.forEach((item,index)=>{
@@ -86,16 +88,44 @@ export default {
           })
         })
         options.series[0].data = data
-      }else if(options.series[0].type === 'scatter'){
-        let data = []
-        for(let i = 0;i<32;i++){
-          data.push({
-            name:`${i+1}`,
-            value:[options.series[0].dataIndex[0]*i,options.series[0].dataIndex[1]*i]
+      }
+      else if(options.series[0].type === 'scatter'){
+        options.series.forEach((item,index)=>{
+          let arr = []
+          const pinArea = options.additions.locationPin
+          const size = options.additions.symbolSize
+          for(let i = 0;i<item.items.length;i++){
+            //附加节点大小，突出部分地区
+            item.symbolSize = (value,params) =>{
+              return pinArea&&pinArea.includes(params.name)?size+10:size
+            }
+            arr.push({
+              name:item.items[i],
+              value:randomTweenData[index][i]
+            })
+          }
+          item.data = arr
+        })
+        //添加参考线
+        if(options.additions.markLine){
+          let markLine = {data:[]}
+          options.additions.markLine.forEach((item,index)=>{
+            markLine.data.push({
+              name:item.name,
+              label: {
+                formatter: '{b}'
+              },
+              xAxis:item.axis === 'xAxis'?item.value:undefined,
+              yAxis:item.axis === 'yAxis'?item.value:undefined
+            })
+          })
+          options.series.push({
+            type:"scatter",
+            markLine:markLine
           })
         }
-        options.series[0].data = data
       }
+      else return options
     },
     //函数附加(自定义图形移动函数)
     funcAttach(options){
@@ -123,15 +153,16 @@ export default {
       }
     },
     graphRender() {
+      //异步执行，指标更新需要重新获取数据，配置项更新不做处理
       this.loading = true
       this.funcAttach(this.options)
       if(this.myCharts&&this.complateOptions){
-        //新加的项目需要重新赋值，所以放在渲染之前
         this.myCharts.setOption(this.complateOptions,true)
         this.loading = false
         setTimeout(()=>{
           this.getSrc()
         },2000)
+
       }
 
     },

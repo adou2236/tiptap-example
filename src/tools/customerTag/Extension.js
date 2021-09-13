@@ -32,10 +32,10 @@ export default Node.create({
         ]
     },
     // addCommands() {
-    //     const that = this
     //     return {
-    //         editorOver: () => ({commands}) => {
-    //             commands.exitCode().run()
+    //         //设置翻译后文本的样式
+    //         setInnerAttribute: (options) => ({commands}) => {
+    //             console.log(options)
     //         },
     //     }
     // },
@@ -57,6 +57,7 @@ export default Node.create({
 
     renderHTML({node,HTMLAttributes}) {
         //此处增加翻译逻辑
+        console.log("Node",node,this)
         return ['span', mergeAttributes(HTMLAttributes),`${node.attrs.index}`]
     },
 

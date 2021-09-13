@@ -101,15 +101,13 @@ export default {
     methods: {
         //删除图形
         deleteGraphic(id){
-            this.options.graphic = this.graphic.filter(item=>item.id!==id)
-            console.log(this.options.graphic)
+            this.options.graphic = this.options.graphic.filter(item=>item.id!==id)
         },
         /**
          * 生成新的自定义图形
          * id根据时间戳生成以保证唯一
          */
         addGraphic(){
-            let count = this.graphic.length || 0
             let graphic = {
                 id: parseInt(new Date().getTime() / 1000),
                 type: 'text',
@@ -125,13 +123,8 @@ export default {
                     fill: '#000000',
                     text: `新建文本`
                 },
-                //拖动事件
-                // ondragend: function ({offsetX,offsetY}) {
-                //     console.log("拖动结束",this,offsetX,offsetY)
-                //     that.onShapDragging(count, [offsetX, offsetY]);
-                // }
             }
-            this.graphic.push(graphic)
+            this.options.graphic.push(graphic)
         },
         onShapDragging(id,position){
             let element = this.options.graphic.find(item=>item.id === id)

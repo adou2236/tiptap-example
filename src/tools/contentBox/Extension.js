@@ -4,8 +4,8 @@ import Component from './ContentBox.vue'
 import Paragraph from '@tiptap/extension-paragraph'
 
 
-export default Paragraph.extend({
-    name: 'contentBox',
+export default Node.create({
+    name: 'content-box',
     group: 'block',
     inline: false,
     content: 'block*',
@@ -16,8 +16,19 @@ export default Paragraph.extend({
     //添加里字段
     addAttributes() {
         return {
+            isSplit: {
+                default:false
+            }
         }
     },
+    addCommands() {
+        return {
+            getParagraphHtml: (node) => ({tr}) => {
+                console.log(tr.selectAll)
+            },
+        }
+    },
+
     parseHTML() {
         return [{tag: 'content-box'}]
     },

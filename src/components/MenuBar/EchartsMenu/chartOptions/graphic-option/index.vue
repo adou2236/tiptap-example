@@ -20,7 +20,6 @@ export default {
   },
   methods:{
     handleDelete(id){
-      console.log("id",id)
       this.$emit('deleteGraphic',id)
     },
     addGraphic(){

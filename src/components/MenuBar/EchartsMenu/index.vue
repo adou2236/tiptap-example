@@ -23,9 +23,11 @@
 
       <series-pie v-if="chartType === 'pie'" :series="options.series"></series-pie>
 
-      <series-scatter v-if="chartType === 'scatter'" :series="options.series"></series-scatter>
+      <series-scatter v-if="chartType === 'scatter'" :series="options.series" :additions="options.additions"></series-scatter>
 
-      <graphic-option :graphic="options.graphic" @addGraphic="addGraphic" @deleteGraphic="deleteGraphic"></graphic-option>
+      <graphic-option :graphic="options.graphic"
+                      @addGraphic="addGraphic"
+                      @deleteGraphic="deleteGraphic"></graphic-option>
 
     </el-collapse>
   </el-form>

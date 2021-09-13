@@ -34,7 +34,6 @@ export default Image.extend({
                 }
             },
             setImageSize: (options) => ({ tr, commands  }) => {
-                console.log("进入函数",tr,commands)
                 return commands.updateAttributes('custom-image', {width:options[0],height:options[1]})
             },
         }

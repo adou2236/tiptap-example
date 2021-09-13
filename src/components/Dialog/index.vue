@@ -49,12 +49,14 @@ export default {
   left: 50%;
   transform: translateX(-50%);
   border: 2px solid black;
+  z-index: 1000;
 }
 .close{
   position: absolute;
   right: 20px;
   top: 10px;
   cursor: pointer;
+  z-index: 10001;
 }
 .content{
   height: 100%;

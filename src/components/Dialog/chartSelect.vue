@@ -18,6 +18,7 @@ export default {
         {id:'lab',label:'柱状+折线'},
         {id:'pie',label:'饼状图'},
         {id:'scatter',label:'中国地区气泡图'},
+        {id:'map',label:'热力图'},
       ]
     }
   },

@@ -1,3 +1,5 @@
+import {defaultColor, geography} from "../assets/maps";
+
 const isType = function (type) {
   return function (arg) {
     return Object.prototype.toString.call(arg) === `[object ${type}]`;
@@ -70,6 +72,7 @@ const base = {
     itemWidth: 20,
     itemHeight: 5,
   },
+  "graphic":[],
 }
 //图像初始化选项，柱状图折线图混用
 const optionsInitBAL = function(){
@@ -161,6 +164,30 @@ const optionsInitPIE = function(){
   }
 }
 const optionsInitSCATTER = function(){
+  let series = []
+  geography.forEach((item,index)=>{
+    series.push(
+        {
+          type: 'scatter',
+          name:item.label,
+          label:{
+            show:true,
+            position:[0,0],
+            formatter:'{b}'
+          },
+          labelLine:{
+            show:false
+          },
+          itemStyle:{
+            color:defaultColor[index]
+          },
+          items:item.children,
+          dataIndex:[1,2],
+        }
+    )
+
+  })
+
   return {
     ...base,
     "xAxis": {
@@ -207,21 +234,38 @@ const optionsInitSCATTER = function(){
       borderColor: '#333',
       borderWidth: 0
     },
-    series: [{
-      type: 'scatter',
-      label:{
-        show:true,
-        position:[0,0],
-        formatter:'{b}'
-      },
-      labelLine:{
-        show:true
-      },
-      symbolSize: 20,
-      dataIndex:[1,2],
-    }]
+    series: series,
+    //针对散点图的额外属性
+    "additions":{
+      symbolSize: 10,
+      locationPin:false,//凸显某个地区boolean/string
+      markLine:[],//辅助线array
+    }
   }
 }
+
+const optionsInitMAP = function(){
+  return {
+    ...base,
+    tooltip:{
+      show:true,
+      // formatter:'{b}<br/>{c}',
+      trigger: 'item',  //axis, item, none
+      padding: [5, 10, 5, 10], // 上右下左
+      backgroundColor: '#FFFFFF',
+      borderColor: '#333',
+      borderWidth: 0
+    },
+    geo: {
+      map: 'china',
+    },
+    series: [{
+      type: 'map',
+      map: 'china',
+    }],
+  }
+}
+
 const optionsInit = function (type){
   if(type === 'lab'){
     return optionsInitBAL()
@@ -229,6 +273,8 @@ const optionsInit = function (type){
     return optionsInitPIE()
   }else if(type === 'scatter'){
     return optionsInitSCATTER()
+  }else if(type === 'map'){
+    return optionsInitMAP()
   }
 }
 

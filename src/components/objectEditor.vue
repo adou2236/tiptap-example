@@ -1,6 +1,11 @@
 <template>
   <div>
 <!--    占位数据:<input v-model="viewText"/><br/>-->
+
+    <div v-if="editor&&editor.isActive('content-box')">
+      <button @click="toogleBoxSize(editor.getAttributes('content-box').isSplit)" style="background: #fff200">段落{{contentActionText}}</button>
+      <button @click="boxTest">段落测试</button>
+    </div>
     <div v-if="editor&&editor.isActive('custom-tag')">
       标签类型：<select v-model="type">
         <option value ="string">常量标签</option>
@@ -9,15 +14,15 @@
       </select><br/>
         内部数据：<input v-model="tagIndex"/>
     </div>
-    <div v-else-if="editor&&editor.isActive('custom-image')">
+    <div v-if="editor&&editor.isActive('custom-image')">
       图片属性<br/>
       图片路径<input v-model="imageAttr.src" /><br/>
       图片宽<input v-model="imageAttr.width" />px<br/>
       图片高<input v-model="imageAttr.height" />px<br/>
       <button @click="setImageAttr">确定</button>
     </div>
-    <table-menu v-else-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
-    <echarts-menu v-else-if="editor&&editor.isActive('custom-chart')"
+    <table-menu v-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
+    <echarts-menu v-if="editor&&editor.isActive('custom-chart')"
                   :editor="editor"
                   :options="chartOptions"
     ></echarts-menu>
@@ -44,6 +49,9 @@ export default {
   mounted() {
   },
   computed:{
+    contentActionText(){
+      return this.editor.getAttributes('content-box').isSplit?'合并':'分两列'
+    },
     //如何改变里内容
     type:{
       get(){
@@ -89,8 +97,6 @@ export default {
 
       }
     }
-
-
   },
   watch:{
     currentObject(v){
@@ -98,6 +104,13 @@ export default {
     }
   },
   methods:{
+    boxTest(){
+      console.log(this.editor.chain().focus().getParagraphHtml().run())
+
+    },
+    toogleBoxSize(v){
+      this.editor.chain().focus().updateAttributes('content-box',{isSplit:!v}).run()
+    },
     renderChart(options){
       let base = new baseOptions(options)
       // this.editor.chain().updateAttributes('custom-chart', {options:base.options}).run()
