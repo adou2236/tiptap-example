@@ -1,9 +1,9 @@
 <template>
   <div class="series">
-    <div v-for="(item,index) in dataIndex">
+    <div v-for="(item,index) in items">
       数据项{{index+1}}
       <el-form-item label="数据指标">
-        <el-input v-model="dataIndex[index]" />
+        <el-input v-model="items[index]" />
       </el-form-item>
     </div>
   </div>
@@ -12,10 +12,10 @@
 <script>
 export default {
   model:{
-    prop:'dataIndex'
+    prop:'items'
   },
   props:{
-    dataIndex:Array,
+    items:Array,
   },
   name: "series"
 }

@@ -32,7 +32,7 @@ export default {
     },
     props:{
         editor:{type:Object},
-        index:{type:Array},
+        index:{type:Object},
         options:{type:Object},
     },
     data() {
@@ -52,7 +52,7 @@ export default {
     },
     computed: {
         chartType(){
-            let type = this.options.series[0].type
+            let type = this.index.type
             if(type === 'line' || type === 'bar'){
                 return 'lab'
             }else{

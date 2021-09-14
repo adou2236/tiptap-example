@@ -22,26 +22,38 @@ export default {
       xAxis: ['指数1', '指数2', '指数3', '指数4'],
       data: [200, 100, 300, 400],
       src: '#',
-      loading:false
+      loading:false,
+      complateOptions:{},//附加数据的完整配置
 
     }
   },
   mounted() {
     this.$nextTick(() => {
+      this.loading = true
       this.chartsInit()
+      let temple = deepCopy(this.options)
+      this.complateOptions = this.dataAttach(temple,this.index)
       this.graphRender()
     })
     window.addEventListener('resize', this.resize)
   },
   watch: {
-    index() {
-      for (let i = 0; i < 4; i++) {
-        this.data[i] = Math.random() * 100
-      }
-      this.graphRender()
+    index: {
+      handler() {
+        this.loading = true
+        //指标变化，异步请求
+        setTimeout(()=>{
+          let temple = deepCopy(this.options)
+          this.complateOptions = this.dataAttach(temple,this.index)
+          this.graphRender()
+        },1500)
+      },
+      deep: true, // 深度监听数据变化
     },
     options: {
       handler() {
+        let temple = deepCopy(this.options)
+        this.complateOptions = this.dataAttach(temple,this.index)
         this.graphRender()
       },
       deep: true, // 深度监听数据变化
@@ -54,34 +66,33 @@ export default {
     index() {
       return this.node.attrs.index
     },
-    //完整opt加上数据
-    complateOptions(){
-      let temple = deepCopy(this.options)
-      this.dataAttach(temple)
-      return temple
-    }
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resize)
   },
   methods: {
-    //数据附加
-    dataAttach(options){
-      if(options.series[0].type === 'line' || options.series[0].type === 'bar'){
-        //折线，柱状图数据附加
+    /**
+     * 数据附加，为防止无效数据请求，应该只对index的变化做响应
+     * @param options 配置项
+     * @param index 数据指标
+     * @returns {*} options处理后的原对象
+     */
+    dataAttach(options,index){
+      //柱线图
+      if(index.type === 'lab'){
         options.xAxis.data = this.xAxis
-        options.series.forEach((item,index)=>{
+        options.series.forEach((item,num)=>{
           let arr = []
           for (let i = 0; i < 4; i++) {
-            arr[i] = parseInt( i * 100 * item.dataIndex)
+            arr[i] = parseInt( i * 100 * index.items[num])
           }
           item.data = arr
         })
       }
-      else if(options.series[0].type === 'pie'){
+      else if(index.type === 'pie'){
         //饼状图数据附加
         let data = []
-        options.series[0].dataIndex.forEach((item,index)=>{
+        index.items.forEach((item,index)=>{
           data.push({
             name:`指标名称${index+1}`,
             value:item
@@ -89,7 +100,8 @@ export default {
         })
         options.series[0].data = data
       }
-      else if(options.series[0].type === 'scatter'){
+      else if(index.type === 'scatter'){
+        //散点图
         options.series.forEach((item,index)=>{
           let arr = []
           const pinArea = options.additions.locationPin
@@ -125,7 +137,7 @@ export default {
           })
         }
       }
-      else return options
+      return options
     },
     //函数附加(自定义图形移动函数)
     funcAttach(options){
@@ -154,7 +166,6 @@ export default {
     },
     graphRender() {
       //异步执行，指标更新需要重新获取数据，配置项更新不做处理
-      this.loading = true
       this.funcAttach(this.options)
       if(this.myCharts&&this.complateOptions){
         this.myCharts.setOption(this.complateOptions,true)

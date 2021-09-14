@@ -15,8 +15,9 @@ export default Node.create({
 
     addAttributes() {
         return {
+            //后台所用数据
             index:{
-                default:1
+                default:{}
             },
             //完成绘图后生成的base64
             src:{

@@ -1,6 +1,8 @@
 <template>
   <node-view-wrapper  class="vue-component">
-    <node-view-content ref="text" class="content" :class="[node.attrs.type]"/>
+    <span class="content" :class="[node.attrs.type]" >
+      {{node.attrs.coverText}}
+    </span>
   </node-view-wrapper>
 </template>
 
@@ -17,6 +19,9 @@ export default Vue.extend({
   mounted(){
   },
   methods: {
+    contentChange(v){
+      console.log(v)
+    }
   },
 })
 </script>
@@ -26,6 +31,7 @@ export default Vue.extend({
   display: inline;
 }
 .content {
+  padding: 0 3px;
   margin: 0 3px;
   display: inline;
   &.string{

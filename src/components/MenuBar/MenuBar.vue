@@ -31,26 +31,26 @@ export default {
         {
           icon: 'bold',
           title: '加粗',
-          action: () => this.editor.chain().focus().toggleBold().run(),
-          isActive: () => this.editor.isActive('bold'),
+          action: () => this.editor.chain().focus().toggleFontWeight().run(),
+          isActive: () => this.editor.getAttributes("textStyle").fontWeight,
         },
         {
           icon: 'italic',
           title: '斜体',
           action: () => this.editor.chain().focus().toggleItalic().run(),
-          isActive: () => this.editor.isActive('italic'),
+          isActive: () => this.editor.getAttributes("textStyle").italic,
         },
         {
           icon: 'strikethrough',
           title: '删除线',
-          action: () => this.editor.chain().focus().toggleStrike().run(),
-          isActive: () => this.editor.isActive('strike'),
+          action: () => this.editor.chain().focus().toggleCenterline().run(),
+          isActive: () => this.editor.getAttributes("textStyle").centerLine,
         },
         {
           icon: 'underline',
           title: '下划线',
           action: () => this.editor.chain().focus().toggleUnderline().run(),
-          isActive: () => this.editor.isActive('underline'),
+          isActive: () => this.editor.getAttributes("textStyle").underLine,
         },
         {
           icon: 'emphasis-cn',

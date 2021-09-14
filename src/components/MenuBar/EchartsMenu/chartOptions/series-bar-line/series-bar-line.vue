@@ -1,18 +1,20 @@
 <template>
   <el-collapse-item title="数据项配置" name="7">
     <el-button @click="addSeriesItem" type="primary" size="mini" >添加数据项</el-button>
-    <series v-for="(item,index) in series" :index="index" :item="item"></series>
+    <series v-for="(item,num) in series" :index="num" :item="item" :items="index.items"></series>
   </el-collapse-item>
 </template>
 
 <script>
 import Series from "./series";
-import {deepCopy} from "../../../../../unit/baseType";
+import {deepCopy,labSeriesInit} from "../../../../../unit/baseType";
+
 export default {
   name: "series-bar-line",
   components: {Series},
   props:{
-    series:Array
+    series:Array,
+    index:Object
   },
   data(){
     return{
@@ -21,9 +23,9 @@ export default {
   methods:{
     //添加项目
     addSeriesItem() {
-      let copyData = deepCopy(this.series[0])
-      let newSeries = { ...copyData,dataIndex:undefined}
-      this.series.push(newSeries)
+      let copyData = labSeriesInit()
+      this.series.push(copyData)
+      this.index.items.push(null)
     }
   }
 }

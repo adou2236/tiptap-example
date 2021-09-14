@@ -6,7 +6,6 @@ export default Node.create({
     name: 'custom-tag',
     group: 'inline',
     inline: true,
-    content: 'text*',
     selectable: true,
     draggable: false,
 
@@ -15,6 +14,9 @@ export default Node.create({
         return {
             type: {
                 default: 'string',
+            },
+            coverText:{
+                default:"新建文本"
             },
             index: {
                 default: 'none',
@@ -31,14 +33,26 @@ export default Node.create({
             },
         ]
     },
-    // addCommands() {
-    //     return {
-    //         //设置翻译后文本的样式
-    //         setInnerAttribute: (options) => ({commands}) => {
-    //             console.log(options)
-    //         },
-    //     }
-    // },
+    addCommands() {
+        return {
+            //设置翻译后文本的样式
+            setInnerAttribute: (options) => ({commands}) => {
+                console.log(options)
+            },
+            //标签文字加粗
+            toggleBold: (options) => ({ chain }) => {
+                if(tr.selection?.node?.type?.name === 'custom-tag') {
+                    return commands.updateAttributes('custom-image', options)
+                }
+                else {
+                    return chain()
+                        .setMark('textStyle', { fontFamily: null })
+                        .removeEmptyTextStyle()
+                        .run()
+                }
+            },
+        }
+    },
     // addProseMirrorPlugins () {
     //     const that = this
     //     return [
@@ -57,7 +71,7 @@ export default Node.create({
 
     renderHTML({node,HTMLAttributes}) {
         //此处增加翻译逻辑
-        console.log("Node",node,this)
+        // console.log("Node",node,this)
         return ['span', mergeAttributes(HTMLAttributes),`${node.attrs.index}`]
     },
 

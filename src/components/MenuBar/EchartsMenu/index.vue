@@ -19,11 +19,11 @@
 
       <y-axis-option v-if="chartType !== 'pie'" :yAxis="options.yAxis" @change="changeYAxisOption"></y-axis-option>
 
-      <series-bar-line v-if="chartType === 'lab'" :series="options.series"></series-bar-line>
+      <series-bar-line v-if="chartType === 'lab'" :index="index" :series="options.series"></series-bar-line>
 
-      <series-pie v-if="chartType === 'pie'" :series="options.series"></series-pie>
+      <series-pie v-if="chartType === 'pie'" :index="index" :series="options.series"></series-pie>
 
-      <series-scatter v-if="chartType === 'scatter'" :series="options.series" :additions="options.additions"></series-scatter>
+      <series-scatter v-if="chartType === 'scatter'" :index="index" :series="options.series" :additions="options.additions"></series-scatter>
 
       <graphic-option :graphic="options.graphic"
                       @addGraphic="addGraphic"

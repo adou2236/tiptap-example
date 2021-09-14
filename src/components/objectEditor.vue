@@ -2,29 +2,34 @@
   <div>
 <!--    占位数据:<input v-model="viewText"/><br/>-->
 
-    <div v-if="editor&&editor.isActive('content-box')">
-      <button @click="toogleBoxSize(editor.getAttributes('content-box').isSplit)" style="background: #fff200">段落{{contentActionText}}</button>
-      <button @click="boxTest">段落测试</button>
-    </div>
+<!--    <div v-if="editor&&editor.isActive('content-box')">-->
+<!--      <button @click="toogleBoxSize(editor.getAttributes('content-box').isSplit)" style="background: #fff200">段落{{contentActionText}}</button>-->
+<!--      <button @click="boxTest">段落测试</button>-->
+<!--    </div>-->
     <div v-if="editor&&editor.isActive('custom-tag')">
       标签类型：<select v-model="type">
         <option value ="string">常量标签</option>
         <option value ="formula">公式标签</option>
         <option value="request">函数标签</option>
-      </select><br/>
-        内部数据：<input v-model="tagIndex"/>
+      </select>
+      <br/>
+      外部文本：<textarea v-model="coverText"/>
+      <br/>
+      翻译文本：<textarea v-model="tagIndex"/>
+<!--      <button @click="setTagAttr">确定</button>-->
     </div>
-    <div v-if="editor&&editor.isActive('custom-image')">
+    <div v-else-if="editor&&editor.isActive('custom-image')">
       图片属性<br/>
       图片路径<input v-model="imageAttr.src" /><br/>
       图片宽<input v-model="imageAttr.width" />px<br/>
       图片高<input v-model="imageAttr.height" />px<br/>
       <button @click="setImageAttr">确定</button>
     </div>
-    <table-menu v-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
-    <echarts-menu v-if="editor&&editor.isActive('custom-chart')"
+    <table-menu v-else-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
+    <echarts-menu v-else-if="editor&&editor.isActive('custom-chart')"
                   :editor="editor"
                   :options="chartOptions"
+                  :index="chartIndex"
     ></echarts-menu>
 <!--                      @renderChart="renderChart"-->
   </div>
@@ -58,7 +63,7 @@ export default {
         return this.editor.getAttributes('custom-tag').type || ''
       },
       set(v){
-        this.editor.chain().focus().updateAttributes('custom-tag',{type:v}).run()
+        this.editor.chain().updateAttributes('custom-tag',{type:v}).run()
       }
     },
     chartOptions: {
@@ -70,10 +75,17 @@ export default {
     },
     chartIndex:{
       get(){
-        return this.editor.getAttributes('custom-chart').index || []
+        return this.editor.getAttributes('custom-chart').index || {}
       },
       set(v){
-        // this.editor.chain().updateAttributes('custom-chart',{index:v}).run()
+      }
+    },
+    coverText:{
+      get(){
+        return this.editor.getAttributes('custom-tag').coverText || ''
+      },
+      set(v){
+        this.editor.chain().updateAttributes('custom-tag',{coverText:v}).run()
       }
     },
     tagIndex:{
@@ -82,6 +94,18 @@ export default {
       },
       set(v){
         this.editor.chain().updateAttributes('custom-tag',{index:v}).run()
+      }
+    },
+    tagAttr:{
+      get(){
+        return{
+          type:this.editor.getAttributes('custom-tag').type,
+          index:this.editor.getAttributes('custom-tag').index,
+          coverText:this.editor.getAttributes('custom-tag').coverText,
+        }
+      },
+      set(){
+
       }
 
     },
@@ -122,6 +146,14 @@ export default {
     //   }
     //   this.editor.chain().focus().setChartOptions('custom-chart',data).run()
     // },
+    setTagAttr(){
+      let data = {
+        type:this.tagAttr.type,
+        index:this.tagAttr.index,
+        coverText:this.tagAttr.coverText,
+      }
+      this.editor.chain().focus().updateAttributes('custom-tag',data).run()
+    },
     setImageAttr(){
       let data = {
         width:this.imageAttr.width,

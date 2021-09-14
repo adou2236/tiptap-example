@@ -2,7 +2,7 @@
   <div class="series">
     数据项{{index+1}}
     <el-form-item label="数据指标">
-      <el-input v-model="item.dataIndex" />
+      <el-input v-model="items[index]" />
     </el-form-item>
     <el-form-item label="图像类型">
       <el-select v-model="item.type">
@@ -64,7 +64,8 @@
 export default {
   props:{
     index:Number,
-    item:Object
+    item:Object,
+    items:Array
   },
   name: "series"
 }

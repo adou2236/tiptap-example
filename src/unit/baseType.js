@@ -75,7 +75,7 @@ const base = {
   "graphic":[],
 }
 //图像初始化选项，柱状图折线图混用
-const optionsInitBAL = function(){
+const optionsInitLAB = function(){
   return {
     ...base,
     "tooltip": {
@@ -123,22 +123,22 @@ const optionsInitBAL = function(){
       }
     },
     "series": [
-      {
-        "type": 'line',
-        "lineStyle":{
-          color:'#333',
-          width:1
-        },
-        "itemStyle":{
-          color:'#333',
-          borderColor:'',
-          borderWidth:'',
-          borderRadius:''
-        },
-        "areaStyle":{
-          color:'transparent'
-        }
-      }
+      // {
+      //   "type": 'line',
+      //   "lineStyle":{
+      //     color:'#333',
+      //     width:1
+      //   },
+      //   "itemStyle":{
+      //     color:'#333',
+      //     borderColor:'',
+      //     borderWidth:'',
+      //     borderRadius:''
+      //   },
+      //   "areaStyle":{
+      //     color:'transparent'
+      //   }
+      // }
     ],
   }
 }
@@ -156,7 +156,6 @@ const optionsInitPIE = function(){
     "series": [
       {
         "type": 'pie',
-        "dataIndex":[],
         "radius": ['0%', '70%'],//内外半径
         "center": ['50%', '50%'],//中心位置
       }
@@ -182,7 +181,6 @@ const optionsInitSCATTER = function(){
             color:defaultColor[index]
           },
           items:item.children,
-          dataIndex:[1,2],
         }
     )
 
@@ -268,7 +266,7 @@ const optionsInitMAP = function(){
 
 const optionsInit = function (type){
   if(type === 'lab'){
-    return optionsInitBAL()
+    return optionsInitLAB()
   }else if(type === 'pie'){
     return optionsInitPIE()
   }else if(type === 'scatter'){
@@ -278,5 +276,34 @@ const optionsInit = function (type){
   }
 }
 
-export {deepCopy,baseOptions,optionsInitBAL,optionsInit}
+//柱线图单项初始化
+const labSeriesInit = function () {
+  return {
+      "type": 'line',
+      "lineStyle":{
+        color:'#333',
+        width:1
+      },
+      "itemStyle":{
+        color:'#333',
+        borderColor:'',
+        borderWidth:'',
+        borderRadius:''
+      },
+      "areaStyle":{
+        color:'transparent'
+      }
+    }
+
+}
+
+const indexInit = function (type){
+  return {
+    type:type,
+    xAxis:'',
+    items:[]
+  }
+}
+
+export {deepCopy,baseOptions,optionsInitLAB,optionsInit,indexInit,labSeriesInit}
 

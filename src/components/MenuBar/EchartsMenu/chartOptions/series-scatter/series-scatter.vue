@@ -1,10 +1,10 @@
 <template>
   <el-collapse-item title="数据项配置" name="7">
     <el-form-item label="横坐标指标">
-      <el-input v-model="series[0].dataIndex[0]"></el-input>
+      <el-input v-model="index.items[0]"></el-input>
     </el-form-item>
     <el-form-item label="纵坐标指标">
-      <el-input v-model="series[0].dataIndex[1]"></el-input>
+      <el-input v-model="index.items[1]"></el-input>
     </el-form-item>
     <el-form-item label="标记大小">
       <el-input-number v-model="additions.symbolSize"></el-input-number>
@@ -75,8 +75,12 @@ import {geography} from "../../../../../assets/maps";
 export default {
   name: "series-scatter",
   props:{
+    //图表配置
     series:Array,
-    additions:Object
+    //额外配置（辅助线，放大地区，标记大小）
+    additions:Object,
+    //数据项
+    index:Object
   },
   data(){
     return{
