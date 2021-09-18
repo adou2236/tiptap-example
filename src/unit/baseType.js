@@ -15,6 +15,18 @@ export const isArray = isType('Array');
 
 export const isDate = isType('Date');
 
+const formateFunction = function(name,params){
+  this.name = name;
+  this.params = params
+  this.__proto__.toString = () => {
+    if(this.name&&this.params){
+      let paramsStr = params.map(item=>item.value).toString()
+      return `${name}(${paramsStr})`
+    }else return ''
+
+  }
+}
+
 const deepCopy = function(data) {
   if (!Array.isArray(data) && !isObject(data)) {
     return data;
@@ -305,5 +317,5 @@ const indexInit = function (type){
   }
 }
 
-export {deepCopy,baseOptions,optionsInitLAB,optionsInit,indexInit,labSeriesInit}
+export {deepCopy,baseOptions,optionsInitLAB,optionsInit,indexInit,labSeriesInit,formateFunction}
 

@@ -7,20 +7,19 @@ export default Node.create({
     group: 'inline',
     inline: true,
     selectable: true,
-    draggable: false,
+    draggable: true,
 
     //添加里字段
     addAttributes() {
         return {
             type: {
-                default: 'string',
+                default: 'variety',
             },
             coverText:{
                 default:"新建文本"
             },
-            index: {
-                default: 'none',
-                require: true
+            content: {
+                default: {},
             }
 
         }

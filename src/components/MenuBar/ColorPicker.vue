@@ -45,7 +45,6 @@ export default {
       this.$emit('action',item)
     },
     showPicker(){
-      console.log("asd",this.isActive())
       this.visible=!this.visible
     },
     hidePicker(){

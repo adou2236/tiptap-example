@@ -24,7 +24,7 @@ export default {
           this.$emit("lineInsert");
           break
         case 'tag':
-          this.$emit("tagInsert");
+          this.$emit("tagInsert",item.type);
           break
         case 'image':
           this.$emit("imageInsert");

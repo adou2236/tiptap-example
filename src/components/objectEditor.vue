@@ -3,21 +3,23 @@
 <!--    占位数据:<input v-model="viewText"/><br/>-->
 
 <!--    <div v-if="editor&&editor.isActive('content-box')">-->
-<!--      <button @click="toogleBoxSize(editor.getAttributes('content-box').isSplit)" style="background: #fff200">段落{{contentActionText}}</button>-->
+<!--&lt;!&ndash;      <button @click="toogleBoxSize(editor.getAttributes('content-box').isSplit)" style="background: #fff200">段落{{contentActionText}}</button>&ndash;&gt;-->
 <!--      <button @click="boxTest">段落测试</button>-->
 <!--    </div>-->
-    <div v-if="editor&&editor.isActive('custom-tag')">
-      标签类型：<select v-model="type">
-        <option value ="string">常量标签</option>
-        <option value ="formula">公式标签</option>
-        <option value="request">函数标签</option>
-      </select>
-      <br/>
-      外部文本：<textarea v-model="coverText"/>
-      <br/>
-      翻译文本：<textarea v-model="tagIndex"/>
-<!--      <button @click="setTagAttr">确定</button>-->
-    </div>
+<!--    <div v-if="editor&&editor.isActive('custom-tag')">-->
+<!--      标签类型：<select v-model="type">-->
+<!--        <option value ="string">常量标签</option>-->
+<!--        <option value ="formula">公式标签</option>-->
+<!--        <option value="request">函数标签</option>-->
+<!--      </select>-->
+<!--      <br/>-->
+<!--      外部文本：<textarea v-model="coverText"/>-->
+<!--      <br/>-->
+<!--      翻译文本：<textarea v-model="tagIndex"/>-->
+<!--&lt;!&ndash;      <button @click="setTagAttr">确定</button>&ndash;&gt;-->
+<!--    </div>-->
+    <tag-menu v-if="editor&&editor.isActive('custom-tag')" :editor="editor">
+    </tag-menu>
     <div v-else-if="editor&&editor.isActive('custom-image')">
       图片属性<br/>
       图片路径<input v-model="imageAttr.src" /><br/>
@@ -38,6 +40,7 @@
 <script>
 import TableMenu from "./MenuBar/TableMenu";
 import EchartsMenu from "./MenuBar/EchartsMenu/index.vue"
+import TagMenu from './MenuBar/tagMenu/tagMenu.vue'
 import {baseOptions} from "../unit/baseType";
 export default {
   name: "objectEditor",
@@ -130,7 +133,6 @@ export default {
   methods:{
     boxTest(){
       console.log(this.editor.chain().focus().getParagraphHtml().run())
-
     },
     toogleBoxSize(v){
       this.editor.chain().focus().updateAttributes('content-box',{isSplit:!v}).run()

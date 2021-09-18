@@ -6,6 +6,7 @@ export default Node.create({
     name: 'custom-chart',
     group: 'block',
     // inline: false,
+    content: 'block*',
     selectable: true,
     draggable: false,
     atom: true,
@@ -15,6 +16,8 @@ export default Node.create({
 
     addAttributes() {
         return {
+            title:{},
+            source:{},
             //后台所用数据
             index:{
                 default:{}
@@ -45,6 +48,7 @@ export default Node.create({
     },
 
     renderHTML({HTMLAttributes}) {
+        // console.log(HTMLAttributes)
         let attr = {
             src:HTMLAttributes.src,
             class:'chart'

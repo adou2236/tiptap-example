@@ -1,5 +1,10 @@
 <template>
-  <node-view-wrapper :id="`chart-${random}`" class="chart" v-loading="loading" element-loading-text="模拟异步加载">
+  <node-view-wrapper style="padding: 10px">
+    <node-view-content as="p" class="title"></node-view-content>
+    <div :id="`chart-${random}`" class="chart"
+         v-loading="loading"
+         element-loading-text="模拟异步加载"></div>
+    <node-view-content as="p" class="source" v-model="node.source"/>
   </node-view-wrapper>
 </template>
 
@@ -11,6 +16,7 @@ import {randomTweenData} from "../../assets/maps";
 import '../../assets/china.js'
 export default {
   name: "chartBox",
+  props: nodeViewProps,
   components: {
     NodeViewWrapper,
     NodeViewContent
@@ -133,7 +139,10 @@ export default {
           })
           options.series.push({
             type:"scatter",
-            markLine:markLine
+            markLine:{
+              animation:false,
+              ...markLine
+            }
           })
         }
       }
@@ -193,6 +202,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.title{
+  color: #C8152E;
+  border-bottom: 2px solid black;
+  font-family: STSong;
+  line-height: 30px;
+  min-height: 30px;
+}
+.source{
+  color: #C8152E;
+  border-top: 2px solid black;
+  font-family: STSong;
+
+}
 
 
 </style>

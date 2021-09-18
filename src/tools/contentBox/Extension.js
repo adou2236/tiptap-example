@@ -1,7 +1,6 @@
-import { Node, mergeAttributes } from '@tiptap/core'
+import {Node, mergeAttributes, getSchema, getHTMLFromFragment} from '@tiptap/core'
 import { VueNodeViewRenderer } from '@tiptap/vue-2'
 import Component from './ContentBox.vue'
-import Paragraph from '@tiptap/extension-paragraph'
 
 
 export default Node.create({
@@ -23,8 +22,10 @@ export default Node.create({
     },
     addCommands() {
         return {
-            getParagraphHtml: (node) => ({tr}) => {
-                console.log(tr.selectAll)
+            getParagraphHtml: () => (node) => {
+                console.log(this,node)
+                const schema = getSchema(editor.extensionManager.extensions)
+                // return getHTMLFromFragment(node,schema)
             },
         }
     },

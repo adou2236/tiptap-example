@@ -34,10 +34,13 @@ export default Vue.extend({
   padding: 0 3px;
   margin: 0 3px;
   display: inline;
-  &.string{
+  &.smart{
+    background: #68cef8;
+  }
+  &.variety{
     background: #b38a8a;
   }
-  &.formula{
+  &.function{
     background: #72a572;
   }
   &.request{
