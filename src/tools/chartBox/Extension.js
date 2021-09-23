@@ -16,8 +16,6 @@ export default Node.create({
 
     addAttributes() {
         return {
-            title:{},
-            source:{},
             //后台所用数据
             index:{
                 default:{}

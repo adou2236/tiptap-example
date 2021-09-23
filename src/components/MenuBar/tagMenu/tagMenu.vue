@@ -1,21 +1,22 @@
 <template>
   <div>
+    <button @click="handleFocus">聚焦</button>
     外部文本：
     <br/>
-    <button @click="changeType">改变类型</button>
-    <el-input type="textarea" v-model="coverText"></el-input>
+    <el-input autofocus type="textarea" v-model="coverText"></el-input>
     <div v-if="type === 'variety'">
-      变量内容
-      <select>
-        <option>date</option>
-        <option>area</option>
-        <option>index</option>
-      </select>
+      变量内容:
+      <br/>
+      <el-select v-model="content">
+        <el-option label="date" value="date">date</el-option>
+        <el-option label="area" value="area">area</el-option>
+        <el-option label="index" value="index">index</el-option>
+      </el-select>
     </div>
     <div v-if="type === 'function'">
-      函数内容
-      <button @click="changeType">改变type</button>
-      <button @click="changeFunction">插入函数</button>
+      函数内容:
+      <br/>
+      <button @click="changeFunction">插入/修改函数</button>
       <br/>
       {{functionJson.toString()}}
     </div>
@@ -56,6 +57,11 @@ export default {
         return this.editor.getAttributes('custom-tag').type || ''
       }
     },
+    varietyData:{
+      get(){
+        return this.editor.getAttributes('custom-tag').type || ''
+      }
+    },
     coverText:{
       get(){
         return this.editor.getAttributes('custom-tag').coverText || ''
@@ -68,25 +74,29 @@ export default {
     },
     content:{
       get(){
-        console.log(this.editor)
         return this.editor.getAttributes('custom-tag').content || ''
+      },
+      set(v){
+        this.editor.chain().updateAttributes('custom-tag', {content:v}).run()
       }
     }
   },
   async created() {
-    this.functionJson = new formateFunction(this.content.name,this.content.params)
+    this.functionJson = new formateFunction(this.content)
   },
   methods:{
     handleFocus(){
-      console.log("聚焦")
-      this.editor.chain().focus().updateAttributes('custom-tag',{type:"variety"}).run()
+      let type = this.editor.getAttributes('custom-tag').type || ''
+      console.log(type)
+      this.editor.chain().updateAttributes('custom-tag',{type:'variety'}).run()
+      // this.editor.chain().updateAttributes('custom-tag',{type:type}).run()
     },
     changeType(){
       this.editor.chain().updateAttributes('custom-tag',{type:'variety'}).run()
     },
     getFunc(obj){
-      this.functionJson = new formateFunction(obj.name,obj.params)
-      this.editor.chain().focus().updateAttributes('custom-tag',{content:obj}).run()
+      this.functionJson = new formateFunction(obj)
+      this.editor.chain().updateAttributes('custom-tag',{content:obj}).run()
       this.visible = false
     },
     changeFunction(){

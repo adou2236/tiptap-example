@@ -1,10 +1,10 @@
 <template>
   <node-view-wrapper style="padding: 10px">
-    <node-view-content as="p" class="title"></node-view-content>
+<!--    <node-view-content as="p" class="title"></node-view-content>-->
     <div :id="`chart-${random}`" class="chart"
          v-loading="loading"
          element-loading-text="模拟异步加载"></div>
-    <node-view-content as="p" class="source" v-model="node.source"/>
+<!--    <node-view-content as="p" class="source" v-model="node.source"/>-->
   </node-view-wrapper>
 </template>
 
@@ -153,11 +153,11 @@ export default {
       const that = this
       options?.graphic.forEach((item,index)=>{
         item.ondragend = function(){
-          that.onShapDragging(item.id, [this.x, this.y]);
+          that.onShapeDragging(item.id, [this.x, this.y]);
         }
       })
     },
-    onShapDragging(id,position){
+    onShapeDragging(id,position){
       let element = this.options.graphic.find(item=>item.id === id)
       element.left = position[0]
       element.top = position[1]

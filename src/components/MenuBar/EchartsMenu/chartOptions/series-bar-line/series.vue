@@ -10,6 +10,18 @@
         <el-option label="line" value="line"></el-option>
       </el-select>
     </el-form-item>
+    <el-form-item label="堆叠指数">
+      <el-select v-model="item.stack">
+        <el-option label="不堆叠" :value="false">不堆叠</el-option>
+        <el-option :value="'1'">1</el-option>
+        <el-option :value="'2'">2</el-option>
+        <el-option :value="'3'">3</el-option>
+        <el-option :value="'4'">4</el-option>
+        <el-option :value="'5'">5</el-option>
+      </el-select>
+
+    </el-form-item>
+
     <el-form-item label="颜色">
       <el-color-picker v-model="item.itemStyle.color"></el-color-picker>
     </el-form-item>
@@ -67,7 +79,17 @@ export default {
     item:Object,
     items:Array
   },
-  name: "series"
+  name: "series",
+  methods:{
+    changeStack(value){
+      if(value === false){
+        this.item.stack = '1'
+      }else{
+        this.item.stack = false
+      }
+
+    }
+  }
 }
 </script>
 

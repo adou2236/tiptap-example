@@ -54,15 +54,12 @@ export default {
       extensions: this.defaultProps,
       content: json,
       editable: true,
-      autofocus:'end',
       onCreate({editor}){
       },
       onUpdate({editor}){
-        console.log('更新2')
         let json = editor.getJSON()
+        console.log('更新2',json)
         that.mainEditor.chain().updateAttributes('custom-tag',{content:json.content[0].content}).run()
-        // that.editor.chain().focus().run()
-        // that.mainEditor.updateAttributes('custom-tag',{content:json.content[0].content})
       },
     })
   },

@@ -15,15 +15,14 @@ export const isArray = isType('Array');
 
 export const isDate = isType('Date');
 
-const formateFunction = function(name,params){
-  this.name = name;
-  this.params = params
+const formateFunction = function(content){
+  this.name = content.name;
+  this.params = content.params
   this.__proto__.toString = () => {
     if(this.name&&this.params){
-      let paramsStr = params.map(item=>item.value).toString()
-      return `${name}(${paramsStr})`
+      let paramsStr = content.params.map(item=>item.value).toString()
+      return `${content.name}(${paramsStr})`
     }else return ''
-
   }
 }
 
@@ -292,6 +291,8 @@ const optionsInit = function (type){
 const labSeriesInit = function () {
   return {
       "type": 'line',
+      //堆叠指数
+      "stack": false,
       "lineStyle":{
         color:'#333',
         width:1

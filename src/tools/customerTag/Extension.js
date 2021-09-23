@@ -1,13 +1,16 @@
-import { Node, mergeAttributes } from '@tiptap/core'
-import { VueNodeViewRenderer } from '@tiptap/vue-2'
+import {Node, mergeAttributes, getSchema} from '@tiptap/core'
+import {generateHTML, VueNodeViewRenderer} from '@tiptap/vue-2'
 import Component from './ComponentEdit.vue'
+import Document from '@tiptap/extension-document'
+import Paragraph from '@tiptap/extension-paragraph'
+import Text from '@tiptap/extension-text'
 
 export default Node.create({
     name: 'custom-tag',
     group: 'inline',
     inline: true,
     selectable: true,
-    draggable: true,
+    draggable: false,
 
     //添加里字段
     addAttributes() {
@@ -20,7 +23,7 @@ export default Node.create({
             },
             content: {
                 default: {},
-            }
+            },
 
         }
     },
@@ -39,17 +42,6 @@ export default Node.create({
                 console.log(options)
             },
             //标签文字加粗
-            toggleBold: (options) => ({ chain }) => {
-                if(tr.selection?.node?.type?.name === 'custom-tag') {
-                    return commands.updateAttributes('custom-image', options)
-                }
-                else {
-                    return chain()
-                        .setMark('textStyle', { fontFamily: null })
-                        .removeEmptyTextStyle()
-                        .run()
-                }
-            },
         }
     },
     // addProseMirrorPlugins () {
@@ -70,9 +62,13 @@ export default Node.create({
 
     renderHTML({node,HTMLAttributes}) {
         //此处增加翻译逻辑
-        // console.log("Node",node,this)
-        return ['span', mergeAttributes(HTMLAttributes),`${node.attrs.index}`]
+        // 深度优先递归执行❌太难
+        //将数据分解为表达式与结果，翻译时计算结果值
+        const {result} = node.attrs
+        return ['span', mergeAttributes(),`${result}`]
     },
+
+
 
     addNodeView() {
         return VueNodeViewRenderer(Component)

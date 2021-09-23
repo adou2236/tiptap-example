@@ -15,7 +15,7 @@
         </button>
       </div>
     </button>
-
+    <check-box v-model="checkBoxVisible" :content="checkContent" @reCheck="selectItem('check')"></check-box>
   </node-view-wrapper>
 </template>
 
@@ -23,10 +23,12 @@
 import Vue from 'vue'
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from '@tiptap/vue-2'
 import { getHTMLFromFragment, getSchema, } from '@tiptap/core'
+import CheckBox from "./checkBox";
 
 
 export default Vue.extend({
   components: {
+    CheckBox,
     NodeViewWrapper,
     NodeViewContent
   },
@@ -35,6 +37,8 @@ export default Vue.extend({
     return {
       drawShow:false,
       isFocus:false,
+      checkBoxVisible:false,
+      checkContent:'空',
       items:[
         // {id:'insert',label:'插入'},
         {id:'delete',label:'删除'},
@@ -59,8 +63,10 @@ export default Vue.extend({
         console.log("插入")
       }else if(id === 'check'){
         const schema = getSchema(this.editor.extensionManager.extensions)
-        console.log(getHTMLFromFragment(this.node,schema))
+        this.checkContent = getHTMLFromFragment(this.node,schema)
+        this.checkBoxVisible = true
       }
+      this.drawShow = false
     },
     hidePicker(){
       this.drawShow=false
@@ -134,6 +140,7 @@ export default Vue.extend({
       }
     }
   }
+
 }
 
 
