@@ -1,7 +1,7 @@
 <template>
-  <el-collapse-item title="数据项配置" name="7">
+  <el-collapse-item title="数据项配置" name="a-3">
     <el-button @click="addSeriesItem" type="primary" size="mini" >添加数据项</el-button>
-    <series v-model="index.items"></series>
+    <series :items="index.items"></series>
   </el-collapse-item>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="数据项配置" name="7">
+  <el-collapse-item title="数据项配置" name="a-4">
     <el-form-item label="横坐标指标">
       <el-input v-model="index.items[0]"></el-input>
     </el-form-item>

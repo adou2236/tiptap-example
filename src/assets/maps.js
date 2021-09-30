@@ -73,6 +73,8 @@ const province = [
     "新疆",
 ]
 
+const shandong = ['青岛','济南','菏泽','滨州']
+
 const defaultColor = [
     '#f34a4a',
     "#3c3cec",
@@ -88,4 +90,4 @@ const geography = [
 ]
 
 
-export {randomData,randomTweenData,defaultColor,province,geography}
+export {randomData,randomTweenData,defaultColor,province,geography,shandong}

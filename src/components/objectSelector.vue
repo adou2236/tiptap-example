@@ -1,10 +1,12 @@
 <template>
   <div>
     <button v-for="(item,index) in objects" :key="index" @click="handleSelect(item)">{{item.name}}</button>
+    <br/>
   </div>
 </template>
 
 <script>
+
 export default {
   name: "objectSelector",
   props:{
@@ -15,6 +17,10 @@ export default {
     objects:{
       type:Array,
       default:()=>[]
+    },
+  },
+  data(){
+    return{
     }
   },
   methods:{
@@ -38,6 +44,20 @@ export default {
       }
 
     },
+    handleAddVar(type){
+      let temp = {
+        varKey :'new',
+        varValue: '新的东西',
+        varType: '5'
+      }
+      if(type === "global"){
+        globalVar.push(temp)
+      }
+
+    }
+  },
+  mounted() {
+    console.log(this.editor)
   }
 }
 </script>

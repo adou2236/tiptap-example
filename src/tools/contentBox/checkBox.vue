@@ -5,7 +5,7 @@
       <span @click="reCheck" class="reCheck-btn">刷新</span>
       <span @click="close" class="close-btn">X</span>
     </div>
-    <div v-html="content">aaaaa</div>
+    <div v-html="content"></div>
   </div>
 </template>
 

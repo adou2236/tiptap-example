@@ -253,6 +253,85 @@ const optionsInitSCATTER = function(){
   }
 }
 
+const optionsInitCOMBO = function(){
+  return {
+    ...base,
+    "xAxis": {
+      "show": true,
+      data:[],
+      "axisLine": {
+        "show": true,
+        "lineStyle": {
+          "color": "",
+          "width": 1,
+          "type": "solid"
+        },
+      },
+      splitLine: {
+        show:false,
+        lineStyle: {
+          color: "",
+          width: 0
+        }
+      }
+    },
+    "yAxis": {
+      axisLine: {
+        show: true,
+        lineStyle: {
+          color: "",
+          width: 1,
+          type: "solid"
+        }
+      },
+      splitLine: {
+        show:false,
+        lineStyle: {
+          color: "",
+          width: 0
+        }
+      }
+    },
+    tooltip:{
+      show:true,
+      trigger: 'axis',  //axis, item, none
+      padding: [5, 10, 5, 10], // 上右下左
+      backgroundColor: '#FFFFFF',
+      borderColor: '#333',
+      borderWidth: 0
+    },
+    "series": [
+      {
+        name: '2011',
+        type: 'bar',
+        barWidth:10,
+        data: [],
+        colorByRegion:false,
+      },
+      {
+        name: '2012',
+        type: 'scatter',
+        symbol:'rect',
+        symbolSize:[100,10],
+        data: [],
+        colorByRegion:false,
+      }
+    ],
+    //针对复杂组合图的额外属性
+    "additions":{
+      xType:'region',//横坐标类型region/time
+      xIndex:'china',//横坐标数据值
+      //数据使用多维度，通过xAxis.data的值来改变顺序
+      sortIndex:0,//排序指标，默认第一个
+      //单一数据项指标
+      dataIndex:'存贷比',
+      //每项指标对应查询
+      seriesIndex:[2019,2020],
+      markLine:[],//辅助线array
+    }
+  }
+}
+
 const optionsInitMAP = function(){
   return {
     ...base,
@@ -276,15 +355,24 @@ const optionsInitMAP = function(){
 }
 
 const optionsInit = function (type){
-  if(type === 'lab'){
-    return optionsInitLAB()
-  }else if(type === 'pie'){
-    return optionsInitPIE()
-  }else if(type === 'scatter'){
-    return optionsInitSCATTER()
-  }else if(type === 'map'){
-    return optionsInitMAP()
+  switch (type) {
+    //简单柱线组合图
+    case 'lab':
+      return optionsInitLAB()
+    //简单饼状图
+    case 'pie':
+      return optionsInitPIE()
+    //复杂气泡图
+    case 'scatter':
+      return optionsInitSCATTER()
+    //复杂地图
+    case 'map':
+      return optionsInitMAP()
+    //复杂组合图
+    case 'combo':
+      return optionsInitCOMBO()
   }
+
 }
 
 //柱线图单项初始化
@@ -318,5 +406,12 @@ const indexInit = function (type){
   }
 }
 
-export {deepCopy,baseOptions,optionsInitLAB,optionsInit,indexInit,labSeriesInit,formateFunction}
+//31省数据模拟
+const regionData = [1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3]
+const timeData = [1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3]
+
+
+
+
+export {deepCopy,baseOptions,optionsInitLAB,optionsInit,indexInit,labSeriesInit,formateFunction,regionData}
 

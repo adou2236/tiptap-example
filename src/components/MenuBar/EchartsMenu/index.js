@@ -14,10 +14,12 @@ import SeriesBarLine from "./chartOptions/series-bar-line/series-bar-line";
 import SeriesPie from "./chartOptions/series-pie/series-pie";
 import PieSize from "./chartOptions/series-pie/pie-size";
 import SeriesScatter from "./chartOptions/series-scatter/series-scatter";
+import SeriesCombo from "./chartOptions/series-combo/series-combo";
 
 
 export default {
     components: {
+        SeriesCombo,
         SeriesScatter,
         PieSize,
         SeriesPie,
@@ -38,6 +40,7 @@ export default {
     data() {
         return {
             activeNames:[],
+            activeNames2:[],
             xAxisData:[],
             backgroundColor: this.options.backgroundColor,
             title: this.options.title,
@@ -83,12 +86,13 @@ export default {
         //     })
         // },
         //绑定值变化，重新绘图
-        chartOptions: {
-            handler(to) {
-                this.$emit('renderChart',to)
-            },
-            deep: true, // 深度监听
-        },
+        // chartOptions: {
+        //     handler(to) {
+        //         console.log("这是什么玩意")
+        //         this.$emit('renderChart',to)
+        //     },
+        //     deep: true, // 深度监听
+        // },
 
     },
     mounted() {
@@ -125,11 +129,6 @@ export default {
                 },
             }
             this.options.graphic.push(graphic)
-        },
-        onShapDragging(id,position){
-            let element = this.options.graphic.find(item=>item.id === id)
-            element.left = position[0]
-            element.top = position[1]
         },
         // renderChart(options = this.options){
         //     // this.options.backgroundColor = "#FF0000"

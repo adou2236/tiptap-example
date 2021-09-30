@@ -8,6 +8,7 @@
 import Vue from 'vue'
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from '@tiptap/vue-2'
 import {deepCopy, formateFunction} from "../../unit/baseType";
+import {getVarsById} from "../../request/api";
 
 export default Vue.extend({
   components: {
@@ -15,15 +16,20 @@ export default Vue.extend({
     NodeViewContent
   },
   props: nodeViewProps,
+  data(){
+    return{
+      //相对局部变量表
+      vars:[],
+    }
+  },
   watch:{
     content:{
       //监听内容更改，重新获取result
-      async handler(v) {
-        this.node.attrs.result = await this.getResult(v)
+      handler() {
+        this.node.attrs.result = this.getResult(this.node)
       },
-      deep: true,
+      deep: false,
     }
-
   },
   computed:{
     content(){
@@ -31,24 +37,47 @@ export default Vue.extend({
     }
   },
   async created(){
+    let id = "15_root"
+    if(this.node.attrs.type === 'smart'&&this.node.attrs.id){
+      id=this.node.attrs.id
+    }
+    this.vars = await this.getVars(id)
     if(this.node.attrs.type === 'function'){
       this.node.attrs.content = new formateFunction(this.node.attrs.content)
     }
-    this.node.attrs.result = await this.getResult()
+    this.node.attrs.result = this.getResult(this.node)
+  },
+  mounted() {
   },
   methods: {
+    async getVars(id){
+      let {data} = await getVarsById(id)
+      return data.content.data
+    },
     //异步请求接口
-    getResult(content){
-      return new Promise((resolve,reject)=>{
-        setTimeout(()=>{
-          if(content){
-            resolve("更改内容重新请求")
-          }else{
-            resolve("异步获取结果")
-          }
-        },1000)
-      })
-
+    //智能文本翻译递归实现
+    getResult(node,from='outter'){
+      let result = ''
+      let nodeType = node.type
+      //！==inner只对独立的变量进行翻译，智能文本中的变量不翻译
+      if(nodeType === 'custom-tag'||nodeType.name === 'custom-tag'){
+        //自定义标签处理方法
+        let type = node.attrs.type
+        let content = node.attrs.content
+        if(type === "variety"&&content){
+          //变量处理
+          result += this.vars.find(item=>item.varKey === content)?.varValue||'未知变量'
+        }else if(type === "smart"&&content){
+          //智能文本处理
+          content.forEach(item=>{
+            result+=this.getResult(item,"inner")
+          })
+        }
+      }else if(nodeType === 'text'){
+        //纯文本处理
+        result += node.text
+      }
+      return result
     }
   },
 })
@@ -74,6 +103,10 @@ export default Vue.extend({
   &.request{
     background: #cbcb86;
   }
+  &.focus{
+    outline: 3px solid #68cef8;
+  }
+
 }
 
 </style>

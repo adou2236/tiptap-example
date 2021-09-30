@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="x轴配置" name="4">
+  <el-collapse-item title="x轴配置" name="s-5">
     <el-form-item label="坐标名称">
       <el-input v-model="xAxis.name"/>
     </el-form-item>

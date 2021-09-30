@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="提示框配置" name="6">
+  <el-collapse-item title="提示框配置" name="a-2">
     <el-form-item label="显示隐藏">
       <el-switch v-model="tooltip.show"></el-switch>
     </el-form-item>

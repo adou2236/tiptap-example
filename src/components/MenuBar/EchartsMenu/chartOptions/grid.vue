@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="边距配置" name="3">
+  <el-collapse-item title="边距配置" name="s-3">
     <el-form-item label="上边距">
       <el-radio-group v-model="topType">
         <el-radio-button label="1" value="1">绝对值</el-radio-button>

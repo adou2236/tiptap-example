@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="图形配置" name="3">
+  <el-collapse-item title="图形配置" name="a-1">
     <el-form-item label="圆心位置-水平">
       <el-input v-model="center[0]"></el-input>
     </el-form-item>

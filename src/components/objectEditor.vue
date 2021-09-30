@@ -1,24 +1,9 @@
 <template>
   <div>
-<!--    占位数据:<input v-model="viewText"/><br/>-->
-
-<!--    <div v-if="editor&&editor.isActive('content-box')">-->
-<!--&lt;!&ndash;      <button @click="toogleBoxSize(editor.getAttributes('content-box').isSplit)" style="background: #fff200">段落{{contentActionText}}</button>&ndash;&gt;-->
-<!--      <button @click="boxTest">段落测试</button>-->
-<!--    </div>-->
-<!--    <div v-if="editor&&editor.isActive('custom-tag')">-->
-<!--      标签类型：<select v-model="type">-->
-<!--        <option value ="string">常量标签</option>-->
-<!--        <option value ="formula">公式标签</option>-->
-<!--        <option value="request">函数标签</option>-->
-<!--      </select>-->
-<!--      <br/>-->
-<!--      外部文本：<textarea v-model="coverText"/>-->
-<!--      <br/>-->
-<!--      翻译文本：<textarea v-model="tagIndex"/>-->
-<!--&lt;!&ndash;      <button @click="setTagAttr">确定</button>&ndash;&gt;-->
-<!--    </div>-->
-    <tag-menu v-if="editor&&editor.isActive('custom-tag')" :editor="editor">
+    标签焦点{{editor.isActive('custom-tag')}}
+    表格焦点{{editor.isActive('custom-chart')}}
+    <button @click="varsManager">全局变量管理</button>
+    <tag-menu v-if="editor&&editor.isActive('custom-tag')" :editor="editor" :range-id="'15_root'">
     </tag-menu>
     <div v-else-if="editor&&editor.isActive('custom-image')">
       图片属性<br/>
@@ -31,9 +16,12 @@
     <echarts-menu v-else-if="editor&&editor.isActive('custom-chart')"
                   :editor="editor"
                   :options="chartOptions"
-                  :index="chartIndex"
-    ></echarts-menu>
-<!--                      @renderChart="renderChart"-->
+                  :index="chartIndex">
+    </echarts-menu>
+    <var-manager-dialog v-model="managerDialog"
+                        v-if="managerDialog"
+                        :id="'15_root'">
+    </var-manager-dialog>
   </div>
 </template>
 
@@ -42,9 +30,10 @@ import TableMenu from "./MenuBar/TableMenu";
 import EchartsMenu from "./MenuBar/EchartsMenu/index.vue"
 import TagMenu from './MenuBar/tagMenu/tagMenu.vue'
 import {baseOptions} from "../unit/baseType";
+import VarManagerDialog from "./Dialog/varManagerDialog";
 export default {
   name: "objectEditor",
-  components: {EchartsMenu, TableMenu},
+  components: {VarManagerDialog, EchartsMenu, TableMenu},
   props:{
     editor:{
       type:Object
@@ -52,6 +41,7 @@ export default {
   },
   data(){
     return{
+      managerDialog:false
     }
   },
   mounted() {
@@ -131,8 +121,8 @@ export default {
     }
   },
   methods:{
-    boxTest(){
-      console.log(this.editor.chain().focus().getParagraphHtml().run())
+    varsManager(){
+      this.managerDialog = true
     },
     toogleBoxSize(v){
       this.editor.chain().focus().updateAttributes('content-box',{isSplit:!v}).run()

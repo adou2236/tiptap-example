@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="图例配置" name="2">
+  <el-collapse-item title="图例配置" name="s-2">
     {{legend.show}}
     <el-form-item label="图例显隐">
       <el-switch v-model="legend.show"></el-switch>

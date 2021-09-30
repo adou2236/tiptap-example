@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="数据项配置" name="7">
+  <el-collapse-item title="数据项配置" name="a-2">
     <el-button @click="addSeriesItem" type="primary" size="mini" >添加数据项</el-button>
     <series v-for="(item,num) in series" :index="num" :item="item" :items="index.items"></series>
   </el-collapse-item>

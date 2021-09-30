@@ -1,17 +1,85 @@
 import axios from 'axios'
+import store from '../store'
 const head = '/api'
 
-const getDoc = () => axios({
-    url:`${head}/doc/template/3`,
-    methods:'get'
+
+const getDoc = (id) => axios({
+    url:`${head}/doc/template/${id}`,
+    method:'get'
 })
 
 const getFunctions = () => axios({
     url:`${head}/func/function/list`,
-    methods:'get'
+    method:'get'
+})
+
+const getVarsById = (id) => {
+    //先访问缓存是否有这个变量组
+    if(store.state.vars[id]){
+        return {
+            data:{
+                content:{
+                    data:store.state.vars[id]
+                }
+            }
+        }
+    }else{
+        //缓存没有则走接口
+        return axios({
+            url:`${head}/doc/variable/getBySegment`,
+            method:'get',
+            params:{
+                segments:id
+            }
+        }).then(res=>{
+            store.commit({
+                type:'setGlobalVars',
+                segmentId:id,
+                data:res.data.content.data
+            });
+            return res
+        })
+    }
+}
+
+const varsSave = (data) => axios({
+    url:`${head}/doc/variable/batchSave`,
+    method:'post',
+    data:data
+}).then(res=>{
+    store.commit({
+        type:'setGlobalVars',
+        segmentId:data.segmentId,
+        data:res.data.content.data
+
+    });
+    return res
+})
+
+const getTempList = (data) => axios({
+    url:`${head}/doc/template/list`,
+    method:'post',
+    data:data
+
+})
+
+const getIndexList = (data) => axios({
+    url:`${head}/data/indicator/list`,
+    method:'post',
+    data:data
+})
+
+const getGeoTree = () => axios({
+    url:`${head}/data/geo/tree`,
+    method:'get',
 })
 
 export {
     getDoc,
-    getFunctions
+    getFunctions,
+    getVarsById,
+    varsSave,
+    getTempList,
+    getIndexList,
+    getGeoTree
 }

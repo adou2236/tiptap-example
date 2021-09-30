@@ -18,6 +18,10 @@ export default Node.create({
             type: {
                 default: 'variety',
             },
+            //文本id，由id获取局部变量
+            id: {
+                default:null
+            },
             coverText:{
                 default:"新建文本"
             },

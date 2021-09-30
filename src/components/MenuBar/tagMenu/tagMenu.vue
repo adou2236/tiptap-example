@@ -1,16 +1,17 @@
 <template>
   <div>
-    <button @click="handleFocus">聚焦</button>
     外部文本：
     <br/>
     <el-input autofocus type="textarea" v-model="coverText"></el-input>
     <div v-if="type === 'variety'">
       变量内容:
+      {{content}}
       <br/>
       <el-select v-model="content">
-        <el-option label="date" value="date">date</el-option>
-        <el-option label="area" value="area">area</el-option>
-        <el-option label="index" value="index">index</el-option>
+<!--        这里存后台不可存value，因为数据要根据变量表变化-->
+        <el-option v-for="item in vars" :label="item.varKey" :value="item.varKey" :key="item.varKey">
+          {{item.varKey}}
+        </el-option>
       </el-select>
     </div>
     <div v-if="type === 'function'">
@@ -20,7 +21,8 @@
       <br/>
       {{functionJson.toString()}}
     </div>
-    <tag-editor v-if="type === 'smart'" :mainEditor="editor"></tag-editor>
+    <tag-editor v-if="type === 'smart'" :mainEditor="editor"
+                :rangeId="editor.getAttributes('custom-tag').id"></tag-editor>
     <function-tag-dialog v-model="visible"
                          v-if="visible"
                          :functionJson="functionJson"
@@ -30,17 +32,20 @@
 
 <script>
 import TagEditor from "./tagEditor";
-import {getFunctions} from "../../../request/api";
+import {getFunctions, getVarsById} from "../../../request/api";
 import FunctionTagDialog from "../../Dialog/functionTagDialog";
-import {formateFunction} from "../../../unit/baseType";
+import {formateFunction, globalVar} from "../../../unit/baseType";
 export default {
   name: "TagName",
   components: {FunctionTagDialog, TagEditor},
   props:{
-    editor:Object
+    editor:Object,
+    //生效范围ID，全局/局部
+    rangeId:String
   },
   data(){
     return {
+      vars:[],
       visible:false,
       functions:[],
       functionJson:{},
@@ -83,11 +88,15 @@ export default {
   },
   async created() {
     this.functionJson = new formateFunction(this.content)
+    this.vars = await this.getVars(this.rangeId)
   },
   methods:{
+    async getVars(id){
+      let {data} = await getVarsById(id)
+      return data.content.data
+    },
     handleFocus(){
       let type = this.editor.getAttributes('custom-tag').type || ''
-      console.log(type)
       this.editor.chain().updateAttributes('custom-tag',{type:'variety'}).run()
       // this.editor.chain().updateAttributes('custom-tag',{type:type}).run()
     },

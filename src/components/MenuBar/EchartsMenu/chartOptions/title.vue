@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="标题配置" name="1">
+  <el-collapse-item title="标题配置" name="s-1">
     <el-form-item label="标题">
       <el-input v-model="title.text"></el-input>
     </el-form-item>

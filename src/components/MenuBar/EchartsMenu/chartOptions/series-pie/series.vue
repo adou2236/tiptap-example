@@ -3,7 +3,7 @@
     <div v-for="(item,index) in items">
       数据项{{index+1}}
       <el-form-item label="数据指标">
-        <el-input v-model="items[index]" />
+        <el-input :value="items[index]" />
       </el-form-item>
     </div>
   </div>

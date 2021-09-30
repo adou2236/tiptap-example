@@ -1,10 +1,8 @@
 <template>
-  <node-view-wrapper style="padding: 10px">
-<!--    <node-view-content as="p" class="title"></node-view-content>-->
+  <node-view-wrapper class="content">
     <div :id="`chart-${random}`" class="chart"
          v-loading="loading"
          element-loading-text="模拟异步加载"></div>
-<!--    <node-view-content as="p" class="source" v-model="node.source"/>-->
   </node-view-wrapper>
 </template>
 
@@ -12,17 +10,24 @@
 import {NodeViewWrapper, nodeViewProps, NodeViewContent} from '@tiptap/vue-2'
 import * as echarts from 'echarts'
 import {baseOptions, deepCopy} from "../../unit/baseType";
-import {randomTweenData} from "../../assets/maps";
+import {province, randomData, randomTweenData} from "../../assets/maps";
 import '../../assets/china.js'
 export default {
   name: "chartBox",
-  props: nodeViewProps,
+  props: {
+    ...nodeViewProps,
+    updateAttributes: {
+      type: Function,
+      required: true,
+    },
+  },
   components: {
     NodeViewWrapper,
     NodeViewContent
   },
   data() {
     return {
+      inChange:false,
       random: Math.random() * (new Date()).getTime(),
       myCharts: null,
       xAxis: ['指数1', '指数2', '指数3', '指数4'],
@@ -34,49 +39,80 @@ export default {
     }
   },
   mounted() {
+    console.log("周期走几次")
     this.$nextTick(() => {
-      this.loading = true
       this.chartsInit()
+      // this.loading = true
       let temple = deepCopy(this.options)
       this.complateOptions = this.dataAttach(temple,this.index)
       this.graphRender()
     })
     window.addEventListener('resize', this.resize)
+
   },
   watch: {
-    index: {
-      handler() {
-        this.loading = true
-        //指标变化，异步请求
-        setTimeout(()=>{
-          let temple = deepCopy(this.options)
-          this.complateOptions = this.dataAttach(temple,this.index)
-          this.graphRender()
-        },1500)
+    editor: {
+      immediate: false,
+      handler(editor) {
+        if (editor) {
+          this.$nextTick(() => {
+            this.chartsInit()
+            let temple = deepCopy(this.options)
+            this.complateOptions = this.dataAttach(temple,this.index)
+            this.graphRender('editor')
+          })
+        }
       },
-      deep: true, // 深度监听数据变化
     },
-    options: {
-      handler() {
-        let temple = deepCopy(this.options)
-        this.complateOptions = this.dataAttach(temple,this.index)
-        this.graphRender()
-      },
-      deep: true, // 深度监听数据变化
-    }
+    // 'index.items': {
+    //   handler(oldVal,newVal) {
+    //     console.log(oldVal,newVal)
+    //     if(oldVal!==newVal){
+    //       console.log("指标的变化",oldVal.toString(),newVal.toString())
+    //       this.loading = true
+    //       //指标变化，异步请求
+    //       setTimeout(()=>{
+    //         console.log("cnm")
+    //         let temple = deepCopy(this.options)
+    //         this.complateOptions = this.dataAttach(temple,this.index)
+    //         this.graphRender()
+    //       },1500)
+    //     }
+    //   },
+    //   immediate:false,
+    //   deep: true, // 深度监听数据变化
+    // },
+    // options:{
+    //   handle(oldVal,newVal){
+    //     console.log("变化了？",oldVal,newVal)
+    //     let temple = deepCopy(this.options)
+    //     this.complateOptions = this.dataAttach(temple,this.index)
+    //     this.graphRender('option')
+    //   },
+    //   immediate:false,
+    //   deep: true, // 深度监听数据变化
+    // }
   },
   computed: {
     options(){
-      return  this.node.attrs.options
+      return this.node.attrs.options
     },
     index() {
       return this.node.attrs.index
     },
+    source(){
+      return this.node.attrs.source
+    }
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resize)
   },
   methods: {
+    handleInput(v){
+      this.updateAttributes({
+        source: v,
+      })
+    },
     /**
      * 数据附加，为防止无效数据请求，应该只对index的变化做响应
      * @param options 配置项
@@ -146,6 +182,17 @@ export default {
           })
         }
       }
+      else if(index.type === 'combo'){
+        //复杂组合图
+        if(options.additions.xType === 'region'){
+          options.xAxis.data = province
+        }
+        options.series.forEach((item,index)=>{
+          for(let i =0;i<province.length;i++){
+            item.data.push([province[i],randomData[i]])
+          }
+        })
+      }
       return options
     },
     //函数附加(自定义图形移动函数)
@@ -173,15 +220,17 @@ export default {
         this.myCharts = echarts.init(dom)
       }
     },
-    graphRender() {
+    graphRender(source) {
+      console.log("渲染")
       //异步执行，指标更新需要重新获取数据，配置项更新不做处理
       this.funcAttach(this.options)
       if(this.myCharts&&this.complateOptions){
         this.myCharts.setOption(this.complateOptions,true)
         this.loading = false
-        setTimeout(()=>{
-          this.getSrc()
-        },2000)
+        // this.getSrc()
+        //
+        // setTimeout(()=>{
+        // },6000)
 
       }
 
@@ -192,7 +241,9 @@ export default {
         pixelRatio: 2,
       });
       // let options = new baseOptions(this.options)
-      this.node.attrs.src = this.src
+      this.updateAttributes({
+        src: this.src,
+      })
       // this.node.attrs.options = options.options
       // this.editor.chain().focus().updateAttributes('custom-chart',{src: this.src}).run()
       // this.editor.chain().focus().updateAttributes('custom-chart',{options: options.options}).run()
@@ -202,19 +253,32 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.title{
-  color: #C8152E;
-  border-bottom: 2px solid black;
-  font-family: STSong;
-  line-height: 30px;
-  min-height: 30px;
-}
-.source{
-  color: #C8152E;
-  border-top: 2px solid black;
-  font-family: STSong;
+.content{
+  padding: 10px;
+  position: relative;
+  .chart{
+    z-index: -1;
+  }
 
+  &.focus{
+    outline: 3px solid #68cef8;
+  }
+  .title{
+    color: #C8152E;
+    border-bottom: 2px solid black;
+    font-family: STSong;
+    line-height: 30px;
+    min-height: 30px;
+  }
+  .source{
+    color: #C8152E;
+    border-top: 2px solid black;
+    font-family: STSong;
+    line-height: 1rem;
+    min-height: 1rem;
+  }
 }
+
 
 
 </style>

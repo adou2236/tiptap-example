@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="自定义图像" name="8">
+  <el-collapse-item title="自定义图像" name="s-7">
     <el-button @click="addGraphic">添加图形</el-button>
     拖拽改变位置
     <div v-for="(item,index) in graphic" :key="item.id">
@@ -16,7 +16,6 @@ export default {
     graphic:Array
   },
   mounted() {
-    console.log("重新加载")
   },
   methods:{
     handleDelete(id){
