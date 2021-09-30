@@ -17,7 +17,7 @@
 
 <script>
 export default {
-  name: "line",
+  name: "lineOpt",
   props:{
     item:{
       type:Object

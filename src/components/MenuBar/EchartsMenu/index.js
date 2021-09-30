@@ -85,6 +85,9 @@ export default {
         //         item.lineStyle.color = getLinearGradientColor(to, 'right')
         //     })
         // },
+        /**
+         * 重新利用起来，不要在原来对象的基础上进行数值的更改，不容易监听到
+         */
         //绑定值变化，重新绘图
         // chartOptions: {
         //     handler(to) {

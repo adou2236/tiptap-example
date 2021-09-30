@@ -18,7 +18,7 @@
 
 <script>
 export default {
-  name: "line",
+  name: "scatterOpt",
   props:{
     item:{
       type:Object

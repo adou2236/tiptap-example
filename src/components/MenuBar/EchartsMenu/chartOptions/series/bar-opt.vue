@@ -27,7 +27,7 @@
 
 <script>
 export default {
-  name: "line",
+  name: "barOpt",
   props:{
     item:{
       type:Object

@@ -127,11 +127,11 @@ export default {
     toogleBoxSize(v){
       this.editor.chain().focus().updateAttributes('content-box',{isSplit:!v}).run()
     },
-    renderChart(options){
-      let base = new baseOptions(options)
-      // this.editor.chain().updateAttributes('custom-chart', {options:base.options}).run()
-      this.editor.chain().upDateChartOptions(base.options).run()
-    },
+    // renderChart(options){
+    //   let base = new baseOptions(options)
+    //   // this.editor.chain().updateAttributes('custom-chart', {options:base.options}).run()
+    //   this.editor.chain().upDateChartOptions(base.options).run()
+    // },
     // renderChart(){
     //   let data = {
     //     index:this.chartIndex+1

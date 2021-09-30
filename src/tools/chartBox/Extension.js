@@ -6,8 +6,8 @@ export default Node.create({
     name: 'custom-chart',
     group: 'block',
     // inline: false,
-    // content: 'block*',
-    // selectable: true,
+    content: 'block+',
+    selectable: true,
     draggable: false,
     atom: true,
     //查询表格所用到的指标

@@ -1,5 +1,6 @@
 <template>
   <node-view-wrapper class="content">
+    <div>CNM</div>
     <div :id="`chart-${random}`" class="chart"
          v-loading="loading"
          element-loading-text="模拟异步加载"></div>
@@ -39,13 +40,12 @@ export default {
     }
   },
   mounted() {
-    console.log("周期走几次")
     this.$nextTick(() => {
       this.chartsInit()
       // this.loading = true
       let temple = deepCopy(this.options)
       this.complateOptions = this.dataAttach(temple,this.index)
-      this.graphRender()
+      this.graphRender("初始化，周期")
     })
     window.addEventListener('resize', this.resize)
 
@@ -64,30 +64,26 @@ export default {
         }
       },
     },
-    // 'index.items': {
-    //   handler(oldVal,newVal) {
-    //     console.log(oldVal,newVal)
-    //     if(oldVal!==newVal){
-    //       console.log("指标的变化",oldVal.toString(),newVal.toString())
-    //       this.loading = true
-    //       //指标变化，异步请求
-    //       setTimeout(()=>{
-    //         console.log("cnm")
-    //         let temple = deepCopy(this.options)
-    //         this.complateOptions = this.dataAttach(temple,this.index)
-    //         this.graphRender()
-    //       },1500)
-    //     }
-    //   },
-    //   immediate:false,
-    //   deep: true, // 深度监听数据变化
-    // },
+    'index.items': {
+      handler(oldVal,newVal) {
+        this.loading = true
+        //指标变化，异步请求
+        setTimeout(()=>{
+          console.log("cnm")
+          let temple = deepCopy(this.options)
+          this.complateOptions = this.dataAttach(temple,this.index)
+          this.graphRender("指标变化")
+        },1500)
+      },
+      immediate:false,
+      deep: true, // 深度监听数据变化
+    },
     // options:{
-    //   handle(oldVal,newVal){
+    //   handle:function(oldVal,newVal){
     //     console.log("变化了？",oldVal,newVal)
-    //     let temple = deepCopy(this.options)
-    //     this.complateOptions = this.dataAttach(temple,this.index)
-    //     this.graphRender('option')
+    //     // let temple = deepCopy(this.options)
+    //     // this.complateOptions = this.dataAttach(temple,this.index)
+    //     // this.graphRender('option')
     //   },
     //   immediate:false,
     //   deep: true, // 深度监听数据变化
@@ -221,7 +217,7 @@ export default {
       }
     },
     graphRender(source) {
-      console.log("渲染")
+      console.log("渲染，来源是",source)
       //异步执行，指标更新需要重新获取数据，配置项更新不做处理
       this.funcAttach(this.options)
       if(this.myCharts&&this.complateOptions){
@@ -256,8 +252,17 @@ export default {
 .content{
   padding: 10px;
   position: relative;
+  .click-bar{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    background: rgba(255, 0, 0, 0.19);
+    z-index: 2;
+  }
   .chart{
-    z-index: -1;
+    z-index: 1;
   }
 
   &.focus{
