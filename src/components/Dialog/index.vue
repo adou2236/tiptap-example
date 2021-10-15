@@ -98,5 +98,20 @@ export default {
 .content >>> .chart{
   width: 100%;
 }
+.content >>> .title{
+  color: #C8152E;
+  border-bottom: 2px solid black;
+  font-family: STSong;
+  line-height: 1.5rem;
+  min-height: 1.5rem;
+  font-size: 1.5rem;
+}
+.content >>> .source{
+  color: #000000;
+  border-top: 2px solid black;
+  font-family: STSong;
+  line-height: 1rem;
+  min-height: 1rem;
+}
 </style>
 

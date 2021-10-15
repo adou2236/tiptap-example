@@ -1,32 +1,37 @@
 <template>
   <div>
+
     外部文本：
     <br/>
-    <el-input autofocus type="textarea" v-model="coverText"></el-input>
-    <div v-if="type === 'variety'">
+    <el-input type="textarea" v-model="attrs.coverText" @input="(v)=>handleChange('coverText',v)"></el-input>
+    <div v-if="attrs.type === 'variety'">
       变量内容:
-      {{content}}
       <br/>
-      <el-select v-model="content">
+      <el-select v-model="attrs.content" @change="(v)=>handleChange('content',v)">
 <!--        这里存后台不可存value，因为数据要根据变量表变化-->
         <el-option v-for="item in vars" :label="item.varKey" :value="item.varKey" :key="item.varKey">
           {{item.varKey}}
         </el-option>
       </el-select>
     </div>
-    <div v-if="type === 'function'">
-      函数内容:
+    <div v-if="attrs.type === 'function'">
+      函数内容:{{functionJson.toString()}}
       <br/>
       <button @click="changeFunction">插入/修改函数</button>
       <br/>
-      {{functionJson.toString()}}
     </div>
-    <tag-editor v-if="type === 'smart'" :mainEditor="editor"
-                :rangeId="editor.getAttributes('custom-tag').id"></tag-editor>
+    <tag-editor v-if="attrs.type === 'smart'"
+                v-model="attrs.content"
+                :mainEditor="editor"
+                :rangeId="attrs.id">
+    </tag-editor>
+    <br/>
+    <button v-if="!isInner" @click="handleCommit">确认</button>
     <function-tag-dialog v-model="visible"
                          v-if="visible"
                          :functionJson="functionJson"
-                         @commit="getFunc"></function-tag-dialog>
+                         @commit="getFunc">
+    </function-tag-dialog>
   </div>
 </template>
 
@@ -34,14 +39,15 @@
 import TagEditor from "./tagEditor";
 import {getFunctions, getVarsById} from "../../../request/api";
 import FunctionTagDialog from "../../Dialog/functionTagDialog";
-import {formateFunction, globalVar} from "../../../unit/baseType";
+import {deepCopy, formateFunction, globalVar} from "../../../unit/baseType";
 export default {
   name: "TagName",
   components: {FunctionTagDialog, TagEditor},
   props:{
     editor:Object,
     //生效范围ID，全局/局部
-    rangeId:String
+    rangeId:String,
+    isInner:Boolean
   },
   data(){
     return {
@@ -49,6 +55,7 @@ export default {
       visible:false,
       functions:[],
       functionJson:{},
+      attrs:{},
       data:[
         {type:'string',value:'这是一段常量'},
         {type:'request',value:'这是一段变量'},
@@ -57,24 +64,12 @@ export default {
     }
   },
   computed:{
-    type:{
-      get(){
-        return this.editor.getAttributes('custom-tag').type || ''
-      }
-    },
-    varietyData:{
-      get(){
-        return this.editor.getAttributes('custom-tag').type || ''
-      }
-    },
     coverText:{
       get(){
         return this.editor.getAttributes('custom-tag').coverText || ''
       },
       set(v){
         this.editor.chain().updateAttributes('custom-tag', {coverText:v}).run()
-        // this.editor.chain().focus().run()
-        // this.editor.chain().updateAttributes('custom-tag', {coverText:v}).run()
       }
     },
     content:{
@@ -86,22 +81,41 @@ export default {
       }
     }
   },
+  watch:{
+    //内部编辑器则数据绑定
+    // attrs:{
+    //   handler(newVal,oldVal){
+    //     if(this.isInner){
+    //       console.log("aaa???",newVal)
+    //       this.editor.chain().updateAttributes('custom-tag', newVal).run()
+    //     }
+    //   },
+    //   deep:true,
+    //   immediate:false,
+    // }
+  },
   async created() {
     this.functionJson = new formateFunction(this.content)
-    this.vars = await this.getVars(this.rangeId)
+    this.vars = await this.getVars(this.rangeId);
+    this.attrs = this.editor.getAttributes('custom-tag')
   },
   methods:{
+    handleChange(type,value){
+      if(this.isInner){
+        this.editor.chain().updateAttributes('custom-tag', {[type]:value}).run()
+      }
+    },
+    handleCommit(){
+      console.log("提交的数据",this.attrs)
+      this.editor.chain().focus().updateAttributes('custom-tag', this.attrs).run()
+    },
     async getVars(id){
-      let {data} = await getVarsById(id)
-      return data.content.data
-    },
-    handleFocus(){
-      let type = this.editor.getAttributes('custom-tag').type || ''
-      this.editor.chain().updateAttributes('custom-tag',{type:'variety'}).run()
-      // this.editor.chain().updateAttributes('custom-tag',{type:type}).run()
-    },
-    changeType(){
-      this.editor.chain().updateAttributes('custom-tag',{type:'variety'}).run()
+      if(id){
+        let {data} = await getVarsById(id)
+        return data?.content.data
+      }else{
+        return []
+      }
     },
     getFunc(obj){
       this.functionJson = new formateFunction(obj)

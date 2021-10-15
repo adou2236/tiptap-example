@@ -35,6 +35,8 @@
   </el-collapse-item>
 </template>
 <script>
+import {deepCopy} from "../../../../unit/baseType";
+
 export default {
   props:{
     grid: Object
@@ -49,21 +51,22 @@ export default {
       leftType: '1',
       rightType: '1',
       bottomType: '1',
+      innerGrid:deepCopy(this.grid)
     }
   },
   watch: {
-    // grid: {
-    //   handler(to) {
-    //     this.$emit('change', to)
-    //   },
-    //   immediate: true,
-    //    deep: true
-    // }
+    innerGrid: {
+      handler(to) {
+        this.$emit('change', to)
+      },
+      immediate: false,
+      deep: true
+    }
   },
   methods: {
     handleChangePosition(data, type) {
       let key = `${type}Type`
-      this.grid[type] = this[key] == 1 ? data : data + '%'
+      this.innerGrid[type] = this[key] == 1 ? data : data + '%'
     }
   }
 }

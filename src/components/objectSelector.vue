@@ -1,7 +1,9 @@
 <template>
-  <div>
-    <button v-for="(item,index) in objects" :key="index" @click="handleSelect(item)">{{item.name}}</button>
-    <br/>
+  <div class="object-selector" :style="`width: ${isHidden?'20px':'20%'}`">
+    <div v-if="!isHidden">
+      <button v-for="(item,index) in objects" :key="index" @click="handleSelect(item)">{{item.name}}</button>
+    </div>
+    <div @click="handleDraw" class="drawer-btn">{{ optionText }}</div>
   </div>
 </template>
 
@@ -21,9 +23,18 @@ export default {
   },
   data(){
     return{
+      isHidden:false
+    }
+  },
+  computed:{
+    optionText(){
+      return this.isHidden?'展开':'收起'
     }
   },
   methods:{
+    handleDraw(){
+      this.isHidden = !this.isHidden
+    },
     handleSelect(item){
       switch (item.id){
         case 'line':
@@ -44,24 +55,22 @@ export default {
       }
 
     },
-    handleAddVar(type){
-      let temp = {
-        varKey :'new',
-        varValue: '新的东西',
-        varType: '5'
-      }
-      if(type === "global"){
-        globalVar.push(temp)
-      }
-
-    }
   },
-  mounted() {
-    console.log(this.editor)
-  }
 }
 </script>
 
 <style lang="scss" scoped>
+.object-selector{
+  position: relative;
+  overflow: hidden;
+  transition: all .3s ease;
+  .drawer-btn{
+    position: absolute;
+    cursor: pointer;
+    right: 0;
+    top: 20px;
+  }
+}
+
 
 </style>

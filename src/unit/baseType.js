@@ -15,6 +15,20 @@ export const isArray = isType('Array');
 
 export const isDate = isType('Date');
 
+
+const debounce = function(fn, delay = 500) {
+  var timer;
+  return function () {
+    var args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args); // this 指向vue
+    }, delay);
+  };
+}
+
 const formateFunction = function(content){
   this.name = content.name;
   this.params = content.params
@@ -55,22 +69,6 @@ const baseOptions = function(param){
 }
 //通用图像属性
 const base = {
-  "backgroundColor":"",
-  "title": {
-    "show": true,
-    "text": "",
-    "textStyle": {
-      "color": "#333",
-      "fontSize": 18,
-      "fontWeight": "normal",
-      "fontStyle": "normal"
-    },
-    "left": 20,
-    "top": 20,
-    "right": 20,
-    "bottom": 20,
-    "subtext": ""
-  },
   "grid": {
     left: 50,
     right: 50,
@@ -134,22 +132,6 @@ const optionsInitLAB = function(){
       }
     },
     "series": [
-      // {
-      //   "type": 'line',
-      //   "lineStyle":{
-      //     color:'#333',
-      //     width:1
-      //   },
-      //   "itemStyle":{
-      //     color:'#333',
-      //     borderColor:'',
-      //     borderWidth:'',
-      //     borderRadius:''
-      //   },
-      //   "areaStyle":{
-      //     color:'transparent'
-      //   }
-      // }
     ],
   }
 }
@@ -159,18 +141,15 @@ const optionsInitPIE = function(){
     "tooltip": {
       show: true,
       trigger: 'item',  //axis, item, none
-      padding: [5, 10, 5, 10], // 上右下左
-      backgroundColor: "#FFFFFF",
-      borderColor: "#333",
-      borderWidth: 0
     },
-    "series": [
-      {
-        "type": 'pie',
-        "radius": ['0%', '70%'],//内外半径
-        "center": ['50%', '50%'],//中心位置
-      }
-    ],
+    "series": {
+      "type": 'pie',
+      data:[]
+    },
+    additions:{
+      "radius": ['0%', '70%'],//内外半径
+      "center": ['50%', '50%'],//中心位置
+    }
   }
 }
 const optionsInitSCATTER = function(){
@@ -259,74 +238,20 @@ const optionsInitCOMBO = function(){
     "xAxis": {
       "show": true,
       data:[],
-      "axisLine": {
-        "show": true,
-        "lineStyle": {
-          "color": "",
-          "width": 1,
-          "type": "solid"
-        },
-      },
-      splitLine: {
-        show:false,
-        lineStyle: {
-          color: "",
-          width: 0
-        }
-      }
     },
     "yAxis": {
-      axisLine: {
-        show: true,
-        lineStyle: {
-          color: "",
-          width: 1,
-          type: "solid"
-        }
-      },
-      splitLine: {
-        show:false,
-        lineStyle: {
-          color: "",
-          width: 0
-        }
-      }
+      "show": true,
     },
     tooltip:{
       show:true,
       trigger: 'axis',  //axis, item, none
-      padding: [5, 10, 5, 10], // 上右下左
-      backgroundColor: '#FFFFFF',
-      borderColor: '#333',
-      borderWidth: 0
     },
     "series": [
-      {
-        name: '2011',
-        type: 'bar',
-        barWidth:10,
-        data: [],
-        colorByRegion:false,
-      },
-      {
-        name: '2012',
-        type: 'scatter',
-        symbol:'rect',
-        symbolSize:[100,10],
-        data: [],
-        colorByRegion:false,
-      }
     ],
     //针对复杂组合图的额外属性
     "additions":{
-      xType:'region',//横坐标类型region/time
-      xIndex:'china',//横坐标数据值
       //数据使用多维度，通过xAxis.data的值来改变顺序
       sortIndex:0,//排序指标，默认第一个
-      //单一数据项指标
-      dataIndex:'存贷比',
-      //每项指标对应查询
-      seriesIndex:[2019,2020],
       markLine:[],//辅助线array
     }
   }
@@ -354,7 +279,7 @@ const optionsInitMAP = function(){
   }
 }
 
-const optionsInit = function (type){
+const optionsInit = function(type){
   switch (type) {
     //简单柱线组合图
     case 'lab':
@@ -398,7 +323,22 @@ const labSeriesInit = function () {
 
 }
 
+//指标项初始化
 const indexInit = function (type){
+  switch(type){
+    case 'pie':
+      return{
+        type:type,
+        xAxis:'',
+        items:[]
+      }
+    case 'combo':{
+      return{
+
+      }
+    }
+
+  }
   return {
     type:type,
     xAxis:'',
@@ -410,8 +350,55 @@ const indexInit = function (type){
 const regionData = [1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3]
 const timeData = [1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3]
 
+const chartColor=  [
+    "rgb(166,9,34)",
+    "rgb(19,98,176)",
+    "rgb(194,157,27)",
+    "rgb(30,162,136)",
+    "rgb(137,137,137)",
+    "rgb(247,150,70)",
+    "rgb(0,0,0)",
+]
+//研报图表默认风格
+const REPORT_THEME = {
+  // backgroundColor:"rgba(188,190,192,0.6)",
+  backgroundColor:"#FFFFFF",
+  color:chartColor,
+  tooltip:{
+    padding: [5, 10, 5, 10], // 上右下左
+    backgroundColor: '#FFFFFF',
+    borderColor: '#333',
+    borderWidth: 0
+  },
+  categoryAxis:{
+    axisLine:{
+      show:true,
+      lineStyle:{
+        color:'rgb(188,190,192)'
+      }
+    },
+    axisLabel:{
+      interval:0,
+      rotate:90
+    },
+  },
+  valueAxis:{
+    axisLine:{
+      show:true,
+      lineStyle:{
+        color:'rgb(188,190,192)'
+      }
+    },
+    splitLine:{
+      show:false
+    }
+  }
+
+}
 
 
-
-export {deepCopy,baseOptions,optionsInitLAB,optionsInit,indexInit,labSeriesInit,formateFunction,regionData}
+export {deepCopy,baseOptions,optionsInitLAB,
+  optionsInit,indexInit,labSeriesInit,
+  formateFunction,regionData,debounce,
+  chartColor,REPORT_THEME}
 

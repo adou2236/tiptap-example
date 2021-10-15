@@ -21,9 +21,10 @@
 
 <script>
 import Vue from 'vue'
-import { NodeViewWrapper, nodeViewProps, NodeViewContent } from '@tiptap/vue-2'
-import { getHTMLFromFragment, getSchema, } from '@tiptap/core'
+import {NodeViewContent, nodeViewProps, NodeViewWrapper} from '@tiptap/vue-2'
+import {generateHTML, getSchema} from '@tiptap/core'
 import CheckBox from "./checkBox";
+import {partCheck} from "../../request/api";
 
 
 export default Vue.extend({
@@ -56,17 +57,35 @@ export default Vue.extend({
     window.removeEventListener('click',this.hidePicker)
   },
   methods: {
-    selectItem(id){
+    async selectItem(id){
       if(id === 'delete'){
         this.deleteNode()
       }else if(id === 'insert'){
         console.log("插入")
       }else if(id === 'check'){
-        const schema = getSchema(this.editor.extensionManager.extensions)
-        this.checkContent = getHTMLFromFragment(this.node,schema)
+        // const schema = getSchema(this.editor.extensionManager.extensions)
+        let {content} = this.node.content
+        let data = {
+          id:this.$route.params.id,
+          doc:{
+            type:'content-box',
+            content:content
+          }
+        }
+        let res = await partCheck(data)
+        this.checkContent = generateHTML(res.data.content, this.editor.extensionManager.extensions)
         this.checkBoxVisible = true
       }
       this.drawShow = false
+    },
+    getPartTransJson(json){
+      let data = {
+        id:this.$route.params.id,
+        doc:json
+      }
+      partCheck(data).then(res=>{
+        console.log(res)
+      })
     },
     hidePicker(){
       this.drawShow=false

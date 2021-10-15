@@ -1,9 +1,6 @@
 import {Node, mergeAttributes, getSchema} from '@tiptap/core'
 import {generateHTML, VueNodeViewRenderer} from '@tiptap/vue-2'
 import Component from './ComponentEdit.vue'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import Text from '@tiptap/extension-text'
 
 export default Node.create({
     name: 'custom-tag',
@@ -28,7 +25,9 @@ export default Node.create({
             content: {
                 default: {},
             },
-
+            text:{
+                default:''
+            }
         }
     },
 
@@ -68,8 +67,8 @@ export default Node.create({
         //此处增加翻译逻辑
         // 深度优先递归执行❌太难
         //将数据分解为表达式与结果，翻译时计算结果值
-        const {result} = node.attrs
-        return ['span', mergeAttributes(),`${result}`]
+        const {text} = node.attrs
+        return ['span', mergeAttributes(),`${text}`]
     },
 
 

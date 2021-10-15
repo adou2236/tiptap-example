@@ -10,10 +10,17 @@
 </template>
 
 <script>
+import {deepCopy} from "../../../../../unit/baseType";
+
 export default {
   name: "index",
   props:{
     graphic:Array
+  },
+  data() {
+    return {
+      innerGraphic:deepCopy(this.graphic)
+    };
   },
   mounted() {
   },

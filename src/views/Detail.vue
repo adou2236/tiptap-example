@@ -2,23 +2,26 @@
   <div class="app">
     <menu-bar v-if="editor" class="menu-bar" :editor="editor" />
     <div class="main-container">
-      <object-selector style="width: 20%"
-                       v-if="editor"
+      <object-selector v-if="editor"
                        :editor="editor"
                        :objects="tools"
                        @lineInsert="handleAddLine"
                        @tagInsert="handleAppendTag"
                        @imageInsert="handleInsertImage"
-                       @chartInsert="handleSelectChart"
-      ></object-selector>
+                       @chartInsert="handleSelectChart">
+      </object-selector>
       <div class="editor-content">
         <editor-content @keydown.enter="newYourEditor" :editor="editor"/>
         <div class="new-line" @click="handleAddLine(true)">+</div>
       </div>
-      <object-editor style="width: 20%;overflow-y: auto" v-if="editor" :editor="editor"></object-editor>
+      <object-editor style="width: 40%" v-if="editor" :rootId="root_id" :editor="editor"></object-editor>
     </div>
-    <div @click="handleClick">JSON输出</div>
-    <div @click="handleClick2">html输出</div>
+    <div>
+      <button @click="handleClick">JSON输出</button>
+      <button @click="handleClick2">html输出</button>
+      <button @click="save">保存</button>
+    </div>
+
     <my-dialog v-model="dialogVisible" >
       <dl v-html="dialogContent">
         {{dialogContent}}
@@ -84,10 +87,10 @@ import CustomChart from "../tools/chartBox/Extension"
 import {optionsInit} from "../unit/baseType";
 import ChartSelect from "../components/Dialog/chartSelect";
 
-import axios from 'axios'
+
 import vueJsonEditor from 'vue-json-editor'
 import {mapMutations,mapState} from 'vuex';
-import {getDoc, getVarsById} from "../request/api";
+import {getDoc, getVarsById, templateSave} from "../request/api";
 
 
 
@@ -108,8 +111,8 @@ export default {
       value:'',
       editor:null,
       selectParagraph:null,
-      //文档id
-      root_id:'15_root',
+      //文档根id
+      root_id:'',
       json:{
         "type": "doc",
         "content": [
@@ -120,96 +123,111 @@ export default {
             },
             "content": [
               {
-                "type": "paragraph",
+                "type": "custom-chart",
                 "attrs": {
-                  "textAlign": "left"
-                },
-                "content": [
-                  {
-                    "type": "custom-tag",
-                    "attrs": {
-                      "type": "variety",
-                      "id": null,
-                      "coverText": "变量",
-                      "content": "index",
-                      "result": "国内生产总值:TI:Transport, Storage and Post(季,十亿人民币)"
-                    }
+                  "index": {
+                    "type": "combo",
+                    "xaxisType": "region",
+                    "xaxisIndex": "provinces",
+                    "items": [
+                      {
+                        "time": "date",
+                        "timeType": "var",
+                        "indicator": "国内生产总值(年,十亿人民币)",
+                        "indicatorType": "const"
+                      }
+                    ]
                   },
-                  {
-                    "type": "custom-tag",
-                    "attrs": {
-                      "type": "function",
-                      "id": null,
-                      "coverText": "公式",
-                      "content": {
-                        "name": "getValue",
-                        "params": [
-                          {
-                            "kind": "variety",
-                            "value": "gdp"
-                          },
-                          {
-                            "kind": "const",
-                            "value": "2019-12-01"
-                          },
-                          {
-                            "kind": "const",
-                            "value": "北京"
-                          },
-                          {
-                            "kind": "variety",
-                            "value": "城市类型"
-                          }
-                        ]
+                  "src": "",
+                  "options": {
+                    "backgroundColor": "",
+                    "title": {
+                      "show": true,
+                      "text": "",
+                      "textStyle": {
+                        "color": "#333",
+                        "fontSize": 18,
+                        "fontWeight": "normal",
+                        "fontStyle": "normal"
                       },
-                      "result": ""
-                    }
-                  },
-                  {
-                    "type": "custom-tag",
-                    "attrs": {
-                      "type": "smart",
-                      "id": "15_6",
-                      "coverText": "占位",
-                      "content": [
-                        {
-                          "type": "custom-tag",
-                          "attrs": {
-                            "coverText": "date",
-                            "type": "variety",
-                            "content": "date"
-                          }
-                        },
-                        {
-                          "type": "custom-tag",
-                          "attrs": {
-                            "coverText": "1+1",
-                            "type": "function",
-                            "content": {}
-                          }
+                      "left": 20,
+                      "top": 20,
+                      "right": 20,
+                      "bottom": 20,
+                      "subtext": ""
+                    },
+                    "grid": {
+                      "left": 50,
+                      "right": 50,
+                      "bottom": 50,
+                      "top": 50
+                    },
+                    "legend": {
+                      "show": true,
+                      "icon": "circle",
+                      "itemWidth": 20,
+                      "itemHeight": 5
+                    },
+                    "graphic": [],
+                    "xAxis": {
+                      "show": true,
+                      "data": [],
+                      "axisLine": {
+                        "show": true,
+                        "lineStyle": {
+                          "color": "",
+                          "width": 1,
+                          "type": "solid"
                         }
+                      },
+                      "splitLine": {
+                        "show": false,
+                        "lineStyle": {
+                          "color": "",
+                          "width": 0
+                        }
+                      }
+                    },
+                    "yAxis": {
+                      "axisLine": {
+                        "show": true,
+                        "lineStyle": {
+                          "color": "",
+                          "width": 1,
+                          "type": "solid"
+                        }
+                      },
+                      "splitLine": {
+                        "show": false,
+                        "lineStyle": {
+                          "color": "",
+                          "width": 0
+                        }
+                      }
+                    },
+                    "tooltip": {
+                      "show": true,
+                      "trigger": "axis",
+                      "padding": [
+                        5,
+                        10,
+                        5,
+                        10
                       ],
-                      "result": "未知变量"
+                      "backgroundColor": "#FFFFFF",
+                      "borderColor": "#333",
+                      "borderWidth": 0
+                    },
+                    "series": [],
+                    "additions": {
+                      "sortIndex": 0,
+                      "markLine": []
                     }
                   },
-                  {
-                    "type": "custom-tag",
-                    "attrs": {
-                      "type": "variety",
-                      "id": null,
-                      "coverText": "公式2",
-                      "content": {},
-                      "result": "未知变量"
-                    }
-                  }
-                ]
-              },
-              {
-                "type": "paragraph",
-                "attrs": {
-                  "textAlign": "left"
+                  "title": {},
+                  "source": ""
                 }
-              },
+              }
             ]
           }
         ]
@@ -249,10 +267,10 @@ export default {
         TextAlign.configure({
           types: ['heading', 'paragraph'],
         }),
-        Focus.configure({
-          className: 'focus',
-          mode: 'deepest',
-        }),
+        // Focus.configure({
+        //   className: 'focus',
+        //   mode: 'deepest',
+        // }),
         Table.configure({
           resizable: true,
         }),
@@ -278,22 +296,21 @@ export default {
   },
   async mounted() {
     // await this.getVars("15_root")
-    // let {content} = await this.getDoc(this.$route.params.id)
-    // let json = {
-    //   type:'doc',
-    //   content:content.doc
-    // }
+    let {content} = await this.getDoc(this.$route.params.id)
+    this.root_id = content.doc.id
+
     this.editor = new Editor({
       extensions: this.defaultProps,
-      content: this.json,
+      content: content.doc,
       editable: true,
       onCreate({editor}){
-        // console.log(editor)
+        console.log(editor)
       },
       onUpdate(){
         // console.log("数据更新")
       },
     })
+
 
   },
   beforeDestroy() {
@@ -303,6 +320,16 @@ export default {
     ...mapMutations([
       'setGlobalVars',
     ]),
+    save(){
+      let data = {
+        id: this.$route.params.id,
+        doc:this.editor.getJSON()
+      }
+      templateSave(data).then(res=>{
+        console.log(res)
+      })
+
+    },
     async getVars(id){
       let {data} = await getVarsById(id)
       return data.content.data
@@ -352,13 +379,14 @@ export default {
     },
     handleAppendTag(type){
       let text = prompt("输入占位字符","新建文本")
+      let timestamp = (new Date()).getTime()
       if(text){
         this.editor.chain().focus().insertContent({
           "type":"custom-tag",
           "attrs":{
             "type":type,
             "coverText":text,
-            "id":'15_001',
+            "id":`${this.$route.params.id}_${timestamp}`,
             "content":type==='variety'?'':[]
           },
         }).run()
@@ -368,15 +396,22 @@ export default {
       this.dialogVisible4 = true
     },
     handleInsertChart(type){
+      let timestamp = (new Date()).getTime()
       let index = {
+        //图类型
         type:type,
-        xAxis:'',
+        //横坐标类型/饼状图扇叶
+        xaxisType:'region',
+        //横坐标指标(地域或者时间)
+        xaxisIndex:'provinces',
+        //纵坐标指标/饼状图数值
         items:[]
       }
       this.editor.chain().focus().insertContent({
         type:'custom-chart',
         attrs: {
           "index": index,
+          "id":`${this.$route.params.id}_${timestamp}`,
           "src": "",
           "options": optionsInit(type)
         }
@@ -426,14 +461,15 @@ export default {
 }
 .main-container{
   flex: 1;
-  display: flex;
+  display: -webkit-box;
   margin-top: 20px;
-  overflow: hidden;
+  overflow-x: scroll;
 }
 .editor-content{
   width: 60%;
-  margin: 10px;
+  padding: 0 10px;
   overflow-y: auto;
+  box-sizing: border-box;
   /deep/.ProseMirror {
     &:focus-visible {
       outline: none;
@@ -504,9 +540,6 @@ export default {
   }
   .chart{
     height: 400px;
-    &.ProseMirror-selectednode {
-      outline: 3px solid #68cef8;
-    }
   }
 
   blockquote {

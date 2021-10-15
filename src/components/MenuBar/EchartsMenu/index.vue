@@ -1,47 +1,61 @@
 <template>
-  <el-form size="mini" label-width="100px">
-    <el-form-item label="背景色">
-      <el-color-picker v-model="options.backgroundColor"></el-color-picker>
-      <br/>
+  <el-form size="mini" label-width="50px">
+<!--    <el-form-item label="背景色">-->
+<!--      <el-color-picker :value="chartOptions.backgroundColor" @change="(data)=>somethingChange('backgroundColor',data)"></el-color-picker>-->
+<!--    </el-form-item>-->
+    <el-form-item label="标题">
+      <el-input :value="attrs.title" @input="titleChange"/>
+    </el-form-item>
+    <el-form-item label="来源">
+      <el-input :value="attrs.source" @input="sourceChange"/>
     </el-form-item>
     通用配置
     <el-collapse v-model="activeNames" accordion>
-      <title-option v-show="title" :title="options.title" ></title-option>
+<!--      <title-option v-show="chartOptions.title" :title="chartOptions.title" @change="(data)=>somethingChange('title',data)"></title-option>-->
+      <legend-option v-show="chartOptions.legend" :legend="chartOptions.legend" @change="(data)=>somethingChange('legend',data)"></legend-option>
 
-      <legend-option v-show="legend" :legend="options.legend"></legend-option>
+      <grid-option v-if="chartType !== 'pie'" :grid="chartOptions.grid" @change="(data)=>somethingChange('grid',data)"></grid-option>
 
-      <grid-option v-if="chartType !== 'pie'" :grid="options.grid"></grid-option>
+<!--      <tooltip-option v-show="chartOptions.tooltip" :tooltip="chartOptions.tooltip" @change="(data)=>somethingChange('tooltip',data)"></tooltip-option>-->
 
-      <tooltip-option v-show="tooltip" :tooltip="options.tooltip"></tooltip-option>
+      <x-axis-option v-if="chartType !== 'pie'" :xAxis="chartOptions.xAxis" @change="(data)=>somethingChange('xAxis',data)"></x-axis-option>
 
-      <x-axis-option v-if="chartType !== 'pie'" :xAxis="options.xAxis" @change="changeXAxisOption"></x-axis-option>
+      <y-axis-option v-if="chartType !== 'pie'" :yAxis="chartOptions.yAxis" @change="(data)=>somethingChange('yAxis',data)"></y-axis-option>
 
-      <y-axis-option v-if="chartType !== 'pie'" :yAxis="options.yAxis" @change="changeYAxisOption"></y-axis-option>
-
-      <graphic-option :graphic="options.graphic"
-                      @addGraphic="addGraphic"
-                      @deleteGraphic="deleteGraphic"></graphic-option>
+<!--      <graphic-option :graphic="chartOptions.graphic"-->
+<!--                      @addGraphic="addGraphic"-->
+<!--                      @deleteGraphic="deleteGraphic"></graphic-option>-->
 
     </el-collapse>
-    特殊配置
+<!--    特殊配置-->
     <el-collapse v-model="activeNames2" accordion>
 
-      <pie-size v-if="chartType === 'pie'" :radius="options.series[0].radius" :center="options.series[0].center"></pie-size>
+      <pie-size v-if="chartType === 'pie'"
+                :additions="chartOptions.additions"
+                @additionChange="(data)=>somethingChange('additions',data)"></pie-size>
 
-      <series-bar-line v-if="chartType === 'lab'" :index="index" :series="options.series"></series-bar-line>
+<!--      <series-bar-line v-if="chartType === 'lab'" :index="index" :series="series"></series-bar-line>-->
 
-      <series-pie v-if="chartType === 'pie'" :index="index" :series="options.series"></series-pie>
+      <series-pie v-if="chartType === 'pie'"
+                  :index="attrs.index"
+                  :series="chartOptions.series"
+                  @indexChange="indexChange"
+                  @seriesChange="(data)=>somethingChange('series',data)">
+      </series-pie>
 
-      <series-scatter v-if="chartType === 'scatter'"
-                      :index="index"
-                      :series="options.series"
-                      :additions="options.additions">
-      </series-scatter>
+<!--      <series-scatter v-if="chartType === 'scatter'"-->
+<!--                      :index="index"-->
+<!--                      :series="series"-->
+<!--                      :additions="additions">-->
+<!--      </series-scatter>-->
 
       <series-combo v-if="chartType === 'combo'"
-                    :index="index"
-                    :series="options.series"
-                    :additions="options.additions">
+                    :index="attrs.index"
+                    :series="chartOptions.series"
+                    :additions="chartOptions.additions"
+                    @indexChange="indexChange"
+                    @additionChange="(data)=>somethingChange('additions',data)"
+                    @seriesChange="(data)=>somethingChange('series',data)">
       </series-combo>
 
     </el-collapse>
@@ -51,6 +65,5 @@
 </template>
 <script>
 import index from "./index.js";
-import SeriesCombo from "./chartOptions/series-combo/series-combo";
 export default index;
 </script>

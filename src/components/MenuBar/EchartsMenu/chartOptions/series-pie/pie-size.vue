@@ -1,43 +1,41 @@
 <template>
   <el-collapse-item title="图形配置" name="a-1">
     <el-form-item label="圆心位置-水平">
-      <el-input v-model="center[0]"></el-input>
+      <el-input v-model="innerAdditions.center[0]"></el-input>
     </el-form-item>
     <el-form-item label="圆心位置-垂直">
-      <el-input v-model="center[1]"></el-input>
+      <el-input v-model="innerAdditions.center[1]"></el-input>
     </el-form-item>
     <el-form-item label="内径">
-      <el-input v-model="radius[0]"></el-input>
+      <el-input v-model="innerAdditions.radius[0]"></el-input>
     </el-form-item>
     <el-form-item label="外径">
-      <el-input v-model="radius[1]"></el-input>
+      <el-input v-model="innerAdditions.radius[1]"></el-input>
     </el-form-item>
   </el-collapse-item>
 </template>
 <script>
+import {deepCopy} from "../../../../../unit/baseType";
+
 export default {
   props:{
-    center: {
-      type:Array,
-      default:()=>['50%','50%']
-    },
-    radius: {
-      type:Array,
-      default:()=>['0%','70%']
-    }
+    additions:Object
   },
   data() {
     return {
+      innerAdditions:deepCopy(this.additions)
     }
   },
   watch: {
-    // grid: {
-    //   handler(to) {
-    //     this.$emit('change', to)
-    //   },
-    //   immediate: true,
-    //    deep: true
-    // }
+    innerAdditions: {
+      handler(to) {
+        this.$emit("additionChange", to);
+      },
+      deep: true,
+      immediate: false
+    }
+  },
+  mounted(){
   },
   methods: {
     handleChangePosition(data, type) {

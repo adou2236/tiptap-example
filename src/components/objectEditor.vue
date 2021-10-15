@@ -1,26 +1,31 @@
 <template>
-  <div>
-    标签焦点{{editor.isActive('custom-tag')}}
-    表格焦点{{editor.isActive('custom-chart')}}
-    <button @click="varsManager">全局变量管理</button>
-    <tag-menu v-if="editor&&editor.isActive('custom-tag')" :editor="editor" :range-id="'15_root'">
-    </tag-menu>
-    <div v-else-if="editor&&editor.isActive('custom-image')">
-      图片属性<br/>
-      图片路径<input v-model="imageAttr.src" /><br/>
-      图片宽<input v-model="imageAttr.width" />px<br/>
-      图片高<input v-model="imageAttr.height" />px<br/>
-      <button @click="setImageAttr">确定</button>
+  <div style="display: flex">
+    <div class="left">
+<!--      <button @click="varsManager">全局变量管理</button>-->
+      <tag-menu v-if="editor&&editor.isActive('custom-tag')"
+                :key="editor.getAttributes('custom-tag').id"
+                :editor="editor"
+                :range-id="rootId">
+      </tag-menu>
+      <div v-else-if="editor&&editor.isActive('custom-image')">
+        图片属性<br/>
+        图片路径<input v-model="imageAttr.src" /><br/>
+        图片宽<input v-model="imageAttr.width" />px<br/>
+        图片高<input v-model="imageAttr.height" />px<br/>
+        <button @click="setImageAttr">确定</button>
+      </div>
+      <table-menu v-else-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
+      <echarts-menu v-else-if="editor&&editor.isActive('custom-chart')"
+                    @renderChart="renderChart"
+                    :key="editor.getAttributes('custom-chart').id"
+                    :editor="editor"
+                    :attrs="chartAttrs">
+      </echarts-menu>
     </div>
-    <table-menu v-else-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
-    <echarts-menu v-else-if="editor&&editor.isActive('custom-chart')"
-                  :editor="editor"
-                  :options="chartOptions"
-                  :index="chartIndex">
-    </echarts-menu>
+    <var-menu :rootId="rootId" class="right"></var-menu>
     <var-manager-dialog v-model="managerDialog"
                         v-if="managerDialog"
-                        :id="'15_root'">
+                        :id="rootId">
     </var-manager-dialog>
   </div>
 </template>
@@ -28,16 +33,21 @@
 <script>
 import TableMenu from "./MenuBar/TableMenu";
 import EchartsMenu from "./MenuBar/EchartsMenu/index.vue"
+import varMenu from "./MenuBar/varMenu/index.vue"
 import TagMenu from './MenuBar/tagMenu/tagMenu.vue'
 import {baseOptions} from "../unit/baseType";
 import VarManagerDialog from "./Dialog/varManagerDialog";
+import {EventBus} from "../unit/eventBus";
 export default {
   name: "objectEditor",
-  components: {VarManagerDialog, EchartsMenu, TableMenu},
+  components: {VarManagerDialog, EchartsMenu, TableMenu, varMenu},
   props:{
     editor:{
       type:Object
     },
+    rootId:{
+      type:String
+    }
   },
   data(){
     return{
@@ -59,12 +69,10 @@ export default {
         this.editor.chain().updateAttributes('custom-tag',{type:v}).run()
       }
     },
-    chartOptions: {
+    chartAttrs: {
       get(){
-        return this.editor.getAttributes('custom-chart').options
+        return this.editor.getAttributes('custom-chart')
       },
-      set(){
-      }
     },
     chartIndex:{
       get(){
@@ -121,6 +129,10 @@ export default {
     }
   },
   methods:{
+    renderChart(v){
+      EventBus.$emit('optionChange',v)
+      this.editor.chain().updateAttributes('custom-chart',{options:v}).run()
+    },
     varsManager(){
       this.managerDialog = true
     },
@@ -131,12 +143,6 @@ export default {
     //   let base = new baseOptions(options)
     //   // this.editor.chain().updateAttributes('custom-chart', {options:base.options}).run()
     //   this.editor.chain().upDateChartOptions(base.options).run()
-    // },
-    // renderChart(){
-    //   let data = {
-    //     index:this.chartIndex+1
-    //   }
-    //   this.editor.chain().focus().setChartOptions('custom-chart',data).run()
     // },
     setTagAttr(){
       let data = {
@@ -158,6 +164,16 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.left{
+  width: 50%;
+  overflow: scroll;
+}
+.right{
+  width: 50%;
+  border-left: 1px solid #d8d8d8;
+  overflow: scroll;
+}
+
 
 </style>

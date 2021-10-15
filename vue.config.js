@@ -43,7 +43,7 @@ module.exports = {
         hotOnly: false,
         proxy: {
             '/api': {
-                target: 'http://dataplus-research-template',
+                target: 'http://10.68.105.178',
                 changeOrigin: true,
                 pathRewrite: {	//重写路径
                     "^/api": ''

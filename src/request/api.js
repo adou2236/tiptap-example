@@ -74,6 +74,25 @@ const getGeoTree = () => axios({
     method:'get',
 })
 
+const getChartSeries = (data) =>axios({
+    url:`${head}/doc/template/series`,
+    method:'post',
+    data:data
+})
+
+//部分检查
+const partCheck = (data) =>axios({
+    url:`${head}/doc/template/parse`,
+    method:'post',
+    data:data
+})
+
+const templateSave = (data) =>axios({
+    url:`${head}/doc/template/save`,
+    method:'post',
+    data:data
+})
+
 export {
     getDoc,
     getFunctions,
@@ -81,5 +100,8 @@ export {
     varsSave,
     getTempList,
     getIndexList,
-    getGeoTree
+    getGeoTree,
+    getChartSeries,
+    partCheck,
+    templateSave
 }

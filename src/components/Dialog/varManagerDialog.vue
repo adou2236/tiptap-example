@@ -40,7 +40,7 @@
                   :value="item.indicator">
               </el-option>
             </el-select>
-            <el-date-picker v-if="row.keyType == 2" v-model="row.varValue"></el-date-picker>
+            <el-date-picker type="year" value-format="yyyy" v-if="row.keyType == 2" v-model="row.varValue"></el-date-picker>
             <el-cascader
                 v-model="row.varValue"
                 v-if="row.keyType == 4"
@@ -114,7 +114,6 @@ export default {
       let {data} = await getIndexList(params)
       this.searching = false
       this.remoteOptions = data.content.data
-
     },
     addRow(){
       let newData = {

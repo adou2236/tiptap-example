@@ -1,5 +1,4 @@
 import echarts from 'echarts'
-import { getLinearGradientColor } from './utils/chart'
 //统一设置项
 import titleOption from './chartOptions/title.vue'
 import xAxisOption from './chartOptions/xAxis.vue'
@@ -15,6 +14,8 @@ import SeriesPie from "./chartOptions/series-pie/series-pie";
 import PieSize from "./chartOptions/series-pie/pie-size";
 import SeriesScatter from "./chartOptions/series-scatter/series-scatter";
 import SeriesCombo from "./chartOptions/series-combo/series-combo";
+import {deepCopy} from "../../../unit/baseType";
+import {EventBus} from "../../../unit/eventBus";
 
 
 export default {
@@ -34,28 +35,19 @@ export default {
     },
     props:{
         editor:{type:Object},
-        index:{type:Object},
-        options:{type:Object},
+        attrs:{type:Object}
     },
     data() {
         return {
             activeNames:[],
             activeNames2:[],
             xAxisData:[],
-            backgroundColor: this.options.backgroundColor,
-            title: this.options.title,
-            grid: this.options.grid,
-            legend: this.options.legend,
-            xAxis: this.options.xAxis,
-            yAxis: this.options.yAxis,
-            tooltip: this.options.tooltip,
-            series: this.options.series,
-            graphic: this.options.graphic,
+            // chartOptions:{},
         }
     },
     computed: {
         chartType(){
-            let type = this.index.type
+            let type = this.attrs.index.type
             if(type === 'line' || type === 'bar'){
                 return 'lab'
             }else{
@@ -64,48 +56,47 @@ export default {
         },
         chartOptions: {
             get(){
-                return {
-                    // color: this.color,
-                    backgroundColor: this.backgroundColor,
-                    title: this.title,
-                    grid: this.grid,
-                    legend: this.legend,
-                    xAxis: this.xAxis,
-                    yAxis: this.yAxis,
-                    tooltip: this.tooltip,
-                    series: this.series
+                return deepCopy(this.attrs.options)
 
-                }
             },
         }
     },
     watch: {
-        // linearColors(to) {
-        //     this.chartOptions.series.filter(item => {
-        //         item.lineStyle.color = getLinearGradientColor(to, 'right')
-        //     })
-        // },
         /**
          * 重新利用起来，不要在原来对象的基础上进行数值的更改，不容易监听到
          */
-        //绑定值变化，重新绘图
+        // //绑定值变化，重新绘图
         // chartOptions: {
-        //     handler(to) {
-        //         console.log("这是什么玩意")
-        //         this.$emit('renderChart',to)
+        //     handler(newVal,oldVal) {
+        //         console.log(newVal,oldVal,newVal===oldVal)
+        //         if(newVal!==oldVal){
+        //
+        //         }
         //     },
+        //     immediate:false,
         //     deep: true, // 深度监听
         // },
 
     },
-    mounted() {
-        // this.chartOptions.series.filter(item => {
-        //     this.$set(item, 'isLinear', false)
-        // })
+    created() {
+        // this.chartOptions = deepCopy(this.attrs.options)
     },
     beforeDestroy() {
     },
     methods: {
+        //指标变化（触发重新搜索）
+        indexChange(v){
+            this.editor.chain().updateAttributes('custom-chart',{index:v}).run()
+            EventBus.$emit('indexChange',v,this.attrs.id)
+        },
+        //标题变化
+        titleChange(v){
+            this.editor.chain().updateAttributes('custom-chart',{title:v}).run()
+        },
+        //来源变化
+        sourceChange(v){
+            this.editor.chain().updateAttributes('custom-chart',{source:v}).run()
+        },
         //删除图形
         deleteGraphic(id){
             this.options.graphic = this.options.graphic.filter(item=>item.id!==id)
@@ -133,59 +124,11 @@ export default {
             }
             this.options.graphic.push(graphic)
         },
-        // renderChart(options = this.options){
-        //     // this.options.backgroundColor = "#FF0000"
-        //     // console.log("this.options",this.editor.chain())
-        //     this.editor.chain().focus().updateAttributes('custom-chart',{options:options}).run()
-        //     console.log("改完是否生效",this.editor.getAttributes('custom-chart').options)
-        // },
-        //更改标题配置
-        changeTitleOption(data) {
-            this.title = data
+        //更改配置
+        somethingChange(key,data) {
+            this.chartOptions[key] = data
+            this.editor.chain().updateAttributes('custom-chart',{options:this.chartOptions}).run()
+            EventBus.$emit('optionChange',this.chartOptions,this.attrs.id)
         },
-        //更改间距配置
-        changeGridOption(data) {
-            this.grid = data
-        },
-        //更改图例配置
-        changeLegendOption(data) {
-            this.legend = data
-        },
-        //更改横坐标配置
-        changeXAxisOption(data) {
-            //重新赋值前剔除数据
-            this.xAxis = data
-        },
-        //更改纵坐标配置
-        changeYAxisOption(data) {
-            this.yAxis = data
-        },
-        ////更改浮窗配置
-        changeTooltipOption(data) {
-            this.tooltip = data;
-        },
-
-        // // 切换渐变状态
-        // changeLinearStatus(isLinear, index) {
-        //     if (isLinear) {
-        //         let colors = this.linearColors;
-        //         this.series[index].lineStyle.color = getLinearGradientColor(colors, 'right')
-        //     } else {
-        //         this.series[index].lineStyle.color = '#e74c3c';
-        //     }
-        // },
-        // //
-        updateDataItem(item, type = 0) {
-            if(type) {
-                item.push(Math.floor(Math.random() * 1000));
-                let newX = this.xAxisData[this.xAxisData.length - 1] + 1
-                this.xAxisData.push(newX)
-            } else {
-                item.pop();
-                this.xAxisData.pop();
-            }
-        },
-        // 添加数据项
-
     }
 }

@@ -37,7 +37,7 @@ export default Vue.extend({
     }
   },
   async created(){
-    let id = "15_root"
+    let id = this.editor.options.content.id
     if(this.node.attrs.type === 'smart'&&this.node.attrs.id){
       id=this.node.attrs.id
     }
@@ -51,8 +51,11 @@ export default Vue.extend({
   },
   methods: {
     async getVars(id){
-      let {data} = await getVarsById(id)
-      return data.content.data
+      if(id){
+        let {data} = await getVarsById(id)
+        return data.content.data
+      }
+
     },
     //异步请求接口
     //智能文本翻译递归实现

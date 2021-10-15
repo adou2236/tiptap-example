@@ -1,14 +1,20 @@
 <template>
   <div>
-    智能文本内容：
+    智能文本内容:
     <div>
       <button @click="tagInsert('variety')">插入变量</button>
       <button @click="tagInsert('function')">插入公式</button>
       <button @click="varsManager">局部变量管理</button>
     </div>
+    <br/>
     <editor-content class="content-editor" :editor="editor"/>
-    <tag-menu v-show="editor&&editor.isActive('custom-tag')" :editor="editor"
-              :rangeId="rangeId"></tag-menu>
+    <br/>
+    <tag-menu v-show="editor&&editor.isActive('custom-tag')"
+              :key="editor.getAttributes('custom-tag').id"
+              :editor="editor"
+              :isInner="true"
+              :rangeId="rangeId">
+    </tag-menu>
     <var-manager-dialog v-model="managerDialog"
                         v-if="managerDialog"
                         :id="rangeId">
@@ -21,8 +27,8 @@
 import {Editor,EditorContent} from "@tiptap/vue-2";
 import CustomerTag from "../../../tools/customerTag/Extension";
 import StarterKit from '@tiptap/starter-kit'
-import TagMenu from '../tagMenu/tagMenu.vue'
 import VarManagerDialog from "../../Dialog/varManagerDialog";
+import Focus from "@tiptap/extension-focus";
 
 
 
@@ -30,44 +36,68 @@ export default {
   name: "tagEditor",
   components: {VarManagerDialog, EditorContent},
   model:{
-    prop:'content',
+    prop:"content",
     event:"change"
   },
   props:{
     //外层编辑器对象
     mainEditor:Object,
-    content:Array,
+    content:{
+      type:Array,
+      default:()=>[]
+    },
     rangeId:String
   },
   data(){
     return{
       managerDialog:false,
+      innerContent:[],
       editor:null,
       defaultProps:[
         StarterKit,
         CustomerTag,
+        Focus.configure({
+          // className: 'focus',
+          mode: 'all',
+        }),
       ],
+    }
+  },
+  watch:{
+    // editorJson:{
+    //   handler(newVal,oldVal){
+    //     if(this.editor){
+    //       console.log("是因为你吗")
+    //       this.editor.commands.setContent(newVal)
+    //     }
+    //   },
+    //   deep:true,
+    //   immediate:false,
+    // },
+  },
+  computed:{
+    editorJson(){
+      return{
+        type:'doc',
+        content:[{
+          type:'paragraph',
+          content:this.content || []
+        }]
+      }
     }
   },
   created() {
     const that = this
-    let content = this.mainEditor.getAttributes("custom-tag").content
-    let json = {
-      type:'doc',
-      content:[{
-        type:'paragraph',
-        content:content
-      }]
-    }
     this.editor = new Editor({
       extensions: this.defaultProps,
-      content: json,
+      content: this.editorJson,
       editable: true,
       onCreate({editor}){
       },
       onUpdate({editor}){
         let json = editor.getJSON()
-        that.mainEditor.chain().updateAttributes('custom-tag',{content:json.content[0].content}).run()
+        console.log("双向数据——————————",json)
+        that.$emit('change',json.content[0].content)
       },
     })
   },
@@ -75,7 +105,6 @@ export default {
     /**
      * TODO 获取当前智能文本的id
      */
-    console.log("加载",this.rangeId)
   },
   methods:{
     varsManager(){
@@ -92,24 +121,13 @@ export default {
         },
       }).run()
     },
-    editorOver(e){
-      let result = []
-      const nodes = e.target.childNodes
-      nodes.forEach(item=>{
-        result.push({
-          type:item.dataset?.type || 'const'
-        })
-        console.log(item.innerText)
-      })
-
-    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .content-editor{
-  border: 1px solid red;
+  border: 1px solid #D8D8D8;
   padding: 20px;
   /deep/.ProseMirror {
     &:focus-visible {
@@ -118,7 +136,7 @@ export default {
   }
 }
 .edit-content{
-  border: 1px solid red;
+  border: 1px solid #D8D8D8;
   .tag{
     margin: 0 5px;
   }

@@ -12,6 +12,9 @@ export default Node.create({
     isolating: true,
     draggable: false,
 
+
+
+
     //添加里字段
     addAttributes() {
         return {
@@ -23,9 +26,8 @@ export default Node.create({
     addCommands() {
         return {
             getParagraphHtml: () => (node) => {
-                console.log(this,node)
-                const schema = getSchema(editor.extensionManager.extensions)
-                // return getHTMLFromFragment(node,schema)
+                console.log(this)
+                console.log(node)
             },
         }
     },

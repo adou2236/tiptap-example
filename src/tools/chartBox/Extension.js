@@ -5,8 +5,7 @@ import Component from "./chartBox.vue";
 export default Node.create({
     name: 'custom-chart',
     group: 'block',
-    // inline: false,
-    content: 'block+',
+    content: 'block*',
     selectable: true,
     draggable: false,
     atom: true,
@@ -16,6 +15,9 @@ export default Node.create({
 
     addAttributes() {
         return {
+            id:{
+              default:null
+            },
             //后台所用数据
             index:{
                 default:{}
@@ -28,19 +30,20 @@ export default Node.create({
                 default:{}
             },
             title:{
-                default:{}
+                default:'标题'
             },
             source:{
-                default:''
+                default:'来源'
             }
         }
     },
 
+
     addCommands() {
         return {
             upDateChartOptions: (options) => ({ tr, commands  }) => {
-                let isChange = JSON.stringify(options) !== JSON.stringify(tr.selection?.node?.attrs?.options)
-                if(tr.selection?.node?.type?.name === 'custom-chart'&&isChange) {
+                if(tr.selection?.node?.type?.name === 'custom-chart') {
+                    console.log("能执行")
                     return commands.updateAttributes('custom-chart', {options:options})
                 }
             },
@@ -51,15 +54,20 @@ export default Node.create({
         return [{tag: 'custom-chart'}]
     },
 
-    renderHTML({HTMLAttributes}) {
+    renderHTML({node,HTMLAttributes}) {
         // console.log(HTMLAttributes)
         let attr = {
             src:HTMLAttributes.src,
             class:'chart'
         }
-        return ['img', mergeAttributes(attr)]
+        const {title,source} = node.attrs
+        return ['div',
+                ['div',mergeAttributes({class:'title'}),title],
+                ['img', mergeAttributes(attr)],
+                ['div',mergeAttributes({class:'source'}),
+                source]]
     },
     addNodeView() {
-        return VueNodeViewRenderer(Component)
+        return VueNodeViewRenderer(Component);
     },
 })
