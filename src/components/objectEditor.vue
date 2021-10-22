@@ -1,7 +1,7 @@
 <template>
   <div style="display: flex">
     <div class="left">
-<!--      <button @click="varsManager">全局变量管理</button>-->
+      <button @click="varsManager">全局变量管理</button>
       <tag-menu v-if="editor&&editor.isActive('custom-tag')"
                 :key="editor.getAttributes('custom-tag').id"
                 :editor="editor"
@@ -15,7 +15,9 @@
         <button @click="setImageAttr">确定</button>
       </div>
       <table-menu v-else-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
-      <echarts-menu v-else-if="editor&&editor.isActive('custom-chart')"
+      <echarts-menu v-else-if="editor
+                              &&editor.isActive('custom-chart')
+                              &&!editor.getAttributes('custom-chart').placeholder"
                     @renderChart="renderChart"
                     :key="editor.getAttributes('custom-chart').id"
                     :editor="editor"

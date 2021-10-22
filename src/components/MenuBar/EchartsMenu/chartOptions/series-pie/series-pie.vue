@@ -8,10 +8,10 @@
       </el-radio-group>
     </el-form-item>
     <el-form-item label="指标">
-      <index-inputer v-model="selectedIndex"></index-inputer>
+      <index-inputer v-model="dataIndex"></index-inputer>
     </el-form-item>
     <el-form-item label="时间">
-      <index-inputer v-model="selectedVar"></index-inputer>
+      <index-inputer type="variety" v-model="time"></index-inputer>
     </el-form-item>
 <!--    <series :items="index.items"></series>-->
   </el-collapse-item>
@@ -34,10 +34,10 @@ export default {
     return{
       innerIndex:deepCopy(this.index),
       innerSeries:deepCopy(this.series),
-      //选择的指标
-      selectedIndex:[...new Set(this.index.items.map(item=>item.indicator))],
-      //选择的变量
-      selectedVar:[...new Set(this.index.items.map(item=>item.time))],
+      //指标
+      dataIndex: '',
+      //选择的时间变量
+      time: '',
     }
   },
   watch:{
@@ -67,29 +67,28 @@ export default {
     comboIndex:{
       get(){
         let result = []
-        let index = this.selectedIndex
-        let time = this.selectedVar
-        for(let i = 0;i<time.length;i++){
-          for(let j = 0;j<index.length;j++){
-            result.push({
-              "time":time[i],    //时间
-              "timeType":"var",   // var:变量  const:常量
-              "indicator": index[j],
-              "indicatorType": "const"
-            })
-          }
+        let index = this.dataIndex
+        let time = this.time
+        result[0]={
+          "time":time,    //时间
+          "timeType":"var",   // var:变量  const:常量
+          "indicator": index,
+          "indicatorType": "const"
         }
         return result
       }
     },
   },
-  async mounted() {
-    this.eventBusListener()
+  created(){
+    this.indexInit()
   },
   methods: {
+    indexInit(){
+      this.dataIndex = this.innerIndex.items[0]?.indicator || ''
+      this.time = this.innerIndex.items[0]?.time || ''
+    },
     seriesInit() {
       let series = []
-      console.log(this.comboIndex,this.innerIndex)
       this.comboIndex.forEach((item, index) => {
         if (this.innerSeries[index]) {
           series=this.innerSeries[index]
@@ -105,22 +104,6 @@ export default {
     },
     handleRemove(tag) {
       this.selectedIndex = this.selectedIndex.filter(obj => obj !== tag)
-    },
-    eventBusListener() {
-      EventBus.$on("indexSelect", (item) => {
-        if (this.selectedIndex.some(obj => obj === item.indicator)) {
-          this.selectedIndex = this.selectedIndex.filter(obj => obj !== item.indicator)
-        } else {
-          this.selectedIndex.push(item.indicator)
-        }
-      });
-      EventBus.$on("varSelect", (item) => {
-        if (this.selectedVar.some(obj => obj === item.varKey)) {
-          this.selectedVar = this.selectedVar.filter(obj => obj !== item.varKey)
-        } else {
-          this.selectedVar.push(item.varKey)
-        }
-      });
     },
   }
 }

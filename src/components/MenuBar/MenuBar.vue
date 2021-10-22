@@ -197,7 +197,7 @@ export default {
           selector: true,
           components: TableSelector,
           action: ({row,col}) => {
-            this.editor.chain().focus().insertTable({rows:row,cols:col,withHeaderRow: false}).run()
+            this.editor.chain().focus().insertCustomTable().run()
           },
         },
         {

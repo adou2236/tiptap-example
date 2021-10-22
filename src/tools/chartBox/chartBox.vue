@@ -1,21 +1,30 @@
 <template>
-  <node-view-wrapper  class="chart-content">
-    <div class="title">{{ title }}</div>
+  <node-view-wrapper class="chart-content">
+    <div class="title">{{ title }}
+    </div>
     <div :id="`chart-${random}`" class="chart"
-         v-loading="loading"></div>
+         v-loading="loading">
+    </div>
+    <div v-if="node.attrs.placeholder" class="placeholder" @click="showDialog">
+      +选择图表
+    </div>
     <div class="source">{{ source }}</div>
+    <chart-select v-model="dialogVisible"
+                  @commit="handleChartReplace">
+    </chart-select>
   </node-view-wrapper>
 </template>
 
 <script>
 import {NodeViewWrapper, nodeViewProps, NodeViewContent} from '@tiptap/vue-2'
 import * as echarts from 'echarts'
-import {baseOptions, deepCopy} from "../../unit/baseType";
-import {province, randomData, randomTweenData} from "../../assets/maps";
+import {baseOptions, chartColor, deepCopy, optionsInit} from "../../unit/baseType";
+import {geography, province, randomData, randomTweenData} from "../../assets/maps";
 import '../../assets/china.js'
 import {getChartSeries} from "../../request/api";
 import {EventBus} from "../../unit/eventBus";
 import Chart from "./components/chart";
+import ChartSelect from "../../components/Dialog/chartSelect";
 export default {
   name: "chartBox",
   props: {
@@ -26,6 +35,7 @@ export default {
     },
   },
   components: {
+    ChartSelect,
     NodeViewWrapper,
     NodeViewContent
   },
@@ -39,16 +49,19 @@ export default {
       src: '#',
       loading:false,
       complateOptions:{},//附加数据的完整配置
+      dialogVisible:false,
 
     }
   },
   mounted() {
     this.$nextTick(async () => {
       this.chartsInit()
-      this.loading = true
-      let temple = deepCopy(this.options)
-      this.complateOptions = await this.dataAttach(temple,this.index)
-      this.graphRender("初始化，周期")
+      if(!this.node.attrs.placeholder){
+        this.loading = true
+        let temple = deepCopy(this.options)
+        this.complateOptions = await this.dataAttach(temple,this.index)
+        this.graphRender("初始化，周期")
+      }
     })
     this.EventBusListener()
     window.addEventListener('resize', this.resize)
@@ -88,6 +101,31 @@ export default {
     window.removeEventListener('resize', this.resize)
   },
   methods: {
+    showDialog(){
+      this.dialogVisible = true
+    },
+    handleChartReplace(type){
+      let timestamp = (new Date()).getTime()
+      let index = {
+        //图类型
+        type:type,
+        //横坐标类型/饼状图扇叶
+        xaxisType:'region',
+        //横坐标指标(地域或者时间)
+        xaxisIndex:'provinces',
+        //纵坐标指标/饼状图数值
+        items:[]
+      }
+      let attrs = {
+        "index": index,
+        "placeholder":false,
+        "id":`${this.$route.params.id}_${timestamp}`,
+        "src": "",
+        "options": optionsInit(type)
+      }
+      this.editor.chain().focus().updateAttributes('custom-chart',attrs).run()
+      this.dialogVisible = false
+    },
     EventBusListener(){
       EventBus.$on("optionChange", async (option,id) => {
         if(id===this.id){
@@ -160,42 +198,79 @@ export default {
         }
         else if(index.type === 'scatter'){
           //散点图
-          options.series.forEach((item,index)=>{
-            let arr = []
-            const pinArea = options.additions.locationPin
-            const size = options.additions.symbolSize
-            for(let i = 0;i<item.items.length;i++){
-              //附加节点大小，突出部分地区
-              item.symbolSize = (value,params) =>{
-                return pinArea&&pinArea.includes(params.name)?size+10:size
-              }
-              arr.push({
-                name:item.items[i],
-                value:randomTweenData[index][i]
-              })
+          let query = {
+            "templateId": this.$route.params.id,
+            ...this.index
+          }
+          if(this.index.items.length>=2){
+            let data = await this.getChartsData(query)
+            //模拟异步获取分组信息
+            let group = [
+              {id: 'west', label: '西部', children:['新疆','甘肃','内蒙古','西藏','青海','宁夏','陕西','四川','重庆','云南','贵州','广西'], color: chartColor[0], labelFormatter: "{b}"},
+              {id: 'east', label: '东部', children:['北京','上海','天津','河北','山东','江苏','浙江','福建','广东'], color: chartColor[1], labelFormatter: "{b}"},
+              {id: 'center', label: '中部', children:['山西','河南','湖北','安徽','湖南','江西','海南'], color: chartColor[2], labelFormatter: "{b}"},
+              {id: 'north-east', label: '东北部', children:['黑龙江','吉林','辽宁'], color: chartColor[3], labelFormatter: "{b}"},
+            ]
+            if(options.additions.group.length<=0){
+              options.additions.group = group
             }
-            item.data = arr
-          })
-          //添加参考线
-          if(options.additions.markLine){
-            let markLine = {data:[]}
-            options.additions.markLine.forEach((item,index)=>{
-              markLine.data.push({
-                name:item.name,
-                label: {
-                  formatter: '{b}'
+            let {xaxisSeries,yaxisSeries} = data
+            let series = []
+            options.additions.group.forEach((item,index)=>{
+              let arr = []
+              const pinArea = options.additions.locationPin
+              const size = options.additions.symbolSize
+              for(let i = 0;i<item.children.length;i++){
+                const num = xaxisSeries.indexOf(item.children[i])
+                //附加节点大小，突出部分地区
+                arr.push({
+                  name:item.children[i],
+                  value:[yaxisSeries[0]?.value[num],yaxisSeries[1]?.value[num]]
+                })
+              }
+              series.push({
+                type: 'scatter',
+                name:item.label,
+                label:{
+                  show:options.additions.labShow,
+                  position:[0,0],
+                  formatter:item.labelFormatter
                 },
-                xAxis:item.axis === 'xAxis'?item.value:undefined,
-                yAxis:item.axis === 'yAxis'?item.value:undefined
+                symbolSize: (value,params) =>{
+                  return pinArea&&pinArea.includes(params.name)?size+10:size
+                },
+                labelLine:{
+                  show:false
+                },
+                itemStyle:{
+                  color:item.color
+                },
+                data:arr,
               })
             })
-            options.series.push({
-              type:"scatter",
-              markLine:{
-                animation:false,
-                ...markLine
-              }
-            })
+            console.log(series)
+            options.series = series
+            //添加参考线
+            // if(options.additions.markLine){
+            //   let markLine = {data:[]}
+            //   options.additions.markLine.forEach((item,index)=>{
+            //     markLine.data.push({
+            //       name:item.name,
+            //       label: {
+            //         formatter: '{b}'
+            //       },
+            //       xAxis:item.axis === 'xAxis'?item.value:undefined,
+            //       yAxis:item.axis === 'yAxis'?item.value:undefined
+            //     })
+            //   })
+            //   options.series.push({
+            //     type:"scatter",
+            //     markLine:{
+            //       animation:false,
+            //       ...markLine
+            //     }
+            //   })
+            // }
           }
         }
         else if(index.type === 'combo'){
@@ -218,6 +293,27 @@ export default {
               options.series[i].type='line'
             }
           }
+        }
+        else if(index.type === 'map'){
+          //饼状图数据附加
+          let query = {
+            "templateId": this.$route.params.id,
+            ...this.index
+          }
+          let data = await this.getChartsData(query)
+          let {xaxisSeries,yaxisSeries} = data
+          let result = {}
+          let dataList = yaxisSeries[0]?.value || []
+          dataList.forEach((item,index)=>{
+            if(item){
+              result[xaxisSeries[index]] = item
+            }
+          })
+          console.log(result)
+          options.geo.label.formatter = (params) => {
+            return params.name + (result[params.name] ? result[params.name]:'')
+          }
+          // options.series.data = result
         }
       }else{
         //options变化，不需要重新请求
@@ -291,27 +387,22 @@ export default {
 <style lang="scss" scoped>
 .chart-content{
   position: relative;
-  margin: 10px 0;
-  .mask{
-    position: absolute;
-    border: 2px dashed #0D0D0D20;
-    left: 0;
-    right: 0;
-    top: 0;
-    z-index: 1000;
-  }
-  .click-bar{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: 0;
-    background: rgba(255, 0, 0, 0.19);
-    z-index: 2;
-  }
+  box-sizing: border-box;
+  padding: 10px;
   .chart{
-    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
   }
+  .placeholder{
+    position: absolute;
+    cursor: pointer;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+  }
+
 
   &.focus{
     outline: 3px solid #68cef8;
@@ -323,6 +414,10 @@ export default {
     line-height: 1.5rem;
     min-height: 1.5rem;
     font-size: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width:100%;
   }
   .source{
     color: #000000;
@@ -330,6 +425,10 @@ export default {
     font-family: STSong;
     line-height: 1rem;
     min-height: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width:100%;
   }
 }
 

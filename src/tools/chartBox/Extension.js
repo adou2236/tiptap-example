@@ -18,6 +18,10 @@ export default Node.create({
             id:{
               default:null
             },
+            //是否为占位表
+            placeholder:{
+                default:false
+            },
             //后台所用数据
             index:{
                 default:{}
@@ -61,11 +65,11 @@ export default Node.create({
             class:'chart'
         }
         const {title,source} = node.attrs
-        return ['div',
+        return ['div',mergeAttributes({class:'chart'}),
                 ['div',mergeAttributes({class:'title'}),title],
                 ['img', mergeAttributes(attr)],
-                ['div',mergeAttributes({class:'source'}),
-                source]]
+                ['div',mergeAttributes({class:'source'}),source]
+            ]
     },
     addNodeView() {
         return VueNodeViewRenderer(Component);

@@ -14,12 +14,14 @@ import SeriesPie from "./chartOptions/series-pie/series-pie";
 import PieSize from "./chartOptions/series-pie/pie-size";
 import SeriesScatter from "./chartOptions/series-scatter/series-scatter";
 import SeriesCombo from "./chartOptions/series-combo/series-combo";
+import SeriesMap from "./chartOptions/series-map/series-map";
 import {deepCopy} from "../../../unit/baseType";
 import {EventBus} from "../../../unit/eventBus";
 
 
 export default {
     components: {
+        SeriesMap,
         SeriesCombo,
         SeriesScatter,
         PieSize,

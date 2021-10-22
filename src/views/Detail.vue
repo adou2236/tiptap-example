@@ -5,14 +5,14 @@
       <object-selector v-if="editor"
                        :editor="editor"
                        :objects="tools"
-                       @lineInsert="handleAddLine"
+                       @lineInsert="showLineSelector"
                        @tagInsert="handleAppendTag"
                        @imageInsert="handleInsertImage"
                        @chartInsert="handleSelectChart">
       </object-selector>
       <div class="editor-content">
-        <editor-content @keydown.enter="newYourEditor" :editor="editor"/>
-        <div class="new-line" @click="handleAddLine(true)">+</div>
+        <editor-content :editor="editor"/>
+        <div class="new-line" @click="showLineSelector">+</div>
       </div>
       <object-editor style="width: 40%" v-if="editor" :rootId="root_id" :editor="editor"></object-editor>
     </div>
@@ -22,11 +22,10 @@
       <button @click="save">保存</button>
     </div>
 
-    <my-dialog v-model="dialogVisible" >
-      <dl v-html="dialogContent">
-        {{dialogContent}}
-      </dl>
-    </my-dialog>
+    <over-view v-model="dialogVisible" :content="dialogContent"></over-view>
+
+    <line-selector v-model="dialogVisible5" @commit="handleAddLine"></line-selector>
+
     <my-dialog v-model="dialogVisible2">
       <image-upload @imageCommit="imageCommit"></image-upload>
     </my-dialog>
@@ -37,13 +36,10 @@
           :mode="'code'"
           :modes="['code']"
           lang="zh"/>
-      <!--      <json-viewer :value="dialogContent"></json-viewer>-->
-      <!--      <pre ><code v-html="dialogContent"></code></pre>-->
     </my-dialog>
-    <my-dialog v-model="dialogVisible4">
-      <chart-select @commit="handleInsertChart"></chart-select>
-    </my-dialog>
-
+    <chart-select v-model="dialogVisible4"
+                  @commit="handleInsertChart">
+    </chart-select>
   </div>
 </template>
 
@@ -74,6 +70,8 @@ import FontSize from '../tools/font-size/font-size'
 import LineHeight from "../tools/line-height/line-height";
 
 //自定义组件
+import { Figure } from '../tools/figure/figure'
+import { Figcaption } from '../tools/figure/figcaption'
 import CustomerTag from '../tools/customerTag/Extension'
 import ContentBox from "../tools/contentBox/Extension";
 import MenuBar from '../components/MenuBar/MenuBar'
@@ -84,6 +82,7 @@ import imageUpload from "../components/Dialog/imageUpload";
 import TableMenu from "../components/MenuBar/TableMenu";
 import CustomImage from "../tools/imageBox/Extension"
 import CustomChart from "../tools/chartBox/Extension"
+import CustomTable from '../tools/tableBox/Extension'
 import {optionsInit} from "../unit/baseType";
 import ChartSelect from "../components/Dialog/chartSelect";
 
@@ -91,11 +90,15 @@ import ChartSelect from "../components/Dialog/chartSelect";
 import vueJsonEditor from 'vue-json-editor'
 import {mapMutations,mapState} from 'vuex';
 import {getDoc, getVarsById, templateSave} from "../request/api";
+import OverView from "../components/Dialog/overView/overView";
+import LineSelector from "../components/Dialog/lineSelector";
 
 
 
 export default {
   components: {
+    LineSelector,
+    OverView,
     ChartSelect,
     TableMenu,
     ObjectSelector,
@@ -113,125 +116,6 @@ export default {
       selectParagraph:null,
       //文档根id
       root_id:'',
-      json:{
-        "type": "doc",
-        "content": [
-          {
-            "type": "content-box",
-            "attrs": {
-              "isSplit": false
-            },
-            "content": [
-              {
-                "type": "custom-chart",
-                "attrs": {
-                  "index": {
-                    "type": "combo",
-                    "xaxisType": "region",
-                    "xaxisIndex": "provinces",
-                    "items": [
-                      {
-                        "time": "date",
-                        "timeType": "var",
-                        "indicator": "国内生产总值(年,十亿人民币)",
-                        "indicatorType": "const"
-                      }
-                    ]
-                  },
-                  "src": "",
-                  "options": {
-                    "backgroundColor": "",
-                    "title": {
-                      "show": true,
-                      "text": "",
-                      "textStyle": {
-                        "color": "#333",
-                        "fontSize": 18,
-                        "fontWeight": "normal",
-                        "fontStyle": "normal"
-                      },
-                      "left": 20,
-                      "top": 20,
-                      "right": 20,
-                      "bottom": 20,
-                      "subtext": ""
-                    },
-                    "grid": {
-                      "left": 50,
-                      "right": 50,
-                      "bottom": 50,
-                      "top": 50
-                    },
-                    "legend": {
-                      "show": true,
-                      "icon": "circle",
-                      "itemWidth": 20,
-                      "itemHeight": 5
-                    },
-                    "graphic": [],
-                    "xAxis": {
-                      "show": true,
-                      "data": [],
-                      "axisLine": {
-                        "show": true,
-                        "lineStyle": {
-                          "color": "",
-                          "width": 1,
-                          "type": "solid"
-                        }
-                      },
-                      "splitLine": {
-                        "show": false,
-                        "lineStyle": {
-                          "color": "",
-                          "width": 0
-                        }
-                      }
-                    },
-                    "yAxis": {
-                      "axisLine": {
-                        "show": true,
-                        "lineStyle": {
-                          "color": "",
-                          "width": 1,
-                          "type": "solid"
-                        }
-                      },
-                      "splitLine": {
-                        "show": false,
-                        "lineStyle": {
-                          "color": "",
-                          "width": 0
-                        }
-                      }
-                    },
-                    "tooltip": {
-                      "show": true,
-                      "trigger": "axis",
-                      "padding": [
-                        5,
-                        10,
-                        5,
-                        10
-                      ],
-                      "backgroundColor": "#FFFFFF",
-                      "borderColor": "#333",
-                      "borderWidth": 0
-                    },
-                    "series": [],
-                    "additions": {
-                      "sortIndex": 0,
-                      "markLine": []
-                    }
-                  },
-                  "title": {},
-                  "source": ""
-                }
-              }
-            ]
-          }
-        ]
-      },
       tools:[
         {id:'line',name:'插入段落'},
         {id:'tag',name:'插入变量',type:'variety'},
@@ -242,6 +126,8 @@ export default {
       ],
       defaultProps:[
         StarterKit,
+        Figure,
+        Figcaption,
         Document,
         Paragraph,
         Text,
@@ -271,6 +157,7 @@ export default {
         //   className: 'focus',
         //   mode: 'deepest',
         // }),
+        CustomTable,
         Table.configure({
           resizable: true,
         }),
@@ -282,6 +169,7 @@ export default {
       dialogVisible2:false,
       dialogVisible3:false,
       dialogVisible4:false,
+      dialogVisible5:false,
       dialogContent:'',
       dialogType:'string',
     }
@@ -304,10 +192,16 @@ export default {
       content: content.doc,
       editable: true,
       onCreate({editor}){
-        console.log(editor)
       },
-      onUpdate(){
-        // console.log("数据更新")
+      onUpdate({editor}){
+        //数据更新监听
+        let json = editor.getJSON()
+        if(json.content.some(item=>item.type !== 'content-box')){
+          json.content = json.content.filter(line=>{
+            return line.type === "content-box"
+          })
+          editor.chain().setContent(json).focus().run()
+        }
       },
     })
 
@@ -352,30 +246,66 @@ export default {
       this.editor.chain().focus().setCustomerImage({ src: url }).run()
       this.dialogVisible2 = false
     },
+    showLineSelector(){
+      this.dialogVisible5 = true
+    },
     //插入段落待修改
-    handleAddLine(append=false){
-      if(!append){
-        this.editor.chain().focus().insertContent({
+    handleAddLine(type='single'){
+      let content = {}
+      if(type === 'single'){
+        content = {
           "type":"content-box",
+          "attrs":{
+            "isSplit":false
+          },
           "content":[
             {
               "type": "paragraph",
               "content":''
             }
           ]
-        }).run()
-      }else{
-        let position = this.editor.getCharacterCount()+2
-        this.editor.chain().focus().insertContentAt(position,{
+        }
+      }else if(type === 'double'){
+        content = {
           "type":"content-box",
+          "attrs":{
+            "isSplit":true
+          },
           "content":[
             {
-              "type": "paragraph",
+              "type": "custom-chart",
+              "attrs":{
+                'placeholder':"true"
+              },
+              "content":''
+            },
+            {
+              "type": "custom-chart",
+              "attrs":{
+                'placeholder':"true"
+              },
               "content":''
             }
           ]
-        }).run()
+        }
       }
+      let position = this.editor.getCharacterCount()+2
+      this.editor.chain().focus().insertContentAt(position,content).run()
+      this.dialogVisible5 = false
+      //在中间插入
+      // if(!append){
+      //   this.editor.chain().focus().insertContent({
+      //     "type":"content-box",
+      //     "content":[
+      //       {
+      //         "type": "paragraph",
+      //         "content":''
+      //       }
+      //     ]
+      //   }).run()
+      // }else{
+      //
+      // }
     },
     handleAppendTag(type){
       let text = prompt("输入占位字符","新建文本")
@@ -431,12 +361,8 @@ export default {
       // this.editor.editable = false
     },
     handleClick2(){
-      // this.editor.setEditable(true)
-      // let style = {
-      //   'font-family':this.json.attrs["font-family-c"]+','+this.json.attrs["font-family-e"]
-      // }
       const result = this.editor.getHTML()
-      this.dialogContent = `<div>${result}</div>`
+      this.dialogContent = result
       this.dialogVisible = true
       // this.editor.setEditable(false)
       // this.editor.editable = false
@@ -492,6 +418,10 @@ export default {
 /deep/.ProseMirror {
   > * + * {
     margin-top: 0.75em;
+  }
+  figure {
+    margin: 0;
+    padding: 0.5rem;
   }
 
 

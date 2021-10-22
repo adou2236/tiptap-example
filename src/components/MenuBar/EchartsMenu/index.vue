@@ -43,11 +43,14 @@
                   @seriesChange="(data)=>somethingChange('series',data)">
       </series-pie>
 
-<!--      <series-scatter v-if="chartType === 'scatter'"-->
-<!--                      :index="index"-->
-<!--                      :series="series"-->
-<!--                      :additions="additions">-->
-<!--      </series-scatter>-->
+      <series-scatter v-if="chartType === 'scatter'"
+                      :index="attrs.index"
+                      :series="chartOptions.series"
+                      :additions="chartOptions.additions"
+                      @indexChange="indexChange"
+                      @additionChange="(data)=>somethingChange('additions',data)"
+                      @seriesChange="(data)=>somethingChange('series',data)">
+      </series-scatter>
 
       <series-combo v-if="chartType === 'combo'"
                     :index="attrs.index"
@@ -57,6 +60,13 @@
                     @additionChange="(data)=>somethingChange('additions',data)"
                     @seriesChange="(data)=>somethingChange('series',data)">
       </series-combo>
+
+      <series-map v-if="chartType === 'map'"
+                  :index="attrs.index"
+                  :series="chartOptions.series"
+                  @indexChange="indexChange"
+                  @seriesChange="(data)=>somethingChange('series',data)">
+      </series-map>
 
     </el-collapse>
 

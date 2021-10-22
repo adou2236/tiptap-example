@@ -1,6 +1,5 @@
 <template>
   <div>
-
     外部文本：
     <br/>
     <el-input type="textarea" v-model="attrs.coverText" @input="(v)=>handleChange('coverText',v)"></el-input>
@@ -106,7 +105,6 @@ export default {
       }
     },
     handleCommit(){
-      console.log("提交的数据",this.attrs)
       this.editor.chain().focus().updateAttributes('custom-tag', this.attrs).run()
     },
     async getVars(id){

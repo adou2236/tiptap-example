@@ -16,13 +16,13 @@
     <el-form-item v-if="innerIndex.xaxisType === 'time'" label="时间范围">
       <el-input v-model="innerIndex.xaxisIndex" />月
     </el-form-item>
-    <el-form-item label="纵坐标">
-    </el-form-item>
+<!--    <el-form-item label="纵坐标">-->
+<!--    </el-form-item>-->
     <el-form-item label="指标">
-      <index-inputer v-model="selectedIndex"></index-inputer>
+      <index-inputer :multiple="true" v-model="selectedIndex"></index-inputer>
     </el-form-item>
     <el-form-item v-if="innerIndex.xaxisType === 'region'" label="时间">
-      <index-inputer v-model="selectedVar"></index-inputer>
+      <index-inputer :multiple="true" type="variety" v-model="selectedVar"></index-inputer>
     </el-form-item>
     <el-form-item v-if="innerIndex.items.length>0" label="图形配置">
       <series-option v-for="(item,index) in index.items" :index="index"
@@ -82,7 +82,6 @@ export default {
     },
     comboIndex:{
       handler(v){
-        console.log(v)
         let data = {
           ...this.innerIndex,
           items:v
@@ -116,12 +115,11 @@ export default {
     },
   },
   async mounted() {
-    this.eventBusListener()
+    // this.eventBusListener()
   },
   methods:{
     seriesInit(){
       let series = []
-      console.log("组合指标----",this.comboIndex)
       this.comboIndex.forEach((item,index)=>{
         if(this.innerSeries[index]){
           series.push(this.innerSeries[index])
@@ -137,9 +135,6 @@ export default {
       })
       this.innerSeries = series
     },
-    handleRemove(tag){
-      this.selectedIndex = this.selectedIndex.filter(obj=>obj!==tag)
-    },
     eventBusListener(){
       EventBus.$on("indexSelect", (item) => {
         if(this.selectedIndex.some(obj=>obj===item.indicator)){
@@ -149,7 +144,6 @@ export default {
         }
       });
       EventBus.$on("varSelect", (item) => {
-        console.log("asd",item)
         if(this.selectedVar.some(obj=>obj===item.varKey)){
           this.selectedVar = this.selectedVar.filter(obj=>obj!==item.varKey)
         }else{

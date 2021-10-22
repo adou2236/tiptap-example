@@ -1,6 +1,5 @@
 <template>
-  <div
-      class="bubble-menu">
+  <div class="bubble-menu">
     <button @click="editor.chain().focus().deleteColumn().run()" :disabled="!editor.can().deleteColumn()">
       删除当前列
     </button>

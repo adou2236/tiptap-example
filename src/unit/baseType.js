@@ -154,27 +154,27 @@ const optionsInitPIE = function(){
 }
 const optionsInitSCATTER = function(){
   let series = []
-  geography.forEach((item,index)=>{
-    series.push(
-        {
-          type: 'scatter',
-          name:item.label,
-          label:{
-            show:true,
-            position:[0,0],
-            formatter:'{b}'
-          },
-          labelLine:{
-            show:false
-          },
-          itemStyle:{
-            color:defaultColor[index]
-          },
-          items:item.children,
-        }
-    )
-
-  })
+  // geography.forEach((item,index)=>{
+  //   series.push(
+  //       {
+  //         type: 'scatter',
+  //         name:item.label,
+  //         label:{
+  //           show:true,
+  //           position:[0,0],
+  //           formatter:'{b}'
+  //         },
+  //         labelLine:{
+  //           show:false
+  //         },
+  //         itemStyle:{
+  //           color:chartColor[index%7]
+  //         },
+  //         items:item.children,
+  //       }
+  //   )
+  //
+  // })
 
   return {
     ...base,
@@ -225,9 +225,19 @@ const optionsInitSCATTER = function(){
     series: series,
     //针对散点图的额外属性
     "additions":{
-      symbolSize: 10,
+      symbolSize: 10,//标记大小
+      labShow:true,//标签显隐
+      labPosX:0,//标签位置
+      labPosY:0,//标签位置
       locationPin:false,//凸显某个地区boolean/string
       markLine:[],//辅助线array
+      //***分组***异步查询
+      group:[
+        {id: 'west', label: '西部', children:['新疆','甘肃','内蒙古','西藏','青海','宁夏','陕西','四川','重庆','云南','贵州','广西'], color: chartColor[0], labelFormatter: "{b}"},
+        {id: 'east', label: '东部', children:['北京','上海','天津','河北','山东','江苏','浙江','福建','广东'], color: chartColor[1], labelFormatter: "{b}"},
+        {id: 'center', label: '中部', children:['山西','河南','湖北','安徽','湖南','江西','海南'], color: chartColor[2], labelFormatter: "{b}"},
+        {id: 'north-east', label: '东北部', children:['黑龙江','吉林','辽宁'], color: chartColor[3], labelFormatter: "{b}"},
+      ]
     }
   }
 }
@@ -258,24 +268,79 @@ const optionsInitCOMBO = function(){
 }
 
 const optionsInitMAP = function(){
+  let group = [
+    {id: 'east', label: '东部', children:['北京','上海','天津','河北','山东','江苏','浙江','福建','广东'], color: chartColor[1]},
+    {id: 'center', label: '中部', children:['山西','河南','湖北','安徽','湖南','江西','海南'], color: chartColor[2]},
+    {id: 'west', label: '西部', children:['新疆','甘肃','内蒙古','西藏','青海','宁夏','陕西','四川','重庆','云南','贵州','广西'], color: chartColor[0]},
+    {id: 'north-east', label: '东北部', children:['黑龙江','吉林','辽宁'], color: chartColor[3]},
+  ]
+  let list = []
+  group.forEach((item,index)=>{
+    list = list.concat(item.children.map(obj=>{
+      return {
+        value:index,
+        name:obj,
+      }
+    }))
+  })
   return {
     ...base,
+    legend:{
+      show:false
+    },
     tooltip:{
-      show:true,
-      // formatter:'{b}<br/>{c}',
+      show:false,
+      formatter: '{b}:{c}',
       trigger: 'item',  //axis, item, none
       padding: [5, 10, 5, 10], // 上右下左
       backgroundColor: '#FFFFFF',
       borderColor: '#333',
       borderWidth: 0
     },
-    geo: {
-      map: 'china',
+    visualMap: {
+      show:true,
+      type:'piecewise',
+      top: 0,
+      right: 0,
+      seriesIndex: [0],
+      pieces: [
+        {
+          value:0,
+          label: '东部',
+          color:chartColor[0],
+        },
+        {
+          value:1,
+          label: '中部',
+          color:chartColor[1],
+        },
+        {
+          value:2,
+          label: '西部',
+          color:chartColor[2],
+        },
+        {
+          value:3,
+          label: '东北部',
+          color:chartColor[3],
+        }
+      ],
+    },
+    geo:{
+      map:'china',
+      label:{
+        show:true,
+      }
     },
     series: [{
-      type: 'map',
-      map: 'china',
+      type: "map",
+      map:'china',
+      geoIndex:0,
+      data:list
     }],
+    additions:{
+      group:group
+    }
   }
 }
 

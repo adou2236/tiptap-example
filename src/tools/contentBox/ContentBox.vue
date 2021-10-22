@@ -1,6 +1,6 @@
 <template>
   <node-view-wrapper class="outter-content" >
-    <node-view-content class="content"/>
+    <node-view-content class="content" :data-issplit="node.attrs.isSplit"/>
     <button @click.stop="showOptions" class="delete-icon">
       <svg class="remix">
         <use :xlink:href="require('remixicon/fonts/remixicon.symbol.svg') + `#ri-more-fill`" />
@@ -109,7 +109,16 @@ export default Vue.extend({
     padding: 10px;
     margin-bottom: 10px;
     border: 1px dashed black;
-
+  }
+  .content[data-issplit=true]{
+    display:flex;
+    /deep/.chart{
+      height: 250px;
+    }
+    /deep/.chart-content{
+      flex: 1;
+      width: 50%
+    }
   }
   &:hover{
     .delete-icon{
