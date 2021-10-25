@@ -3,12 +3,6 @@
 <!--    <el-form-item label="背景色">-->
 <!--      <el-color-picker :value="chartOptions.backgroundColor" @change="(data)=>somethingChange('backgroundColor',data)"></el-color-picker>-->
 <!--    </el-form-item>-->
-    <el-form-item label="标题">
-      <el-input :value="attrs.title" @input="titleChange"/>
-    </el-form-item>
-    <el-form-item label="来源">
-      <el-input :value="attrs.source" @input="sourceChange"/>
-    </el-form-item>
     通用配置
     <el-collapse v-model="activeNames" accordion>
 <!--      <title-option v-show="chartOptions.title" :title="chartOptions.title" @change="(data)=>somethingChange('title',data)"></title-option>-->
@@ -18,9 +12,9 @@
 
 <!--      <tooltip-option v-show="chartOptions.tooltip" :tooltip="chartOptions.tooltip" @change="(data)=>somethingChange('tooltip',data)"></tooltip-option>-->
 
-      <x-axis-option v-if="chartType !== 'pie'" :xAxis="chartOptions.xAxis" @change="(data)=>somethingChange('xAxis',data)"></x-axis-option>
+      <x-axis-option v-if="chartType !== 'pie'&& chartType !== 'map'" :xAxis="chartOptions.xAxis" @change="(data)=>somethingChange('xAxis',data)"></x-axis-option>
 
-      <y-axis-option v-if="chartType !== 'pie'" :yAxis="chartOptions.yAxis" @change="(data)=>somethingChange('yAxis',data)"></y-axis-option>
+      <y-axis-option v-if="chartType !== 'pie' && chartType !== 'map'" :yAxis="chartOptions.yAxis" @change="(data)=>somethingChange('yAxis',data)"></y-axis-option>
 
 <!--      <graphic-option :graphic="chartOptions.graphic"-->
 <!--                      @addGraphic="addGraphic"-->

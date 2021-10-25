@@ -1,7 +1,10 @@
 <template>
   <div style="display: flex">
     <div class="left">
-      <button @click="varsManager">全局变量管理</button>
+      <el-button size="mini" @click="varsManager">全局变量管理</el-button>
+      <el-button size="mini"
+                 v-if="editor&&editor.isActive('custom-chart')"
+                 @click="showGroupDialog">编辑地域组</el-button>
       <tag-menu v-if="editor&&editor.isActive('custom-tag')"
                 :key="editor.getAttributes('custom-tag').id"
                 :editor="editor"
@@ -29,6 +32,7 @@
                         v-if="managerDialog"
                         :id="rootId">
     </var-manager-dialog>
+    <group-editor-dialog v-model="groupDialogVisible" :chartId="editor.getAttributes('custom-chart').id"></group-editor-dialog>
   </div>
 </template>
 
@@ -40,9 +44,10 @@ import TagMenu from './MenuBar/tagMenu/tagMenu.vue'
 import {baseOptions} from "../unit/baseType";
 import VarManagerDialog from "./Dialog/varManagerDialog";
 import {EventBus} from "../unit/eventBus";
+import GroupEditorDialog from "./Dialog/groupEditorDialog";
 export default {
   name: "objectEditor",
-  components: {VarManagerDialog, EchartsMenu, TableMenu, varMenu},
+  components: {GroupEditorDialog, VarManagerDialog, EchartsMenu, TableMenu, varMenu},
   props:{
     editor:{
       type:Object
@@ -53,7 +58,8 @@ export default {
   },
   data(){
     return{
-      managerDialog:false
+      managerDialog:false,
+      groupDialogVisible:false,
     }
   },
   mounted() {
@@ -131,6 +137,9 @@ export default {
     }
   },
   methods:{
+    showGroupDialog(){
+      this.groupDialogVisible = true
+    },
     renderChart(v){
       EventBus.$emit('optionChange',v)
       this.editor.chain().updateAttributes('custom-chart',{options:v}).run()

@@ -15,6 +15,11 @@ export const isArray = isType('Array');
 
 export const isDate = isType('Date');
 
+const arrayDiff = function(arr1,arr2){
+  let aSet = new Set(arr1)
+  let bSet = new Set(arr2)
+  return Array.from(new Set(arr1.concat(arr2).filter(v => !aSet.has(v) || !bSet.has(v))))
+}
 
 const debounce = function(fn, delay = 500) {
   var timer;
@@ -30,12 +35,12 @@ const debounce = function(fn, delay = 500) {
 }
 
 const formateFunction = function(content){
-  this.name = content.name;
+  this.nameEn = content.nameEn;
   this.params = content.params
   this.__proto__.toString = () => {
-    if(this.name&&this.params){
+    if(this.nameEn&&this.params){
       let paramsStr = content.params.map(item=>item.value).toString()
-      return `${content.name}(${paramsStr})`
+      return `${content.nameEn}(${paramsStr})`
     }else return ''
   }
 }
@@ -464,6 +469,6 @@ const REPORT_THEME = {
 
 export {deepCopy,baseOptions,optionsInitLAB,
   optionsInit,indexInit,labSeriesInit,
-  formateFunction,regionData,debounce,
+  formateFunction,regionData,debounce,arrayDiff,
   chartColor,REPORT_THEME}
 

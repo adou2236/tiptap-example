@@ -96,7 +96,6 @@ export default {
       },
       onUpdate({editor}){
         let json = editor.getJSON()
-        console.log("双向数据——————————",json)
         that.$emit('change',json.content[0].content)
       },
     })

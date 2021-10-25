@@ -88,7 +88,8 @@ export default {
     methods: {
         //指标变化（触发重新搜索）
         indexChange(v){
-            this.editor.chain().updateAttributes('custom-chart',{index:v}).run()
+            // this.editor.chain().updateAttributes('custom-chart',{index:v}).run()
+            this.editor.chain().setChartIndex(v).run()
             EventBus.$emit('indexChange',v,this.attrs.id)
         },
         //标题变化
@@ -129,7 +130,9 @@ export default {
         //更改配置
         somethingChange(key,data) {
             this.chartOptions[key] = data
-            this.editor.chain().updateAttributes('custom-chart',{options:this.chartOptions}).run()
+            this.editor.chain().setChartOption(this.chartOptions).run()
+
+            // this.editor.chain().updateAttributes('custom-chart',{options:this.chartOptions}).run()
             EventBus.$emit('optionChange',this.chartOptions,this.attrs.id)
         },
     }

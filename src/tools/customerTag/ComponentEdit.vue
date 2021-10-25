@@ -103,7 +103,7 @@ export default Vue.extend({
   &.function{
     background: #72a572;
   }
-  &.request{
+  &.formula{
     background: #cbcb86;
   }
   &.focus{

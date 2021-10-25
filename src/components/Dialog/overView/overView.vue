@@ -96,6 +96,7 @@ export default {
     handleOpen(){
       this.catalogueInit(this.$refs.content)
       this.chartCatalogueInit(this.$refs.content)
+      this.tableCatalogueInit(this.$refs.content)
     },
     handleClose(){
       this.$emit('change',false)
@@ -122,13 +123,14 @@ export default {
         this.cataData = offsetTops;
       })
     },
+    //图像目录生成
     chartCatalogueInit(dom){
       const offsetTops = [];
       this.$nextTick(()=>{
-        const els = dom.querySelectorAll("div.chart");
+        const els = dom.querySelectorAll("[type='figure-chart']");
         [...els].forEach((ele, elIndex) => {
           const key = 'chart'+elIndex;
-          const label = ele.querySelectorAll("div.title")[0].innerText;
+          const label = ele.querySelectorAll("[type='chart-title']")[0].innerText;
           const level = 0
           if (elIndex === 0) {
             this.currentPath2 = key; //当前选中
@@ -142,6 +144,29 @@ export default {
           })
         });
         this.cataData2 = offsetTops;
+      })
+    },
+    //表格目录生成
+    tableCatalogueInit(dom){
+      const offsetTops = [];
+      this.$nextTick(()=>{
+        const els = dom.querySelectorAll("[type='figure-table']");
+        [...els].forEach((ele, elIndex) => {
+          const key = 'table'+elIndex;
+          const label = ele.querySelectorAll("[type='table-title']")[0].innerText;
+          const level = 0
+          if (elIndex === 0) {
+            this.currentPath3 = key; //当前选中
+          }
+          offsetTops.push({
+            key: key,
+            label: label,
+            level: level,
+            offsetTop: this.getPosition(ele, dom),
+            eleHg: ele.offsetHeight,
+          })
+        });
+        this.cataData3 = offsetTops;
       })
     },
     /**
@@ -224,29 +249,19 @@ export default {
       min-height: 250px;
       box-sizing: border-box;
       padding: 10px;
+      border-color: black;
+      border-width: 2px 0;
+      border-style: solid;
     }
-    /deep/.title{
-      color: #C8152E;
-      border-bottom: 2px solid black;
-      font-family: STSong;
-      line-height: 1.5rem;
-      min-height: 1.5rem;
-      font-size: 1.5rem;
-      overflow: hidden;
+    /deep/figure {
+      margin: 0;
+      padding: 0.5rem;
+      flex: 1;
+    }
+    /deep/figcaption {
       white-space: nowrap;
       text-overflow: ellipsis;
-      width:100%;
-    }
-    /deep/.source{
-      color: #000000;
-      border-top: 2px solid black;
-      font-family: STSong;
-      line-height: 1rem;
-      min-height: 1rem;
       overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      width:100%;
     }
   }
 

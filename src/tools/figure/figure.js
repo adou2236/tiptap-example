@@ -10,7 +10,7 @@ export const Figure = Node.create({
 
     group: 'block',
 
-    content: 'block figcaption',
+    content: 'block figcaption table',
 
     draggable: true,
 
@@ -19,13 +19,13 @@ export const Figure = Node.create({
     parseHTML() {
         return [
             {
-                tag: `figure[data-type="${this.name}"]`,
+                tag: `figure[type="${this.name}"]`,
             },
         ]
     },
 
     renderHTML({ HTMLAttributes }) {
-        return ['figure', mergeAttributes(HTMLAttributes, { 'data-type': this.name }), 0]
+        return ['figure', mergeAttributes({ 'type': this.name }), 0]
     },
 
     // addProseMirrorPlugins() {

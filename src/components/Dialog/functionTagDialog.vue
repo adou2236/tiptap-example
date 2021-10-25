@@ -1,18 +1,18 @@
 <template>
-  <el-dialog :visible="visible" @close="handleClose">
+  <el-dialog :visible="visible" @open="handleOpen" @close="handleClose" append-to-body>
     <div >
       <div class="fnc">
         <div class="left">
           选择函数
-          <el-select :value="selectedFunc" value-key="id" @change="getParamsMsg">
-            <el-option v-for="item in functions" :key="item.id" :value="item" :label="item.nameZh">
+          <el-select :value="selectedFuncId" value-key="id" @change="getParamsMsg">
+            <el-option v-for="item in functions" :key="item.id" :value="item.id" :label="item.nameEn">
             </el-option>
           </el-select>
         </div>
         <div class="right">
           选择参数
           <div v-for="param in myParams" style="display: flex;margin-bottom: 5px">
-            <el-select v-model="param.kind">
+            <el-select v-model="param.paramType">
               <el-option value="variety" label="变量">变量</el-option>
               <el-option value="const" label="常量">常量</el-option>
             </el-select>
@@ -44,7 +44,8 @@ export default {
       type:Object,
       default:()=>{
         return{
-          name:'',
+          id:'',
+          nameEn:'',
           params:[]
         }
       }
@@ -54,31 +55,41 @@ export default {
     return{
       functions:[],
       paramsMessage:[],
-      selectedFunc:{},
+      selectedFuncId:"",
+      selectedFuncName:"",
       myParams:[]
 
     }
   },
   async mounted(){
     this.functions = await this.functionsInit()
-    this.selectedFunc = this.functionJson.name || ''
-    this.myParams = this.functionJson.params || []
+
   },
   methods:{
+    handleOpen(){
+      this.selectedFuncId = this.functionJson.id || ''
+      this.selectedFuncName = this.functionJson.nameEn || ''
+      this.myParams = this.functionJson.params || []
+    },
     handleCommit(){
       let params = this.myParams.map(item=>{
         return{
-          kind:item.kind,
+          paramType:item.paramType,
           value:item.value
         }
       })
-      let obj = {name:this.selectedFunc,params:params}
+      let obj = {
+        id:this.selectedFuncId,
+        nameEn:this.selectedFuncName,
+        params:params
+      }
       this.$emit('commit',obj)
     },
-    getParamsMsg(item){
-
+    getParamsMsg(id){
+      let item = this.functions.find(item=>item.id === id)
       this.myParams = item.params
-      this.selectedFunc = item.nameEn
+      this.selectedFuncId = item.id
+      this.selectedFuncName = item.nameEn
     },
     async functionsInit(){
       let {data} = await getFunctions()

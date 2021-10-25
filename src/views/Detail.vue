@@ -7,6 +7,7 @@
                        :objects="tools"
                        @lineInsert="showLineSelector"
                        @tagInsert="handleAppendTag"
+                       @complexTagInsert="showComplexTagDialog"
                        @imageInsert="handleInsertImage"
                        @chartInsert="handleSelectChart">
       </object-selector>
@@ -40,6 +41,11 @@
     <chart-select v-model="dialogVisible4"
                   @commit="handleInsertChart">
     </chart-select>
+    <complex-tag-dialog v-model="dialogVisible6"
+                        :areaId="root_id"
+                        :type="complexTagType"
+                        @commit="complexTagInsert"
+    ></complex-tag-dialog>
   </div>
 </template>
 
@@ -82,7 +88,8 @@ import imageUpload from "../components/Dialog/imageUpload";
 import TableMenu from "../components/MenuBar/TableMenu";
 import CustomImage from "../tools/imageBox/Extension"
 import CustomChart from "../tools/chartBox/Extension"
-import CustomTable from '../tools/tableBox/Extension'
+import FigureChart from '../tools/chartBox/figureChart'
+import FigureTable from '../tools/tableBox/figureTable'
 import {optionsInit} from "../unit/baseType";
 import ChartSelect from "../components/Dialog/chartSelect";
 
@@ -92,7 +99,7 @@ import {mapMutations,mapState} from 'vuex';
 import {getDoc, getVarsById, templateSave} from "../request/api";
 import OverView from "../components/Dialog/overView/overView";
 import LineSelector from "../components/Dialog/lineSelector";
-
+import ComplexTagDialog from "../components/Dialog/ComplexTagDialog/index"
 
 
 export default {
@@ -107,7 +114,8 @@ export default {
     EditorContent,
     myDialog,
     imageUpload,
-    vueJsonEditor
+    vueJsonEditor,
+    ComplexTagDialog
   },
   data() {
     return {
@@ -119,7 +127,8 @@ export default {
       tools:[
         {id:'line',name:'插入段落'},
         {id:'tag',name:'插入变量',type:'variety'},
-        {id:'tag',name:'插入公式',type:'function'},
+        {id:'tag',name:'插入函数',type:'function'},
+        {id:'complexTag',name:'插入公式',type:'formula'},
         {id:'tag',name:'插入智能文本',type:'smart'},
         {id:'image',name:'插入图片'},
         {id:'chart',name:'插入表格'},
@@ -144,6 +153,8 @@ export default {
         CustomerTag,
         ContentBox,
         CustomChart,
+        FigureChart,
+        FigureTable,
         CustomImage.configure({
           inline:true
         }),
@@ -155,9 +166,8 @@ export default {
         }),
         // Focus.configure({
         //   className: 'focus',
-        //   mode: 'deepest',
+        //   mode: 'all',
         // }),
-        CustomTable,
         Table.configure({
           resizable: true,
         }),
@@ -170,8 +180,10 @@ export default {
       dialogVisible3:false,
       dialogVisible4:false,
       dialogVisible5:false,
+      dialogVisible6:false,
       dialogContent:'',
       dialogType:'string',
+      complexTagType:'formula'
     }
   },
   watch:{
@@ -251,46 +263,46 @@ export default {
     },
     //插入段落待修改
     handleAddLine(type='single'){
-      let content = {}
-      if(type === 'single'){
-        content = {
-          "type":"content-box",
-          "attrs":{
-            "isSplit":false
-          },
-          "content":[
-            {
-              "type": "paragraph",
-              "content":''
-            }
-          ]
-        }
-      }else if(type === 'double'){
-        content = {
-          "type":"content-box",
-          "attrs":{
-            "isSplit":true
-          },
-          "content":[
-            {
-              "type": "custom-chart",
-              "attrs":{
-                'placeholder':"true"
-              },
-              "content":''
-            },
-            {
-              "type": "custom-chart",
-              "attrs":{
-                'placeholder':"true"
-              },
-              "content":''
-            }
-          ]
-        }
-      }
-      let position = this.editor.getCharacterCount()+2
-      this.editor.chain().focus().insertContentAt(position,content).run()
+      // let content = {}
+      // if(type === 'single'){
+      //   content = {
+      //     "type":"content-box",
+      //     "attrs":{
+      //       "isSplit":false
+      //     },
+      //     "content":[
+      //       {
+      //         "type": "paragraph",
+      //         "content":''
+      //       }
+      //     ]
+      //   }
+      // }else if(type === 'double'){
+      //   content = {
+      //     "type":"content-box",
+      //     "attrs":{
+      //       "isSplit":true
+      //     },
+      //     "content":[
+      //       {
+      //         "type": "custom-chart",
+      //         "attrs":{
+      //           'placeholder':"true"
+      //         },
+      //         "content":''
+      //       },
+      //       {
+      //         "type": "custom-chart",
+      //         "attrs":{
+      //           'placeholder':"true"
+      //         },
+      //         "content":''
+      //       }
+      //     ]
+      //   }
+      // }
+      // let position = this.editor.getCharacterCount()+2
+      this.editor.chain().focus().insertNewLine(type).run()
       this.dialogVisible5 = false
       //在中间插入
       // if(!append){
@@ -322,6 +334,24 @@ export default {
         }).run()
       }
     },
+    complexTagInsert(type,content){
+      let timestamp = (new Date()).getTime()
+      this.editor.chain().focus().insertContent({
+        "type":"custom-tag",
+        "attrs":{
+          "type":type,
+          "coverText":'新建公式',
+          "id":`${this.$route.params.id}_${timestamp}`,
+          "content":content
+        },
+      }).run()
+
+    },
+    showComplexTagDialog(type){
+      this.complexTagType = type
+      console.log("????")
+      this.dialogVisible6 = true
+    },
     handleSelectChart(){
       this.dialogVisible4 = true
     },
@@ -337,15 +367,44 @@ export default {
         //纵坐标指标/饼状图数值
         items:[]
       }
-      this.editor.chain().focus().insertContent({
-        type:'custom-chart',
-        attrs: {
-          "index": index,
-          "id":`${this.$route.params.id}_${timestamp}`,
-          "src": "",
-          "options": optionsInit(type)
-        }
-      }).run()
+      let attrs = {
+        "index": index,
+        "id":`${this.$route.params.id}_${timestamp}`,
+        "src": "#",
+        "options": optionsInit(type),
+        "title":"图像标题",
+        "source":"数据来源"
+      }
+      this.editor.chain().focus().insertFigureChart(attrs).run()
+      // this.editor.chain().focus().insertContent({
+      //   type:'custom-chart',
+      //   attrs: {
+      //     "index": index,
+      //     "id":`${this.$route.params.id}_${timestamp}`,
+      //     "src": "",
+      //     "options": optionsInit(type)
+      //   },
+      //   content: [
+      //     {
+      //       type: 'figcaption',
+      //       content: [
+      //         {
+      //           type: 'text',
+      //           text: attrs.title,
+      //         },
+      //       ],
+      //     },
+      //     {
+      //       type: 'figcaption',
+      //       content: [
+      //         {
+      //           type: 'text',
+      //           text: attrs.source,
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // }).run()
       this.dialogVisible4 = false
     },
     handleInsertImage(){
@@ -422,6 +481,12 @@ export default {
   figure {
     margin: 0;
     padding: 0.5rem;
+    flex: 1;
+  }
+  figcaption {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
 

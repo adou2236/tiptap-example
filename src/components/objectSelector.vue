@@ -43,6 +43,9 @@ export default {
         case 'tag':
           this.$emit("tagInsert",item.type);
           break
+        case 'complexTag':
+          this.$emit("complexTagInsert",item.type);
+          break
         case 'image':
           this.$emit("imageInsert");
           break

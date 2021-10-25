@@ -93,6 +93,29 @@ const templateSave = (data) =>axios({
     data:data
 })
 
+const imgSave = (data) => axios({
+    url:`${head}/storage/file/uploadBase64`,
+    method:'post',
+    data:data
+})
+
+const getImage = (key) => {
+    return `${head}/storage/file/key/${key}`
+}
+
+//图像地域分组保存
+const chartGroupSave = (data) => axios({
+    url: `${head}/doc/chart-group/groups`,
+    method:'post',
+    data:data
+})
+
+//获取图像地域分组
+const getChartGroup = (id) => axios({
+    url:`${head}/doc/chart-group/groups/${id}`,
+    method:'get',
+})
+
 export {
     getDoc,
     getFunctions,
@@ -103,5 +126,9 @@ export {
     getGeoTree,
     getChartSeries,
     partCheck,
-    templateSave
+    templateSave,
+    imgSave,
+    getImage,
+    chartGroupSave,
+    getChartGroup
 }

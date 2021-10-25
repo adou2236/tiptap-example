@@ -115,10 +115,6 @@ export default Vue.extend({
     /deep/.chart{
       height: 250px;
     }
-    /deep/.chart-content{
-      flex: 1;
-      width: 50%
-    }
   }
   &:hover{
     .delete-icon{

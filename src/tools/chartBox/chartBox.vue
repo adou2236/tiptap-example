@@ -1,14 +1,11 @@
 <template>
   <node-view-wrapper class="chart-content">
-    <div class="title">{{ title }}
-    </div>
     <div :id="`chart-${random}`" class="chart"
          v-loading="loading">
     </div>
     <div v-if="node.attrs.placeholder" class="placeholder" @click="showDialog">
       +选择图表
     </div>
-    <div class="source">{{ source }}</div>
     <chart-select v-model="dialogVisible"
                   @commit="handleChartReplace">
     </chart-select>
@@ -21,9 +18,8 @@ import * as echarts from 'echarts'
 import {baseOptions, chartColor, deepCopy, optionsInit} from "../../unit/baseType";
 import {geography, province, randomData, randomTweenData} from "../../assets/maps";
 import '../../assets/china.js'
-import {getChartSeries} from "../../request/api";
+import {getChartSeries, getImage, imgSave} from "../../request/api";
 import {EventBus} from "../../unit/eventBus";
-import Chart from "./components/chart";
 import ChartSelect from "../../components/Dialog/chartSelect";
 export default {
   name: "chartBox",
@@ -123,11 +119,13 @@ export default {
         "src": "",
         "options": optionsInit(type)
       }
-      this.editor.chain().focus().updateAttributes('custom-chart',attrs).run()
+      this.node.attrs = attrs
+      // this.editor.chain().focus().updateAttributes('custom-chart',attrs).run()
       this.dialogVisible = false
     },
     EventBusListener(){
       EventBus.$on("optionChange", async (option,id) => {
+        console.log("配置改变-----》")
         if(id===this.id){
           this.loading = true
           let temple = deepCopy(option)
@@ -136,6 +134,7 @@ export default {
         }
       });
       EventBus.$on("indexChange", async (index,id) => {
+        console.log("指标改变-----》")
         if(id===this.id){
           this.loading = true
           let temple = deepCopy(this.options)
@@ -368,13 +367,13 @@ export default {
       this.src = this.myCharts.getDataURL({
         pixelRatio: 2,
       });
-      // let options = new baseOptions(this.options)
-      this.updateAttributes({
-        src: this.src,
-      })
-      // this.node.attrs.options = options.options
-      // this.editor.chain().focus().updateAttributes('custom-chart',{src: this.src}).run()
-      // this.editor.chain().focus().updateAttributes('custom-chart',{options: options.options}).run()
+      let data = {
+        key:this.id,
+        base64:this.src
+      }
+      imgSave(data)
+      this.node.attrs.src = getImage(this.id)
+      // this.editor.chain().focus().updateAttributes('custom-chart', {src:getImage(this.id)}).run()
     },
     async getChartsData(query){
       let {data} = await getChartSeries(query)
@@ -388,7 +387,9 @@ export default {
 .chart-content{
   position: relative;
   box-sizing: border-box;
-  padding: 10px;
+  border-color: black;
+  border-width: 2px 0;
+  border-style: solid;
   .chart{
     display: flex;
     align-items: center;
