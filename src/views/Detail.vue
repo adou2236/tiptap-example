@@ -42,10 +42,10 @@
                   @commit="handleInsertChart">
     </chart-select>
     <complex-tag-dialog v-model="dialogVisible6"
-                        :areaId="root_id"
+                        :range-id="root_id"
                         :type="complexTagType"
-                        @commit="complexTagInsert"
-    ></complex-tag-dialog>
+                        @commit="complexTagInsert">
+    </complex-tag-dialog>
   </div>
 </template>
 
@@ -125,10 +125,10 @@ export default {
       //文档根id
       root_id:'',
       tools:[
-        {id:'line',name:'插入段落'},
-        {id:'tag',name:'插入变量',type:'variety'},
-        {id:'tag',name:'插入函数',type:'function'},
-        {id:'complexTag',name:'插入公式',type:'formula'},
+        // {id:'line',name:'插入段落'},
+        // {id:'tag',name:'插入变量',type:'variety'},
+        // {id:'tag',name:'插入函数',type:'function'},
+        // {id:'complexTag',name:'插入公式',type:'formula'},
         {id:'tag',name:'插入智能文本',type:'smart'},
         {id:'image',name:'插入图片'},
         {id:'chart',name:'插入表格'},
@@ -166,11 +166,9 @@ export default {
         }),
         // Focus.configure({
         //   className: 'focus',
-        //   mode: 'all',
+        //   mode: 'deepest',
         // }),
-        Table.configure({
-          resizable: true,
-        }),
+        Table,
         TableRow,
         TableHeader,
         TableCell

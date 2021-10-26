@@ -7,6 +7,8 @@ import legendOption from './chartOptions/legend.vue'
 import gridOption from './chartOptions/grid.vue'
 import tooltipOption from './chartOptions/tooltip.vue'
 import graphicOption from './chartOptions/graphic-option/index.vue'
+import GroupEditorDialog from "../../Dialog/groupEditorDialog";
+
 
 //柱状图，饼状图设置项
 import SeriesBarLine from "./chartOptions/series-bar-line/series-bar-line";
@@ -21,6 +23,7 @@ import {EventBus} from "../../../unit/eventBus";
 
 export default {
     components: {
+        GroupEditorDialog,
         SeriesMap,
         SeriesCombo,
         SeriesScatter,
@@ -44,6 +47,7 @@ export default {
             activeNames:[],
             activeNames2:[],
             xAxisData:[],
+            groupDialogVisible:false,
             // chartOptions:{},
         }
     },
@@ -86,6 +90,10 @@ export default {
     beforeDestroy() {
     },
     methods: {
+        //地域组弹窗
+        showGroupDialog(){
+            this.groupDialogVisible = true
+        },
         //指标变化（触发重新搜索）
         indexChange(v){
             // this.editor.chain().updateAttributes('custom-chart',{index:v}).run()

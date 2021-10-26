@@ -1,5 +1,6 @@
 import {Node, mergeAttributes, getSchema} from '@tiptap/core'
 import {generateHTML, VueNodeViewRenderer} from '@tiptap/vue-2'
+import { Plugin, PluginKey } from 'prosemirror-state'
 import Component from './ComponentEdit.vue'
 
 export default Node.create({
@@ -47,21 +48,22 @@ export default Node.create({
             //标签文字加粗
         }
     },
-    // addProseMirrorPlugins () {
-    //     const that = this
-    //     return [
-    //         new Plugin({
-    //             key: new PluginKey('eventHandler'),
-    //             props: {
-    //                 handleKeyDown (view, pos) {
-    //                     if(pos.code === 'Space'||pos.code === 'Enter'){
-    //                         that.editor.chain().focus().editorOver().run()
-    //                     }
-    //                 }
-    //             }
-    //         })
-    //     ]
-    // },
+    addProseMirrorPlugins () {
+        const that = this
+        return [
+            new Plugin({
+                key: new PluginKey('eventHandler'),
+                props: {
+                    handleDoubleClickOn(view, pos, node, event) {
+                        if(node?.type?.name === 'custom-tag'){
+                            that.editor.options.onTagDoubleClick(node)
+                        }
+                    },
+
+                }
+            })
+        ]
+    },
 
     renderHTML({node,HTMLAttributes}) {
         //此处增加翻译逻辑

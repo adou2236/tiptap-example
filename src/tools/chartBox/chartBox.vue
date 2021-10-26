@@ -21,6 +21,7 @@ import '../../assets/china.js'
 import {getChartSeries, getImage, imgSave} from "../../request/api";
 import {EventBus} from "../../unit/eventBus";
 import ChartSelect from "../../components/Dialog/chartSelect";
+import {dataAttach} from "./units";
 export default {
   name: "chartBox",
   props: {
@@ -40,8 +41,6 @@ export default {
       inChange:false,
       random: Math.random() * (new Date()).getTime(),
       myCharts: null,
-      xAxis: ['指数1', '指数2', '指数3', '指数4'],
-      data: [200, 100, 300, 400],
       src: '#',
       loading:false,
       complateOptions:{},//附加数据的完整配置
@@ -55,7 +54,7 @@ export default {
       if(!this.node.attrs.placeholder){
         this.loading = true
         let temple = deepCopy(this.options)
-        this.complateOptions = await this.dataAttach(temple,this.index)
+        this.complateOptions = await dataAttach(temple,this.index,this.$route.params.id,this.id)
         this.graphRender("初始化，周期")
       }
     })
@@ -125,20 +124,20 @@ export default {
     },
     EventBusListener(){
       EventBus.$on("optionChange", async (option,id) => {
-        console.log("配置改变-----》")
         if(id===this.id){
+          console.log("配置改变-----》")
           this.loading = true
           let temple = deepCopy(option)
-          this.complateOptions = await this.dataAttach(temple,this.index)
+          this.complateOptions = await dataAttach(temple,this.index,this.$route.params.id,this.id)
           this.graphRender("事件总线(option)")
         }
       });
       EventBus.$on("indexChange", async (index,id) => {
-        console.log("指标改变-----》")
         if(id===this.id){
+          console.log("指标改变-----》")
           this.loading = true
           let temple = deepCopy(this.options)
-          this.complateOptions = await this.dataAttach(temple,index)
+          this.complateOptions = await dataAttach(temple,index,this.$route.params.id,this.id)
           this.graphRender("事件总线(index)")
         }
       });
@@ -247,7 +246,6 @@ export default {
                 data:arr,
               })
             })
-            console.log(series)
             options.series = series
             //添加参考线
             // if(options.additions.markLine){
@@ -295,10 +293,14 @@ export default {
         }
         else if(index.type === 'map'){
           //饼状图数据附加
-          let query = {
-            "templateId": this.$route.params.id,
-            ...this.index
+          if(this.index.items.length>0){
+            let query = {
+              "templateId": this.$route.params.id,
+              ...this.index
+            }
+
           }
+
           let data = await this.getChartsData(query)
           let {xaxisSeries,yaxisSeries} = data
           let result = {}
@@ -308,11 +310,10 @@ export default {
               result[xaxisSeries[index]] = item
             }
           })
-          console.log(result)
           options.geo.label.formatter = (params) => {
             return params.name + (result[params.name] ? result[params.name]:'')
           }
-          // options.series.data = result
+          options.series.data = result
         }
       }else{
         //options变化，不需要重新请求

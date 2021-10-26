@@ -2,23 +2,30 @@
   <div>
     智能文本内容:
     <div>
-      <button @click="tagInsert('variety')">插入变量</button>
-      <button @click="tagInsert('function')">插入公式</button>
-      <button @click="varsManager">局部变量管理</button>
+      <el-button size="mini" type="text" @click="tagInsert('variety')">插入变量</el-button>
+      <el-button size="mini" type="text" @click="tagInsert('function')">插入公式</el-button>
+      <el-button size="mini" type="text" @click="tagInsert('formula')">插入函数</el-button>
+      <el-button disabled size="mini" type="text" >插入逻辑判断</el-button>
+      <el-button disabled size="mini" type="text" >插入循环语句</el-button>
+      <el-button size="mini" type="text" @click="varsManager">局部变量管理</el-button>
     </div>
-    <br/>
-    <editor-content class="content-editor" :editor="editor"/>
-    <br/>
-    <tag-menu v-show="editor&&editor.isActive('custom-tag')"
-              :key="editor.getAttributes('custom-tag').id"
-              :editor="editor"
-              :isInner="true"
-              :rangeId="rangeId">
-    </tag-menu>
+    <inline-editor ref="inline-editor"
+                   :value="content"
+                   :range-id="rangeId"
+                   @update="handleUpdate">
+    </inline-editor>
+<!--    <editor-content class="content-editor" :editor="editor"/>-->
+<!--    <tag-menu v-show="editor&&editor.isActive('custom-tag')"-->
+<!--              :key="editor.getAttributes('custom-tag').id"-->
+<!--              :editor="editor"-->
+<!--              :isInner="true"-->
+<!--              :rangeId="rangeId">-->
+<!--    </tag-menu>-->
     <var-manager-dialog v-model="managerDialog"
                         v-if="managerDialog"
                         :id="rangeId">
     </var-manager-dialog>
+
   </div>
 </template>
 
@@ -29,12 +36,14 @@ import CustomerTag from "../../../tools/customerTag/Extension";
 import StarterKit from '@tiptap/starter-kit'
 import VarManagerDialog from "../../Dialog/varManagerDialog";
 import Focus from "@tiptap/extension-focus";
+import InlineEditor from "../../inlineEditor";
+
 
 
 
 export default {
   name: "tagEditor",
-  components: {VarManagerDialog, EditorContent},
+  components: {InlineEditor, VarManagerDialog, EditorContent},
   model:{
     prop:"content",
     event:"change"
@@ -53,98 +62,22 @@ export default {
       managerDialog:false,
       innerContent:[],
       editor:null,
-      defaultProps:[
-        StarterKit,
-        CustomerTag,
-        Focus.configure({
-          // className: 'focus',
-          mode: 'all',
-        }),
-      ],
     }
-  },
-  watch:{
-    // editorJson:{
-    //   handler(newVal,oldVal){
-    //     if(this.editor){
-    //       console.log("是因为你吗")
-    //       this.editor.commands.setContent(newVal)
-    //     }
-    //   },
-    //   deep:true,
-    //   immediate:false,
-    // },
-  },
-  computed:{
-    editorJson(){
-      return{
-        type:'doc',
-        content:[{
-          type:'paragraph',
-          content:this.content || []
-        }]
-      }
-    }
-  },
-  created() {
-    const that = this
-    this.editor = new Editor({
-      extensions: this.defaultProps,
-      content: this.editorJson,
-      editable: true,
-      onCreate({editor}){
-      },
-      onUpdate({editor}){
-        let json = editor.getJSON()
-        that.$emit('change',json.content[0].content)
-      },
-    })
-  },
-  mounted(){
-    /**
-     * TODO 获取当前智能文本的id
-     */
   },
   methods:{
+    handleUpdate(e){
+      this.$emit('change',e)
+    },
     varsManager(){
       this.managerDialog = true
     },
     tagInsert(type){
-      let text = prompt("输入占位字符","新建文本")
-      this.editor.chain().focus().insertContent({
-        "type":"custom-tag",
-        "attrs":{
-          "type":type,
-          "coverText":text,
-          "content":type==='variety'?'':[]
-        },
-      }).run()
+      this.$refs['inline-editor'].tagType = type
     },
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.content-editor{
-  border: 1px solid #D8D8D8;
-  padding: 20px;
-  /deep/.ProseMirror {
-    &:focus-visible {
-      outline: none;
-    }
-  }
-}
-.edit-content{
-  border: 1px solid #D8D8D8;
-  .tag{
-    margin: 0 5px;
-  }
-  .varity{
-    background: #baf13a;
-  }
-  .function{
-    background: #68cef8;
-  }
-}
 
 </style>

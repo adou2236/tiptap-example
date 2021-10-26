@@ -1,7 +1,11 @@
 <template>
-  <ul>
-    <li v-for="item in varsList" @click="handleClick(item)">{{item.varKey}}</li>
-  </ul>
+  <div>
+    变量
+    <ul>
+      <li v-for="item in varsList" @click="handleClick(item)">{{item.varKey}}</li>
+    </ul>
+  </div>
+
 </template>
 
 <script>

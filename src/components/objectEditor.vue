@@ -2,9 +2,7 @@
   <div style="display: flex">
     <div class="left">
       <el-button size="mini" @click="varsManager">全局变量管理</el-button>
-      <el-button size="mini"
-                 v-if="editor&&editor.isActive('custom-chart')"
-                 @click="showGroupDialog">编辑地域组</el-button>
+
       <tag-menu v-if="editor&&editor.isActive('custom-tag')"
                 :key="editor.getAttributes('custom-tag').id"
                 :editor="editor"
@@ -32,7 +30,7 @@
                         v-if="managerDialog"
                         :id="rootId">
     </var-manager-dialog>
-    <group-editor-dialog v-model="groupDialogVisible" :chartId="editor.getAttributes('custom-chart').id"></group-editor-dialog>
+
   </div>
 </template>
 
@@ -137,9 +135,6 @@ export default {
     }
   },
   methods:{
-    showGroupDialog(){
-      this.groupDialogVisible = true
-    },
     renderChart(v){
       EventBus.$emit('optionChange',v)
       this.editor.chain().updateAttributes('custom-chart',{options:v}).run()

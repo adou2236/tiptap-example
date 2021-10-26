@@ -1,6 +1,6 @@
 <template>
   <el-dialog :visible="dialogVisible"
-             @open="handleOpen"
+             width="1200px"
              @close="handleClose">
     <div class="dialog-content">
       <div class="left">
@@ -8,7 +8,7 @@
         <functions-list :functions-list="functionsList" @commit="functionReceive"></functions-list>
       </div>
       <div class="main">
-        <formula ref="innerEditor" v-model="defaultValue"></formula>
+        <formula ref="innerEditor" v-model="modelValue"></formula>
       </div>
     </div>
     <span slot="footer" class="dialog-footer">
@@ -16,8 +16,10 @@
       <el-button type="primary" @click="handleCommit">确定</el-button>
     </span>
     <function-tag-dialog
+        v-if="functionInsertDialog"
         v-model="functionInsertDialog"
-        :function-json="defaultFunction" @commit="fucSetting"></function-tag-dialog>
+        :defaultValue="defaultFunction"
+        @commit="fucSetting"></function-tag-dialog>
   </el-dialog>
 </template>
 
@@ -27,7 +29,7 @@ import {getFunctions, getVarsById} from "../../../request/api";
 import VarsList from "./dataList/varsList";
 import FunctionsList from "./dataList/functionsList";
 import FunctionTagDialog from "../functionTagDialog";
-import {formateFunction} from "../../../unit/baseType";
+import {deepCopy} from "../../../unit/baseType";
 export default {
   name: "index",
   components: {FunctionTagDialog, FunctionsList, VarsList, Formula},
@@ -41,32 +43,38 @@ export default {
       default:false
     },
     //局部ID
-    areaId:{
+    rangeId:{
       type:String,
       default:''
     },
     type:{
       type:String,
       default:'formula'
+    },
+    defaultValue:{
+      type:[Object,Array,String]
     }
   },
   data(){
     return {
-      defaultValue:[],
+      modelValue:deepCopy(this.defaultValue),
       varsList:[],
       functionsList:[],
       defaultFunction:{},
       functionInsertDialog:false
     }
   },
+  mounted(){
+    this.handleOpen()
+  },
   methods:{
     fucSetting(result){
-      let json = new formateFunction(result)
+      let json = result
       this.$refs.innerEditor.editor.chain().focus().insertContent({
         "type":"custom-tag",
         "attrs":{
           "type":'function',
-          "coverText":json.toString(),
+          "coverText":'这是一个函数',
           "content":json
         },
       }).run()
@@ -88,7 +96,7 @@ export default {
 
     },
     async handleOpen(){
-      this.varsList = await this.getVarsList(this.areaId)
+      this.varsList = await this.getVarsList(this.rangeId)
       this.functionsList = await this.getFunctionsList()
     },
     async getVarsList(id){
@@ -103,7 +111,7 @@ export default {
       this.$emit('change',false)
     },
     handleCommit(){
-      this.$emit('commit',this.type,this.defaultValue)
+      this.$emit('commit',this.type,this.modelValue)
     }
 
   }

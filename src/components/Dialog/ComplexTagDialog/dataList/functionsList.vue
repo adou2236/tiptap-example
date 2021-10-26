@@ -1,7 +1,10 @@
 <template>
-  <ul>
-    <li v-for="item in functionsList" @click="handleClick(item)">{{item.nameEn}}</li>
-  </ul>
+  <div>
+    函数
+    <ul>
+      <li v-for="item in functionsList" @click="handleClick(item)">{{item.nameEn}}</li>
+    </ul>
+  </div>
 </template>
 
 <script>

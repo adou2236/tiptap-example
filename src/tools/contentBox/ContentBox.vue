@@ -1,20 +1,25 @@
 <template>
   <node-view-wrapper class="outter-content" >
     <node-view-content class="content" :data-issplit="node.attrs.isSplit"/>
-    <button @click.stop="showOptions" class="delete-icon">
-      <svg class="remix">
-        <use :xlink:href="require('remixicon/fonts/remixicon.symbol.svg') + `#ri-more-fill`" />
-      </svg>
-      <div class="items" :style="{visibility:drawShow?'visible':'hidden'}">
-        <button
-          class="item"
-          v-for="(item, index) in items"
-          :key="index"
-          @click="selectItem(item.id)">
+    <el-dropdown size="mini"
+                 class="delete-icon"
+                 trigger="hover"
+                 @command="selectItem">
+      <span class="el-dropdown-link">
+        <svg class="remix">
+            <use :xlink:href="require('remixicon/fonts/remixicon.symbol.svg') + `#ri-more-fill`" />
+        </svg>
+      </span>
+      <el-dropdown-menu slot="dropdown">
+        <el-dropdown-item
+            class="item"
+            v-for="(item, index) in items"
+            :key="index"
+            :command="item.id">
           {{ item.label }}
-        </button>
-      </div>
-    </button>
+        </el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
     <check-box v-model="checkBoxVisible" :content="checkContent" @reCheck="selectItem('check')"></check-box>
   </node-view-wrapper>
 </template>
@@ -36,7 +41,6 @@ export default Vue.extend({
   props: nodeViewProps,
   data(){
     return {
-      drawShow:false,
       isFocus:false,
       checkBoxVisible:false,
       checkContent:'空',
@@ -47,14 +51,6 @@ export default Vue.extend({
       ],
       listener:null
     }
-  },
-  watch:{
-  },
-   mounted(){
-    window.addEventListener('click',this.hidePicker)
-  },
-  beforeDestroy() {
-    window.removeEventListener('click',this.hidePicker)
   },
   methods: {
     async selectItem(id){
@@ -73,10 +69,19 @@ export default Vue.extend({
           }
         }
         let res = await partCheck(data)
-        this.checkContent = generateHTML(res.data.content, this.editor.extensionManager.extensions)
+        let transContent = ''
+        if(res.data.content){
+          transContent = res.data.content
+        }else{
+          transContent = {
+            type:'content-box',
+            content:[{type:'text',text:'翻译失败'}]
+          }
+        }
+        console.log(transContent)
+        this.checkContent = generateHTML(transContent, this.editor.extensionManager.extensions)
         this.checkBoxVisible = true
       }
-      this.drawShow = false
     },
     getPartTransJson(json){
       let data = {
@@ -86,12 +91,6 @@ export default Vue.extend({
       partCheck(data).then(res=>{
         console.log(res)
       })
-    },
-    hidePicker(){
-      this.drawShow=false
-    },
-    showOptions(){
-      this.drawShow = true
     },
   },
 })
@@ -126,8 +125,8 @@ export default Vue.extend({
     position: absolute;
     right: 0;
     top: 0;
-    width: 2rem;
-    height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
     background: transparent;
     border: none;
     outline: none;
@@ -136,31 +135,28 @@ export default Vue.extend({
       width: 100%;
       height: 100%;
     }
-    .items{
-      position: absolute;
-      top: 2rem;
-      left: -1rem;
-      z-index: 2000;
-      border-radius: 0.25rem;
-      background: white;
-      color: rgba(black, 0.8);
-      overflow: hidden;
-      font-size: 0.9rem;
-      box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.1),
-        0px 10px 20px rgba(0, 0, 0, 0.1),
-      ;
-      .item{
-        display: block;
-        width: 100%;
-        text-align: left;
-        white-space: nowrap;
-        background: transparent;
-        border: none;
-        padding: 0.2rem 0.5rem;
-        &:hover{
-          background: #baf13a;
-        }
+  }
+  .items{
+    position: absolute;
+    top: 2rem;
+    left: -1rem;
+    z-index: 2000;
+    border-radius: 0.25rem;
+    background: white;
+    color: rgba(black, 0.8);
+    overflow: hidden;
+    font-size: 0.9rem;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    .item{
+      display: block;
+      width: 100%;
+      text-align: left;
+      white-space: nowrap;
+      background: transparent;
+      border: none;
+      padding: 0.2rem 0.5rem;
+      &:hover{
+        background: #baf13a;
       }
     }
   }

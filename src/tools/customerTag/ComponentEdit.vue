@@ -1,5 +1,7 @@
 <template>
-  <node-view-wrapper as="span" :class="['content',node.attrs.type]">
+  <node-view-wrapper
+      as="span"
+      :class="['content',node.attrs.type]">
     {{node.attrs.coverText}}
   </node-view-wrapper>
 </template>
@@ -7,7 +9,6 @@
 <script>
 import Vue from 'vue'
 import { NodeViewWrapper, nodeViewProps, NodeViewContent } from '@tiptap/vue-2'
-import {deepCopy, formateFunction} from "../../unit/baseType";
 import {getVarsById} from "../../request/api";
 
 export default Vue.extend({
@@ -23,13 +24,13 @@ export default Vue.extend({
     }
   },
   watch:{
-    content:{
-      //监听内容更改，重新获取result
-      handler() {
-        this.node.attrs.result = this.getResult(this.node)
-      },
-      deep: false,
-    }
+    // content:{
+    //   //监听内容更改，重新获取result
+    //   handler() {
+    //     this.node.attrs.result = this.getResult(this.node)
+    //   },
+    //   deep: false,
+    // }
   },
   computed:{
     content(){
@@ -37,15 +38,15 @@ export default Vue.extend({
     }
   },
   async created(){
-    let id = this.editor.options.content.id
-    if(this.node.attrs.type === 'smart'&&this.node.attrs.id){
-      id=this.node.attrs.id
-    }
-    this.vars = await this.getVars(id)
-    if(this.node.attrs.type === 'function'){
-      this.node.attrs.content = new formateFunction(this.node.attrs.content)
-    }
-    this.node.attrs.result = this.getResult(this.node)
+    // let id = this.editor.options.content.id
+    // if(this.node.attrs.type === 'smart'&&this.node.attrs.id){
+    //   id=this.node.attrs.id
+    // }
+    // this.vars = await this.getVars(id)
+    // if(this.node.attrs.type === 'function'){
+    //   this.node.attrs.content = new formateFunction(this.node.attrs.content)
+    // }
+    // this.node.attrs.result = this.getResult(this.node)
   },
   mounted() {
   },

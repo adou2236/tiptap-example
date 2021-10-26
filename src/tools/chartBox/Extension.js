@@ -1,6 +1,7 @@
 import {mergeAttributes, Node} from '@tiptap/core'
 import {VueNodeViewRenderer} from "@tiptap/vue-2";
 import Component from "./chartBox.vue";
+import {Plugin, PluginKey} from "prosemirror-state";
 
 export default Node.create({
     name: 'custom-chart',
@@ -42,6 +43,22 @@ export default Node.create({
                 }
             },
         }
+    },
+
+    addProseMirrorPlugins() {
+        return [
+            new Plugin({
+                props: {
+                    handleDOMEvents: {
+                        // prevent dragging nodes out of the figure
+                        dragstart: (view, event) => {
+                            event.preventDefault()
+                            return false
+                        },
+                    },
+                },
+            }),
+        ]
     },
 
     parseHTML() {

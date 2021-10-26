@@ -1,6 +1,9 @@
 <template>
-  <el-dialog :visible="visible" @open="handleOpen" @close="handleClose" append-to-body>
-    <div >
+  <el-dialog :visible="visible"
+             title="插入函数"
+             append-to-body
+             @close="handleClose">
+    <div>
       <div class="fnc">
         <div class="left">
           选择函数
@@ -30,7 +33,6 @@
 
 <script>
 import {getFunctions} from "../../request/api";
-import {formateFunction} from "../../unit/baseType";
 
 export default {
   name: "functionTagDialog",
@@ -40,8 +42,8 @@ export default {
   },
   props:{
     visible:false,
-    functionJson:{
-      type:Object,
+    defaultValue:{
+      type:[String,Object],
       default:()=>{
         return{
           id:'',
@@ -63,13 +65,13 @@ export default {
   },
   async mounted(){
     this.functions = await this.functionsInit()
-
+    this.handleOpen()
   },
   methods:{
     handleOpen(){
-      this.selectedFuncId = this.functionJson.id || ''
-      this.selectedFuncName = this.functionJson.nameEn || ''
-      this.myParams = this.functionJson.params || []
+      this.selectedFuncId = this.defaultValue.id || ''
+      this.selectedFuncName = this.defaultValue.nameEn || ''
+      this.myParams = this.defaultValue.params || []
     },
     handleCommit(){
       let params = this.myParams.map(item=>{

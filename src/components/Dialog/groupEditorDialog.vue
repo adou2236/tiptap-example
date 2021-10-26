@@ -1,5 +1,6 @@
 <template>
   <el-dialog :visible="dialogVisible"
+             title="插入函数"
              @open="handleOpen"
              @close="handleClose">
     <div class="dialog-content">
@@ -83,6 +84,8 @@ export default {
         return list
       },
       set(e){
+        //TODO分组数量变化后，默认选中第一条
+        //无分组则不允许穿梭操作
         //分组变动之后需要将已选择的区域从待选项中去除
         this.groupList.find(item=>item.groupId === this.chooseId).areas = e
       }
@@ -125,7 +128,8 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
       }).then(({ value }) => {
-        if(this.groupList.some(item=>item.groupName === value)){
+        console.log(groupId)
+        if(this.groupList&&this.groupList.some(item=>item.groupName === value)){
           this.$message.error('分组名称重复')
         }else{
           this.groupList.push({groupId:groupId,groupName:value,areas:[]})

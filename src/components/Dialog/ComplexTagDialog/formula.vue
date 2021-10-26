@@ -37,22 +37,31 @@ export default {
       ],
     }
   },
+  computed:{
+    editorJson(){
+      return{
+        type:'doc',
+        content:[{
+          type:'paragraph',
+          content:this.defaultValue || []
+        }]
+      }
+    }
+  },
   mounted(){
     this.editorInit()
   },
   methods:{
     editorInit(){
       let that = this
-      let content = ''
       this.editor = new Editor({
         extensions: this.defaultProps,
-        content: content,
+        content: this.editorJson,
         editable: true,
         onCreate({editor}){
         },
         onUpdate({editor}){
           let json = editor.getJSON()
-          console.log("触发更新",json.content[0].content)
           that.$emit('change',json.content[0].content)
         },
       })

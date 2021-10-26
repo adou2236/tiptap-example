@@ -14,7 +14,7 @@
       </el-select>
     </div>
     <div v-if="attrs.type === 'function'">
-      函数内容:{{functionJson.toString()}}
+      函数内容:{{functionJson.nameEn}}
       <br/>
       <button @click="changeFunction">插入/修改函数</button>
       <br/>
@@ -28,7 +28,7 @@
     <button v-if="!isInner" @click="handleCommit">确认</button>
     <function-tag-dialog v-model="visible"
                          v-if="visible"
-                         :functionJson="functionJson"
+                         :defaultValue="functionJson"
                          @commit="getFunc">
     </function-tag-dialog>
   </div>
@@ -38,7 +38,6 @@
 import TagEditor from "./tagEditor";
 import {getFunctions, getVarsById} from "../../../request/api";
 import FunctionTagDialog from "../../Dialog/functionTagDialog";
-import {deepCopy, formateFunction, globalVar} from "../../../unit/baseType";
 export default {
   name: "TagName",
   components: {FunctionTagDialog, TagEditor},
@@ -94,7 +93,7 @@ export default {
     // }
   },
   async created() {
-    this.functionJson = new formateFunction(this.content)
+    this.functionJson = this.content
     this.vars = await this.getVars(this.rangeId);
     this.attrs = this.editor.getAttributes('custom-tag')
   },
@@ -116,7 +115,7 @@ export default {
       }
     },
     getFunc(obj){
-      this.functionJson = new formateFunction(obj)
+      this.functionJson = obj
       this.editor.chain().updateAttributes('custom-tag',{content:obj}).run()
       this.visible = false
     },
