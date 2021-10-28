@@ -74,7 +74,7 @@ export default Figure.extend({
                 return false
             },
             setChartOption:(option) => ({tr}) => {
-                tr.curSelection.node.attrs.option = option
+                tr.curSelection.node.attrs.options = option
                 return false
             }
 

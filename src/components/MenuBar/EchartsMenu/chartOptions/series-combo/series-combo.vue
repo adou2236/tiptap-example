@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="数据项配置" name="a-5">
+  <el-form>
     <el-form-item label="横坐标">
       <el-radio-group v-model="innerIndex.xaxisType" @change="typeChange">
         <el-radio label="region">地域</el-radio>
@@ -16,22 +16,28 @@
     <el-form-item v-if="innerIndex.xaxisType === 'time'" label="时间范围">
       <el-input v-model="innerIndex.xaxisIndex" />月
     </el-form-item>
-<!--    <el-form-item label="纵坐标">-->
-<!--    </el-form-item>-->
     <el-form-item label="指标">
-      <index-inputer :multiple="true" v-model="selectedIndex"></index-inputer>
+      <index-inputer :tag-clickable="multiple==='index'"
+                     :multiple="multiple === 'both'||multiple==='index'"
+                     v-model="selectedIndex"
+                     @tagClick="handleTagClick"
+      ></index-inputer>
     </el-form-item>
+    {{multiple}}
     <el-form-item v-if="innerIndex.xaxisType === 'region'" label="时间">
-      <index-inputer :multiple="true" type="variety" v-model="selectedVar"></index-inputer>
+      <index-inputer :tag-clickable="multiple==='var'"
+                     :multiple="multiple === 'both'||multiple==='var'"
+                     type="variety"
+                     v-model="selectedVar"
+                     @tagClick="handleTagClick"
+      ></index-inputer>
     </el-form-item>
-    <el-form-item v-if="innerIndex.items.length>0" label="图形配置">
-      <series-option v-for="(item,index) in index.items" :index="index"
-                     :item="item"
-                     :additions="additions"
-                     :series="innerSeries[index]">
-      </series-option>
-    </el-form-item>
-  </el-collapse-item>
+    <series-option  v-if="clickTag"
+                    :additions="additions"
+                    :clickTag="clickTag"
+                    :series="innerSeries[clickTagIndex]">
+    </series-option>
+  </el-form>
 </template>
 
 <script>
@@ -40,6 +46,7 @@ import {EventBus} from "../../../../../unit/eventBus";
 import IndexInputer from "./indexInputer";
 import SeriesOption from "./series-option";
 import {deepCopy} from "../../../../../unit/baseType";
+import {dataAttach} from "../../../../../tools/chartBox/units";
 
 export default {
   name: "series-combo",
@@ -60,9 +67,15 @@ export default {
       innerAdditions:deepCopy(this.additions),
       isFocus:false,
       //选择的指标
-      selectedIndex:[...new Set(this.index.items.map(item=>item.indicator))],
+      selectedIndex:[...new Set(this.index.items.map(item=>item.indicator))].map(obj=>{
+        return {indicator:obj,dataType:'index'}
+      }),
       //选择的变量
-      selectedVar:[...new Set(this.index.items.map(item=>item.time))],
+      selectedVar:[...new Set(this.index.items.map(item=>item.time))].map(obj=>{
+        return {varKey:obj,dataType:'variety'}
+      }),
+      clickTag:null,
+      clickTagIndex:null,
     }
   },
   watch:{
@@ -94,31 +107,63 @@ export default {
     }
   },
   computed:{
+    multiple(){
+      let indexCount = this.selectedIndex.length
+      let varCount = this.selectedVar.length
+      if(indexCount===1&&varCount>1){
+        return 'var'
+      }else if(varCount === 1&&indexCount>1){
+        return 'index'
+      }else {
+        return 'both'
+      }
+
+    },
     //时间与指标的组合指标
     comboIndex:{
       get(){
         let result = []
         let index = this.selectedIndex
         let time = this.selectedVar
-        for(let i = 0;i<time.length;i++){
-          for(let j = 0;j<index.length;j++){
-            result.push({
-              "time":time[i],    //时间
-              "timeType":"var",   // var:变量  const:常量
-              "indicator": index[j],
-              "indicatorType": "const"
-            })
+        try {
+          for(let i = 0;i<time.length;i++){
+            for(let j = 0;j<index.length;j++){
+              result.push({
+                "time":time[i].varKey,    //时间
+                "timeType":"var",   // var:变量  const:常量
+                "indicator": index[j].indicator,
+                "indicatorType": "const"
+              })
+            }
           }
+        }catch (e) {
         }
         return result
       }
     },
   },
   async mounted() {
-    // this.eventBusListener()
+    this.eventBusListener()
   },
   methods:{
+    eventBusListener(){
+      console.log("接收到配置项改变")
+      EventBus.$on("optionChange", async (option,id) => {
+        this.innerAdditions = deepCopy(option)
+      });
+    },
+    handleTagClick(tag){
+      if(tag.dataType === 'index'){
+        this.clickTagIndex = this.selectedIndex.findIndex(item=>item.indicator === tag.indicator)
+        this.clickTag = this.selectedIndex[this.clickTagIndex]
+      }else{
+        this.clickTagIndex = this.selectedVar.findIndex(item=>item.varKey === tag.varKey)
+        this.clickTag = this.selectedVar[this.clickTagIndex]
+      }
+    },
     seriesInit(){
+      this.clickTag = null
+      this.clickTagIndex = null
       let series = []
       this.comboIndex.forEach((item,index)=>{
         if(this.innerSeries[index]){
@@ -134,22 +179,6 @@ export default {
         }
       })
       this.innerSeries = series
-    },
-    eventBusListener(){
-      EventBus.$on("indexSelect", (item) => {
-        if(this.selectedIndex.some(obj=>obj===item.indicator)){
-          this.selectedIndex = this.selectedIndex.filter(obj=>obj!==item.indicator)
-        }else{
-          this.selectedIndex.push(item.indicator)
-        }
-      });
-      EventBus.$on("varSelect", (item) => {
-        if(this.selectedVar.some(obj=>obj===item.varKey)){
-          this.selectedVar = this.selectedVar.filter(obj=>obj!==item.varKey)
-        }else{
-          this.selectedVar.push(item.varKey)
-        }
-      });
     },
     //类型改变，指标初始化
     typeChange(value){

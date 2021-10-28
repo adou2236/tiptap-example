@@ -12,6 +12,7 @@ import MenuItem from './MenuItem.vue'
 import ColorPicker from "./ColorPicker";
 import NormalPicker from "./NormalPicker"
 import TableSelector from './TableSelector'
+import {chartColor} from "../../unit/baseType";
 
 export default {
   components: {
@@ -81,7 +82,7 @@ export default {
           title: '颜色',
           selector: true,
           components: ColorPicker,
-          options:['red','blue','black','pink'],
+          options:chartColor,
           action: (param) => this.editor.chain().focus().setFontColor(param).run(),
           isActive: () => this.editor.getAttributes("textStyle").fontColor,
         },

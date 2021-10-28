@@ -16,9 +16,7 @@
         <button @click="setImageAttr">确定</button>
       </div>
       <table-menu v-else-if="editor&&editor.isActive('table')" :editor="editor"></table-menu>
-      <echarts-menu v-else-if="editor
-                              &&editor.isActive('custom-chart')
-                              &&!editor.getAttributes('custom-chart').placeholder"
+      <echarts-menu v-else-if="editor&&editor.isActive('custom-chart')&&!editor.getAttributes('custom-chart').placeholder"
                     @renderChart="renderChart"
                     :key="editor.getAttributes('custom-chart').id"
                     :editor="editor"

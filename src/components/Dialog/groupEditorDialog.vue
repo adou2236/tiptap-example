@@ -14,25 +14,31 @@
           <span @click="groupDown">下移</span>
         </div>
         <div v-for="item in groupList"
-             :class="item.groupId === chooseId?'list active':'list'"
+             :class="item.groupName === chooseId?'list active':'list'"
              @click="handleClick(item)" >{{item.groupName}}</div>
       </div>
-      <el-transfer
-          class="group-selector"
-          filterable
-          v-model="currentGroup"
-          :titles="['可选地域', '已选地域']"
-          :props="{
-            key: 'key',
-            label: 'key'
-          }"
-          :data="option"
-          @left-check-change="leftChange"
-          @right-check-change="rightChange"
-          @change="handleChange">
-        <el-button class="transfer-footer" slot="left-footer" size="small" @click="handleSelect">确认</el-button>
-        <el-button class="transfer-footer" slot="right-footer" size="small" @click="handleRemove">删除</el-button>
-      </el-transfer>
+      <div class="group-list">
+        <div class="list-header">
+          可选地域
+        </div>
+        <el-checkbox-group :disabled="groupList.length<=0" class="list-selector" v-model="checkboxValue1">
+            <el-checkbox v-for="item in restRegions" :label="item">{{ item }}</el-checkbox>
+        </el-checkbox-group>
+        <el-button class="transfer-footer"
+                   size="mini"
+                   @click="handleSelect">确认</el-button>
+      </div>
+      <div class="group-list">
+        <div class="list-header">
+          已选地域
+        </div>
+        <el-checkbox-group class="list-selector" v-model="checkboxValue2">
+          <el-checkbox v-for="item in currentGroup" :label="item">{{ item }}</el-checkbox>
+        </el-checkbox-group>
+        <el-button class="transfer-footer"
+                   size="mini"
+                   @click="handleRemove">删除</el-button>
+      </div>
     </div>
      <span slot="footer" class="dialog-footer">
       <el-button @click="handleClose">取消</el-button>
@@ -44,7 +50,7 @@
 <script>
 import {province} from "../../assets/maps";
 import {chartGroupSave, getChartGroup} from "../../request/api";
-import {arrayDiff} from "../../unit/baseType";
+import {arrayDiff, chartColor} from "../../unit/baseType";
 export default {
   name: "groupEditorDialog",
   model:{
@@ -59,47 +65,55 @@ export default {
     chartId:{
       type:String,
       default:''
+    },
+    additions:{
+      type:Object,
     }
   },
   data(){
     return{
-      option:province.map(item=>{
-        return {key:item}
-      }),
+      province,
       disable:false,
       chooseId:'',
       groupList:[],
       temporaryLeftList:[],
-      temporaryRightList:[]
+      temporaryRightList:[],
+      checkboxValue1:[],
+      checkboxValue2:[]
 
     }
   },
   computed:{
+    //剩余可选组
+    restRegions(){
+      let allSelected = this.groupList.map(item=>item.areas)
+      if(allSelected.length>0){
+        allSelected = allSelected.reduce(function (a, b) { return a.concat(b)} );
+      }
+      return arrayDiff(province,allSelected)
+    },
     currentGroup:{
       get(){
         let list = []
         if(this.groupList.length>0&&this.chooseId){
-          list = this.groupList.find(item=>item.groupId === this.chooseId).areas
+          list = this.groupList.find(item=>item.groupName === this.chooseId).areas
         }
         return list
       },
       set(e){
-        //TODO分组数量变化后，默认选中第一条
-        //无分组则不允许穿梭操作
-        //分组变动之后需要将已选择的区域从待选项中去除
-        this.groupList.find(item=>item.groupId === this.chooseId).areas = e
+        this.groupList.find(item=>item.groupName === this.chooseId).areas = e
       }
     }
   },
   methods:{
     groupUp(){
-      let index = this.groupList.findIndex(item=>item.groupId === this.chooseId)
+      let index = this.groupList.findIndex(item=>item.groupName === this.chooseId)
       if (index != 0) {
         this.groupList[index] = this.groupList.splice(index - 1, 1, this.groupList[index])[0];
       }
     },
     groupDown(){
-      let index = this.groupList.findIndex(item=>item.groupId === this.chooseId)
+      let index = this.groupList.findIndex(item=>item.groupName === this.chooseId)
       if (index != this.groupList.length - 1) {
         this.groupList[index] = this.groupList.splice(index + 1, 1, this.groupList[index])[0];
       }
@@ -112,72 +126,61 @@ export default {
         if(this.groupList.some(item=>item.groupName === value)){
           this.$message.error('分组名称重复')
         }else{
-          this.groupList.find(item=>item.groupId === this.chooseId).groupName = value
+          this.groupList.find(item=>item.groupName === this.chooseId).groupName = value
         }
       })
     },
     groupRemove(){
       let removeId = this.chooseId
-      this.groupList = this.groupList.filter(item=>item.groupId !== removeId)
-      this.chooseId = this.groupList[0]?.groupId || ''
+      this.groupList = this.groupList.filter(item=>item.groupName !== removeId)
+      this.chooseId = this.groupList[0]?.groupName || ''
     },
     groupAdd(){
-      let timestamp = (new Date()).getTime()
-      let groupId = `${this.chartId}_group_${timestamp}`
       this.$prompt('请输入分组名称', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
       }).then(({ value }) => {
-        console.log(groupId)
         if(this.groupList&&this.groupList.some(item=>item.groupName === value)){
           this.$message.error('分组名称重复')
         }else{
-          this.groupList.push({groupId:groupId,groupName:value,areas:[]})
+          let length = this.groupList.length
+          this.chooseId = value
+          let newGroup = {
+            groupName:value,
+            areas:[],
+            color:chartColor[length],
+            labelFormatter:'{b}'
+          }
+          this.groupList.push(newGroup)
         }
       })
     },
-    async handleOpen(){
-      this.groupList = await this.groupInit()
+    handleOpen(){
+      this.groupList = this.additions.group
       if(this.groupList.length>0){
-        this.chooseId = this.groupList[0].groupId
+          this.chooseId = this.groupList[0].groupName
       }
-    },
-    async groupInit(){
-      let {data} = await getChartGroup(this.chartId)
-      return data.content.content
-    },
-    leftChange(e){
-      this.temporaryLeftList = e
-    },
-    rightChange(e){
-      this.temporaryRightList = e
+
     },
     handleSelect(){
-      let list = new Set([...this.currentGroup,...this.temporaryLeftList])
-      console.log(list)
+      let list = new Set([...this.currentGroup,...this.checkboxValue1])
       this.currentGroup = [...list]
-      this.temporaryLeftList = []
-      this.temporaryRightList = []
+      this.checkboxValue1 = []
+      this.checkboxValue2 = []
     },
     handleRemove(){
-      this.currentGroup = arrayDiff(this.currentGroup,this.temporaryRightList)
-      this.temporaryLeftList = []
-      this.temporaryRightList = []
-    },
-    handleChange(e){
-      console.log(e)
+      this.currentGroup = arrayDiff(this.currentGroup,this.checkboxValue2)
+      this.checkboxValue1 = []
+      this.checkboxValue2 = []
     },
     handleClick(item){
-      this.chooseId = item.groupId
+      this.chooseId = item.groupName
     },
     handleCommit(){
-      let query = {
-        chartId:this.chartId,
-        content:this.groupList
-      }
-      chartGroupSave(query).then(res=>{
-        this.$message.success('保存成功')
-      })
+      this.additions.group = this.groupList
+      this.$emit('additionChange',this.additions)
+      this.$message.success('保存成功')
+      this.handleClose()
     },
     handleClose(){
       this.$emit('change',false)
@@ -211,6 +214,25 @@ export default {
       border-bottom: 1px solid #EBEEF5;
       box-sizing: border-box;
       color: #000;
+    }
+    .list-selector{
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      .el-checkbox{
+        height: 30px;
+        line-height: 30px;
+        font-size: 14px;
+        padding: 0 5px;
+        cursor: pointer;
+        &:hover{
+          background: #EBEEF5;
+        }
+      }
+    }
+    .transfer-footer{
+      height: 40px;
     }
     .list{
       height: 30px;

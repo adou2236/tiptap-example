@@ -1,5 +1,4 @@
 <template>
-  <el-collapse-item title="x轴配置" name="s-5">
     <el-form-item label="坐标名称">
       <el-input v-model="innerXAxis.name"/>
     </el-form-item>
@@ -31,7 +30,6 @@
 <!--    <el-form-item label="分割线宽度">-->
 <!--      <el-input-number v-model="innerXAxis.splitLine.lineStyle.width"></el-input-number>-->
 <!--    </el-form-item>-->
-  </el-collapse-item>
 </template>
 <script>
 import {deepCopy} from "../../../../unit/baseType";

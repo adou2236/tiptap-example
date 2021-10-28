@@ -1,4 +1,4 @@
-import {chartColor} from "../../unit/baseType";
+import {arrayDiff, chartColor} from "../../unit/baseType";
 import {getChartGroup, getChartSeries} from "../../request/api";
 
 /**
@@ -55,27 +55,29 @@ const combo = async function(options,index,rootId){
 //散点图
 const scatter = async function(options,index,rootId,chartId){
     if(index.items.length>=2) {
-        let data = {}
-        let groupData = []
-        await Promise.all([
-            getChartData(index,rootId),
-            groupInit(chartId)
-        ]).then(res=>{
-            data = res[0]
-            groupData = res[1]
-        })
+        let groupData = options.additions.group
+        let data = await getChartData(index,rootId)
+        // await Promise.all([
+        //     getChartData(index,rootId),
+        //     groupInit(chartId)
+        // ]).then(res=>{
+        //     data = res[0]
+        //     groupData = res[1]
+        // })
         let {xaxisSeries, yaxisSeries} = data
         let series = []
         const pinArea = options.additions.locationPin
         const size = options.additions.symbolSize
         xaxisSeries.forEach((region,index)=>{
             let name = ''
-            let colorIndex = 0
+            let color = ''
+            let labelFormatter = '{b}'
             groupData.forEach((groupItem,groupIndex)=>{
-                if(groupItem.areas.includes(region)){
+                if(groupItem.areas.includes(region)) {
                     //当前区域在分组中
                     name = groupItem.groupName
-                    colorIndex = groupIndex
+                    color = groupItem.color
+                    labelFormatter = groupItem.labelFormatter
                 }
             })
             series.push({
@@ -84,7 +86,7 @@ const scatter = async function(options,index,rootId,chartId){
                 label: {
                     show: options.additions.labShow,
                     position: [0, 0],
-                    formatter: `{b}`
+                    formatter: labelFormatter
                 },
                 symbolSize: (value, params) => {
                     return pinArea && pinArea.includes(params.name) ? size + 10 : size
@@ -93,7 +95,7 @@ const scatter = async function(options,index,rootId,chartId){
                     show: false
                 },
                 itemStyle: {
-                    color: options.additions.groupColor[colorIndex]
+                    color: color || chartColor[groupData.length]
                 },
                 data: [{
                     name: region,
@@ -166,6 +168,7 @@ const scatter = async function(options,index,rootId,chartId){
         //     })
         //
         // }
+        console.log(series)
         options.series = series
     }
 }
@@ -218,6 +221,7 @@ const map = async function(options,index,rootId,chartId){
             }
         })
         options.series[0].data = result
+        //显示文字格式化
         options.geo.label = {
             show:true,
             formatter:(params) => {
@@ -227,6 +231,9 @@ const map = async function(options,index,rootId,chartId){
 
             }
         }
+        //添加表格
+        options.yAxis.data = xaxisSeries
+        options.series[1].data = dataList
     }
     //分组颜色渲染
     let regions = []

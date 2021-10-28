@@ -1,47 +1,39 @@
 <template>
-  <div>
-    <div class="gray-box">
-      第{{index}}项
-      <div>颜色
-        <el-color-picker size="mini" v-model="series.color"></el-color-picker>
-      </div>
-      <div>图像类型
-        <el-select v-model="series.type" @change="handleTypeChange">
-          <el-option v-for="item in chartTypes" :label="item.label" :value="item.id" :key="item.id"></el-option>
-        </el-select>
-      </div>
-      <div v-if="series.type === 'scatter'">散点类型
+    <el-form class="gray-box">
+<!--      <div>颜色-->
+<!--        <el-color-picker size="mini" v-model="series.color"></el-color-picker>-->
+<!--      </div>-->
+      {{clickTag.dataType==='index'?clickTag.indicator:clickTag.varKey}}
+      <el-form-item label="图像类型">
+          <el-select v-model="series.type" @change="handleTypeChange">
+            <el-option v-for="item in chartTypes" :label="item.label" :value="item.id" :key="item.id"></el-option>
+          </el-select>
+      </el-form-item>
+      <el-form-item label="散点类型" v-if="series.type === 'scatter'">
         <el-select v-model="series.symbol">
           <el-option v-for="item in symbols" :label="item.label" :value="item.id" :key="item.id"></el-option>
         </el-select>
-      </div>
+      </el-form-item>
 <!--      <div>-->
 <!--        <el-checkbox :checked="additions.sortIndex === index" @change="handleChange" :label="index" label="按照此项排序"></el-checkbox>-->
 <!--      </div>-->
-    </div>
-
-  </div>
+    </el-form>
 </template>
 
 <script>
 export default {
   name: "series-option",
   props:{
-    //序号
-    index:{
-      type:Number
-    },
-    //数据相关
-    item:{
-      type:Object,
-    },
     //图形配置相关
     series:{
       type:Object,
     },
     additions:{
       type:Object,
-    }
+    },
+    clickTag:{
+      type:Object
+    },
   },
   data(){
     return{

@@ -1,20 +1,14 @@
 <template>
   <div class="input-area" @click="handleFocus" >
     <el-tag
-        v-show="multiple"
+        class="index-tag"
         v-for="(tag,index) in showList"
         :key="index"
         closable
         size="mini"
+        @click="handleClick(tag)"
         @close="handleClose(tag)">
-      {{tag}}
-    </el-tag>
-    <el-tag
-        v-show="!multiple&&showList"
-        closable
-        size="mini"
-        @close="handleClose">
-      {{showList}}
+      {{tag.dataType==='index'?tag.indicator:tag.varKey}}
     </el-tag>
   </div>
 </template>
@@ -44,8 +38,12 @@ export default {
     /**
      * 键值对应关系
      */
-    list:{
-      type:[Array,String],
+    list: {
+      type: [Array, String],
+    },
+    tagClickable:{
+      type:Boolean,
+      default:false
     }
   },
   data(){
@@ -78,45 +76,68 @@ export default {
     },
   },
   methods:{
+    handleClick(tag){
+      if(this.tagClickable){
+        this.$emit('tagClick',tag)
+      }
+    },
     handleFocus(){
       this.indexSelectorId = this.id
     },
     eventListenerInit(){
       if(this.type === 'index'){
         EventBus.$on("indexSelect", (item) => {
+          /**
+           * frequency: (...)
+           id: (...)
+           indicator: (...)
+           label: (...)
+           type: (...)
+           unit: (...)
+           */
+          item.dataType = 'index'
           if(this.id===window.indexSelectorId){
             if(this.multiple){
-              if(this.showList.some(obj=>obj===item.indicator)){
-                this.showList = this.showList.filter(obj=>obj!==item.indicator)
+              if(this.showList.some(obj=>obj.indicator===item.indicator)){
+                this.showList = this.showList.filter(obj=>obj.indicator!==item.indicator)
               }else{
-                this.showList.push(item.indicator)
+                this.showList.push(item)
               }
             }else{
-              this.showList = item.indicator
+              this.showList = [item]
             }
           }
         });
       }else if(this.type === 'variety'){
         EventBus.$on("varSelect", (item) => {
+          /**
+           * id: (...)
+           keyType: (...)
+           segmentId: (...)
+           valueType: (...)
+           varKey: (...)
+           varValue: (...)
+           */
+          item.dataType = 'variety'
           if(this.id===window.indexSelectorId){
             if(this.multiple){
-              if(this.showList.some(obj=>obj===item.varKey)){
-                this.showList = this.showList.filter(obj=>obj!==item.varKey)
+              if(this.showList.some(obj=>obj.varKey===item.varKey)){
+                this.showList = this.showList.filter(obj=>obj.varKey!==item.varKey)
               }else{
-                this.showList.push(item.varKey)
+                this.showList.push(item)
               }
             }else{
-              this.showList= item.varKey
+              this.showList= [item]
             }
           }
         });
       }
     },
     handleClose(tag){
-      if(this.multiple){
-        this.showList.splice(this.showList.findIndex(item=>item=== tag),1)
+      if(tag.dataType === 'index'){
+        this.showList.splice(this.showList.findIndex(item=>item.indicator === tag.indicator),1)
       }else{
-        this.showList = ''
+        this.showList.splice(this.showList.findIndex(item=>item.varKey === tag.varKey),1)
       }
       this.$emit('change',this.showList)
     }
@@ -127,9 +148,26 @@ export default {
 <style lang="scss" scoped>
 .input-area{
   border: 1px solid #D8D8D8;
+  width: 250px;
   border-radius: 5px;
   padding: 5px;
   min-height: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  .index-tag{
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    padding-right: 20px;
+    /deep/i{
+      position: absolute!important;
+      right: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
   &.isFocus{
     border-color: blue;
   }

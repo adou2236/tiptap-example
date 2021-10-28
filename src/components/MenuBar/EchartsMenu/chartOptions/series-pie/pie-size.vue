@@ -1,18 +1,18 @@
 <template>
-  <el-collapse-item title="图形配置" name="a-1">
-    <el-form-item label="圆心位置-水平">
-      <el-input v-model="innerAdditions.center[0]"></el-input>
-    </el-form-item>
-    <el-form-item label="圆心位置-垂直">
-      <el-input v-model="innerAdditions.center[1]"></el-input>
-    </el-form-item>
+  <el-form>
+<!--    <el-form-item label="圆心位置-水平">-->
+<!--      <el-input v-model="innerAdditions.center[0]"></el-input>-->
+<!--    </el-form-item>-->
+<!--    <el-form-item label="圆心位置-垂直">-->
+<!--      <el-input v-model="innerAdditions.center[1]"></el-input>-->
+<!--    </el-form-item>-->
     <el-form-item label="内径">
       <el-input v-model="innerAdditions.radius[0]"></el-input>
     </el-form-item>
     <el-form-item label="外径">
       <el-input v-model="innerAdditions.radius[1]"></el-input>
     </el-form-item>
-  </el-collapse-item>
+  </el-form>
 </template>
 <script>
 import {deepCopy} from "../../../../../unit/baseType";

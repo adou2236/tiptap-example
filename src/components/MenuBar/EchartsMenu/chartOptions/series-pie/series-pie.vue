@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="数据项配置" name="a-3">
+  <el-form>
     <el-form-item label="地区">
       <el-radio-group v-model="innerIndex.xaxisIndex">
         <el-radio label="provinces">31省</el-radio>
@@ -8,13 +8,15 @@
       </el-radio-group>
     </el-form-item>
     <el-form-item label="指标">
+      {{comboIndex}}
       <index-inputer v-model="dataIndex"></index-inputer>
     </el-form-item>
     <el-form-item label="时间">
       <index-inputer type="variety" v-model="time"></index-inputer>
     </el-form-item>
+  </el-form>
+
 <!--    <series :items="index.items"></series>-->
-  </el-collapse-item>
 </template>
 
 <script>
@@ -35,15 +37,18 @@ export default {
       innerIndex:deepCopy(this.index),
       innerSeries:deepCopy(this.series),
       //指标
-      dataIndex: '',
+      dataIndex: [...new Set(this.index.items.map(item=>item.indicator))].map(obj=>{
+        return {indicator:obj,dataType:'index'}
+      }),
       //选择的时间变量
-      time: '',
+      time: [...new Set(this.index.items.map(item=>item.time))].map(obj=>{
+        return {varKey:obj,dataType:'variety'}
+      }),
     }
   },
   watch:{
     innerSeries:{
       handler(v,from){
-        console.log(v)
         this.$emit('seriesChange',v)
       },
       immediate:false,
@@ -67,26 +72,26 @@ export default {
     comboIndex:{
       get(){
         let result = []
-        let index = this.dataIndex
-        let time = this.time
-        result[0]={
-          "time":time,    //时间
-          "timeType":"var",   // var:变量  const:常量
-          "indicator": index,
-          "indicatorType": "const"
+        try {
+          let index = this.dataIndex
+          let time = this.time
+          result[0]={
+            "time":time[0].varKey,    //时间
+            "timeType":"var",   // var:变量  const:常量
+            "indicator": index[0].indicator,
+            "indicatorType": "const"
+          }
+        }catch (e) {
+          result = []
         }
         return result
       }
     },
   },
   created(){
-    this.indexInit()
+    // this.indexInit()
   },
   methods: {
-    indexInit(){
-      this.dataIndex = this.innerIndex.items[0]?.indicator || ''
-      this.time = this.innerIndex.items[0]?.time || ''
-    },
     seriesInit() {
       let series = []
       this.comboIndex.forEach((item, index) => {

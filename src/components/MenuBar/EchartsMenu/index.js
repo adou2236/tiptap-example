@@ -74,10 +74,8 @@ export default {
         // //绑定值变化，重新绘图
         // chartOptions: {
         //     handler(newVal,oldVal) {
-        //         console.log(newVal,oldVal,newVal===oldVal)
-        //         if(newVal!==oldVal){
+        //         console.log("拷贝纸变化-------------")
         //
-        //         }
         //     },
         //     immediate:false,
         //     deep: true, // 深度监听
@@ -139,8 +137,6 @@ export default {
         somethingChange(key,data) {
             this.chartOptions[key] = data
             this.editor.chain().setChartOption(this.chartOptions).run()
-
-            // this.editor.chain().updateAttributes('custom-chart',{options:this.chartOptions}).run()
             EventBus.$emit('optionChange',this.chartOptions,this.attrs.id)
         },
     }

@@ -163,38 +163,21 @@ const optionsInitSCATTER = function(){
   return {
     ...base,
     "xAxis": {
-      "show": true,
-      "axisLine": {
+      name:'',
+      axisLine: {
         "show": true,
-        "lineStyle": {
-          "color": "",
-          "width": 1,
-          "type": "solid"
-        },
       },
       splitLine: {
         show:false,
-        lineStyle: {
-          color: "",
-          width: 0
-        }
       }
     },
     "yAxis": {
+      name:'',
       axisLine: {
         show: true,
-        lineStyle: {
-          color: "",
-          width: 1,
-          type: "solid"
-        }
       },
       splitLine: {
         show:false,
-        lineStyle: {
-          color: "",
-          width: 0
-        }
       }
     },
     tooltip:{
@@ -215,8 +198,8 @@ const optionsInitSCATTER = function(){
       labPosY:0,//标签位置
       locationPin:false,//凸显某个地区boolean/string
       markLine:[],//辅助线array
-      //分组默认颜色
-      groupColor:chartColor
+      //分组
+      group:[]
     }
   }
 }
@@ -254,6 +237,12 @@ const optionsInitMAP = function(){
     legend:{
       show:false
     },
+    grid: {
+      right: 10,
+      top: 0,
+      bottom: 0,
+      width: '20%'
+    },
     tooltip:{
       show:true,
       formatter: '{b}:{c}',
@@ -262,6 +251,15 @@ const optionsInitMAP = function(){
       backgroundColor: '#FFFFFF',
       borderColor: '#333',
       borderWidth: 0
+    },
+    xAxis: {
+      show:false
+    },
+    yAxis: {
+      type: 'category',
+      show:false,
+      inverse: true,
+      data: []
     },
     geo:{
       map:'china',
@@ -275,6 +273,22 @@ const optionsInitMAP = function(){
       map:'china',
       geoIndex:0,
       data:[]
+    },{
+      type: 'bar',
+      barWidth:0,
+      tooltip:{
+        show:false
+      },
+      itemStyle:{
+        color:'transparent'
+      },
+      label:{
+        show:true,
+        color:'#000',
+        position:'insideLeft',
+        formatter:'{b}:{c}'
+      },
+      data: []
     }],
     "additions":{
       //分组颜色

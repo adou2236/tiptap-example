@@ -1,5 +1,4 @@
 <template>
-  <el-collapse-item title="y轴配置" name="s-6">
     <el-form-item label="坐标名称">
       <el-input v-model="innerYAxis.name"/>
     </el-form-item>
@@ -31,7 +30,6 @@
 <!--    <el-form-item label="分割线宽度">-->
 <!--      <el-input-number v-model="innerYAxis.splitLine.lineStyle.width"></el-input-number>-->
 <!--    </el-form-item>-->
-  </el-collapse-item>
 </template>
 <script>
 import {deepCopy} from "../../../../unit/baseType";

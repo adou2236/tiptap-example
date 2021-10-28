@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item title="数据项配置" name="a-6">
+  <el-form>
     <el-form-item label="地图">
       <el-radio-group v-model="innerIndex.xaxisIndex">
         <el-radio label="provinces">31省</el-radio>
@@ -16,7 +16,8 @@
     <el-form-item label="时间">
       <index-inputer type="variety" v-model="time"></index-inputer>
     </el-form-item>
-  </el-collapse-item>
+  </el-form>
+
 </template>
 
 <script>
@@ -35,9 +36,13 @@ export default {
       innerSeries:deepCopy(this.series),
       innerAdditions:deepCopy(this.additions),
       //横坐标指标
-      xIndex: '',
-      //选择的时间
-      time: ''
+      xIndex: [...new Set(this.index.items.map(item=>item.indicator))].map(obj=>{
+        return {indicator:obj,dataType:'index'}
+      }),
+      //选择的时间变量
+        time: [...new Set(this.index.items.map(item=>item.time))].map(obj=>{
+        return {varKey:obj,dataType:'variety'}
+      }),
     }
   },
   watch:{
@@ -64,13 +69,15 @@ export default {
     comboIndex:{
       get(){
         let result = []
-        if(this.time&&this.xIndex){
+        try {
           result[0] = {
-            "time": this.time,    //时间
+            "time": this.time[0].varKey,    //时间
             "timeType": "var",   // var:变量  const:常量
-            "indicator": this.xIndex,
+            "indicator": this.xIndex[0].indicator,
             "indicatorType": "const"
           }
+        }catch (e) {
+          result = []
         }
         return result
       }
@@ -85,13 +92,13 @@ export default {
     }
   },
   created(){
-    this.indexInit()
+    // this.indexInit()
   },
   methods: {
-    indexInit(){
-      this.xIndex = this.innerIndex.items[0].indicator || ''
-      this.time = this.innerIndex.items[0].time
-    },
+    // indexInit(){
+    //   this.xIndex = this.innerIndex.items[0].indicator || ''
+    //   this.time = this.innerIndex.items[0].time
+    // },
     handleRemove(tag) {
       this.selectedIndex = this.selectedIndex.filter(obj => obj !== tag)
     },
