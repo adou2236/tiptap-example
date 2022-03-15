@@ -1,28 +1,15 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import Vue from 'vue'
+import Vuex from 'vuex'
+import templateStore from './templateStore'
+import reportStore from './reportStore'
 
-Vue.use(Vuex);
+Vue.use(Vuex)
 
-const store = {
-    state: {
-        //当前文本的所有变量
-        vars:{}
 
+export default new Vuex.Store({
+    modules: {
+        templateStore,
+        reportStore,
     },
-    mutations: {
-        //设置全局变量
-        setGlobalVars(state, payload) {
-            let {segmentId,data} = payload
-            state.vars[segmentId] = data
-        },
-        //清空全局变量
-        removeGlobalVars(state) {
-            state.vars = {}
-        },
-
-    },
-    actions: {
-    },
-};
-
-export default new Vuex.Store(store);
+    strict: false
+})

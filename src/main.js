@@ -5,14 +5,15 @@ import router from './router'
 import 'remixicon/fonts/remixicon.css'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import TagMenu from '../src/components/MenuBar/tagMenu/tagMenu'
-import {REPORT_THEME} from "./unit/baseType";
 import * as Echarts from 'echarts'
+import {TEMPLATE_THEME} from "./assets/js/colors";
 
-Echarts.registerTheme('reportTheme',REPORT_THEME)
-Vue.component("TagMenu", TagMenu);
 Vue.use(ElementUI);
 Vue.config.productionTip = false
+Echarts.registerTheme('templateTheme',TEMPLATE_THEME)
+
+
+Vue.prototype.$Echarts = Echarts
 
 
 new Vue({
