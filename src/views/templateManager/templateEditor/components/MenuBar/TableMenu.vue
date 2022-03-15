@@ -69,43 +69,6 @@ export default {
 
   },
   methods:{
-    saveAsTemplate() {
-        this.$prompt("请输入模板描述", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            closeOnClickModal: false,
-            inputValidator: (v) => {
-                let reg = /[`~!?@#$%^&*【】{}（）\[\]<>《》？！，。/；“”‘’,.;"'+-]/.test(v)
-                if (reg) {
-                    return false
-                }
-                if (v.length > 20) {
-                    return false
-                }
-                return !!v && v.trim().length > 0
-            }
-        }).then(async ({ value }) => {
-            this.saveLoading = true
-            let data = {
-                name: value,
-                type: 2,
-                doc: {
-
-                }
-            }
-        })
-    },
-    handleClick2(e){
-      this.stopBubble(e)
-      this.editor.chain().focus().mergeCells().run()
-    },
-    handleClick(e){
-      event.stopPropagation()
-      this.editor.chain().focus().mergeCells().run()
-    },
-    handleChange(v){
-      console.log(v)
-    },
     stopBubble(e) {
       if (e && e.preventDefault && e.stopPropagation) {
         e.stopPropagation();

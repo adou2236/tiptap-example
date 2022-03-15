@@ -10,7 +10,7 @@ function getQueryString(name){
 }
 
 //判断用户是否拥有某项权利，本地无此逻辑，默认为true
-function hasAuthority(target){
+function hasAuthority(){
     return true
 }
 function base64ToBlob(code) {
@@ -70,6 +70,25 @@ function throttle(fn, interval = 500) {
     }
 }
 
+//深拷贝
+const deepClone = function (source) {
+    if (!source || typeof source !== "object") {
+        throw new Error("error arguments", "shallowClone");
+    }
+    var targetObj = source.constructor === Array ? [] : {};
+    for (var keys in source) {
+        if (source.hasOwnProperty(keys)) {
+            if (source[keys] && typeof source[keys] === "object") {
+                targetObj[keys] = source[keys].constructor === Array ? [] : {};
+                targetObj[keys] = deepClone(source[keys]);
+            } else {
+                targetObj[keys] = source[keys];
+            }
+        }
+    }
+    return targetObj;
+}
+
 export {
     getQueryString,
     hasAuthority,
@@ -77,4 +96,5 @@ export {
     blobToBase64,
     debounce,
     throttle,
+    deepClone,
 }

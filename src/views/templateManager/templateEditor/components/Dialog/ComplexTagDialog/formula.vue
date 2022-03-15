@@ -1,20 +1,6 @@
 <template>
   <div class="formula">
     <editor-content class="content-editor" :editor="editor"/>
-    <!-- <div class="top">
-      <div class="top-left"> -->
-        <!-- <inline-editor ref="inline-editor"
-                    class="content-editor"
-                   :value="content"
-                   :range-id="rangeId"
-                   @update="handleUpdate">
-        </inline-editor> -->
-      <!-- </div> -->
-      <!-- <div class="top-right">待完成部分</div> -->
-    <!-- </div> -->
-    <!-- <div class="bottom">
-      测试部分
-    </div> -->
   </div>
 </template>
 

@@ -25,7 +25,6 @@ import Italic from "@/views/templateManager/templateEditor/tools/italic/italic";
 import Underline from "@/views/templateManager/templateEditor/tools/under-line/under-line";
 import CenterLine from "@/views/templateManager/templateEditor/tools/center-line/center-line";
 import FontSize from "@/views/templateManager/templateEditor/tools/font-size/font-size";
-import LineHeight from "@/views/templateManager/templateEditor/tools/line-height/line-height";
 
 //自定义组件
 import { Figure } from "@/views/templateManager/templateEditor/tools/figure/figure";
@@ -93,7 +92,6 @@ export default {
         Italic,
         FontColor,
         FontSize,
-        LineHeight,
         CustomerTag,
         ContentBox,
         CustomChart,

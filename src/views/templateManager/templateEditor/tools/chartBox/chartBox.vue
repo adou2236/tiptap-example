@@ -4,9 +4,6 @@
           :data-entityIds="entityIds"
           v-loading="loading">
     </div>
-    <div v-show="node.attrs.placeholder" class="placeholder" @click="showDialog">
-      +选择图表
-    </div>
     <div v-show="drawFault" class="placeholder">
       数据未发布
     </div>
@@ -30,9 +27,6 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
-    <chart-select v-model="dialogVisible"
-                  @commit="handleChartReplace">
-    </chart-select>
     <details-dialog v-model="detailsVisible" :data="detailsData" @reRender="handleReRender">
       <div ref="innerChart" style="width:100%;height:100%"></div>
     </details-dialog>
@@ -40,13 +34,11 @@
 </template>
 
 <script>
-import {NodeViewWrapper, nodeViewProps, NodeViewContent} from '@tiptap/vue-2'
+import {NodeViewWrapper, nodeViewProps} from '@tiptap/vue-2'
 import * as echarts from 'echarts'
-import {optionsInit} from "../../unit/baseType";
 import '../../assets/china.js'
 import {getChartSeries} from "@/request/templateApi";
 import {EventBus} from "../../unit/eventBus";
-import ChartSelect from "../../components/Dialog/chartSelect";
 import {dataAttach} from "./units";
 import html2canvas from 'html2canvas';
 import { base64ToBlob } from '../../../../../utils/util';
@@ -62,9 +54,7 @@ export default {
     },
   },
   components: {
-    ChartSelect,
     NodeViewWrapper,
-    NodeViewContent,
     DetailsDialog
   },
   data() {
@@ -75,7 +65,6 @@ export default {
       src: '#',
       loading:false,
       complateOptions:{},//附加数据的完整配置
-      dialogVisible:false,
       drawFault:false,
       items:[
         {id:'showDetails',label:'查看详情'},
@@ -210,9 +199,6 @@ export default {
           this.downloadData()
       }
     },
-    showDialog(){
-      this.dialogVisible = true
-    },
     //防抖处理
     flowRequest(options,index,request = true){
       let as = this.debounce(async ()=>{
@@ -238,29 +224,6 @@ export default {
           fn.apply(this, args);
         }, delay);
       };
-    },
-    handleChartReplace(type){
-      let timestamp = (new Date()).getTime()
-      let index = {
-        //图类型
-        type:type,
-        //横坐标类型/饼状图扇叶
-        xaxisType:'region',
-        //横坐标指标(地域或者时间)
-        xaxisIndex:'provinces',
-        //纵坐标指标/饼状图数值
-        items:[]
-      }
-      let attrs = {
-        "index": index,
-        "placeholder":false,
-        "id":`${this.$route.params.id}_${timestamp}`,
-        "src": "",
-        "options": optionsInit(type)
-      }
-      this.node.attrs = attrs
-      // this.editor.chain().focus().updateAttributes('custom-chart',attrs).run()
-      this.dialogVisible = false
     },
     EventBusListener(){
       EventBus.$on("optionChange", async (options,id) => {

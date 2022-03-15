@@ -51,20 +51,20 @@
       </object-editor>
     </div>
 
-    <over-view v-model="dialogVisible" :content="dialogContent"></over-view>
 
     <line-selector v-model="dialogVisible5" @commit="handleAddLine"></line-selector>
 
     <image-upload v-model="dialogVisible2" @imageCommit="imageCommit"></image-upload>
 
-    <my-dialog v-model="dialogVisible3" >
+    <el-dialog :visible="dialogVisible3">
       <vue-json-editor
           v-model="dialogContent"
           :showBtns="false"
           :mode="'code'"
           :modes="['code']"
           lang="zh"/>
-    </my-dialog>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -102,7 +102,6 @@ import ContentBox from "../tools/contentBox/Extension";
 import MenuBar from '../components/MenuBar/MenuBar'
 import ObjectEditor from "../components/objectEditor";
 import ObjectSelector from "../components/objectSelector";
-import myDialog from "../components/Dialog"
 import imageUpload from "../components/Dialog/imageUpload";
 import CustomImage from "../tools/imageBox/Extension"
 import CustomChart from "../tools/chartBox/Extension"
@@ -110,15 +109,12 @@ import FigureChart from '../tools/chartBox/figureChart'
 import FigureTable from '../tools/tableBox/figureTable'
 import TemplateTable from '../tools/tableBox/templateTable'
 import {optionsInit} from "../unit/baseType";
-import ChartSelect from "../components/Dialog/chartSelect";
 
 
 import vueJsonEditor from 'vue-json-editor'
 import {mapMutations,mapState} from 'vuex';
 import {getDoc, templateSave, templateClone} from "@/request/templateApi";
-import OverView from "../components/Dialog/overView/overView";
 import LineSelector from "../components/Dialog/lineSelector";
-import ComplexTagDialog from "../components/Dialog/ComplexTagDialog/index"
 import Header from './Editor/Header.vue'
 import html2canvas from 'html2canvas'
 import { templateApply } from '@/request/templateApi'
@@ -141,16 +137,12 @@ const doubleAxis = require('@/assets/imgs/tiptap/doubleAxis.png')
 export default {
   components: {
     LineSelector,
-    OverView,
-    ChartSelect,
     ObjectSelector,
     ObjectEditor,
     MenuBar,
     EditorContent,
-    myDialog,
     imageUpload,
     vueJsonEditor,
-    ComplexTagDialog,
     Header
   },
   data() {
@@ -243,7 +235,6 @@ export default {
         TableHeader,
         TableCell
       ],
-      dialogVisible:false,
       dialogVisible2:false,
       dialogVisible3:false,
       dialogVisible5:false,
@@ -446,7 +437,7 @@ export default {
       let eles = document.querySelectorAll('.chart') || []
       let i = 0
       let urls = []
-      return new Promise((resolve,reject)=>{
+      return new Promise((resolve)=>{
         async function count(){
           if(i < eles.length-1){
             setTimeout(count)
@@ -601,13 +592,7 @@ export default {
       this.dialogVisible3 = true
       // this.editor.editable = false
     },
-    handleClick2(){
-      const result = this.editor.getHTML()
-      this.dialogContent = result
-      this.dialogVisible = true
-      // this.editor.setEditable(false)
-      // this.editor.editable = false
-    },
+
   }
 }
 </script>

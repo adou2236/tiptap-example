@@ -67,7 +67,7 @@ const deepCopy = function(data) {
     return ret;
   }
 }
-const removeData = function(objAry, key) {
+const removeData = function(objAry) {
   delete objAry.xAxis.data
   objAry.series.forEach(item=>{
     delete item['data']
@@ -322,7 +322,6 @@ const optionsInitSTACK = function(type){
     ],
     //针对复杂组合图的额外属性
     additions:{
-      reverse:false,//是否反转坐标系
       //数据使用多维度，通过xAxis.data的值来改变顺序
       orderIndex:0,//排序指标，默认第一个
       orderType:type == 'time'?'none':'desc',//时间轴的默认不排序
