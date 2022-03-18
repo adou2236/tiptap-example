@@ -1,6 +1,5 @@
 <template>
-  <common-page>
-    <div class="page-main" slot="main">
+  <div class="page-main">
       <div class="top-messages">
         <span>统计共{{ templateList.length }}条</span>
         <!-- <custom-input
@@ -26,7 +25,6 @@
       </div>
     <statistics-dialog v-model="dialogVisible" :data="statisticsData"></statistics-dialog>
     </div>
-  </common-page>
 </template>
 
 <script>

@@ -1,6 +1,5 @@
 <template>
-  <common-page>
-    <div slot="main" class="manual-detail">
+  <div class="manual-detail">
       <div class="left" v-show=" manuals.includes(reportType)" :style="`${isHidden?'width:0px;margin-right:40px':'width:200px'}`">
         <div v-show="!isHidden" class="title">报告目录</div>
         <el-scrollbar v-show="!isHidden" style="height: 100%">
@@ -99,7 +98,6 @@
         </div>
       </div>
     </div>
-  </common-page>
 </template>
 
 <script>
@@ -211,7 +209,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations("reportStore", ["updateIntelligentType"]),
+    ...mapMutations(["updateIntelligentType"]),
     goBack(){
       this.updateIntelligentType(this.reportType)
       this.$router.go(-1)
@@ -487,7 +485,7 @@ export default {
   width: 100%;
   margin: 0 auto;
   background: #ffffff;
-  height: calc(100vh - 65px);
+  height: 100vh;
   min-width: 1200px;
   .left {
     height: 100%;

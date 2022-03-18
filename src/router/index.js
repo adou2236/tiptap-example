@@ -29,12 +29,12 @@ const router =  new Router({
         },
         {
             name: 'templateViewer',
-            path: 'templateManager/viewer/:id?',
+            path: '/templateManager/viewer/:id?',
             component: templateViewer,
         },
         {
             name: 'templateEditor',
-            path: 'templateManager/editor/:id',
+            path: '/templateManager/editor/:id',
             component: templateEditor,
         }
     ],

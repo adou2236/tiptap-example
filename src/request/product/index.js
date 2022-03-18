@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from '../Axios'
 const head = '/api'
 
 //获取区域评级列表

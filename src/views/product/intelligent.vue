@@ -114,7 +114,7 @@ export default {
     this.baseData = await this.listInit()
   },
   methods: {
-    ...mapMutations("reportStore", ["updateIntelligentType"]),
+    ...mapMutations(["updateIntelligentType"]),
     regionSelect(v){
       if(v&&this.activeReportType.type == '1'){
         this.reportSubmit('1',v)

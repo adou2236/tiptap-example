@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from './Axios'
 import store from '../store'
 const head = '/api'
 

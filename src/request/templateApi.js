@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from './Axios'
 import store from '../store'
 import { getQueryString } from '../utils/util'
 const head = '/doc'
